@@ -10,16 +10,13 @@ interface TransactionItemProps {
 
 const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, isLastInGroup = false }) => {
   // Use a consistent gray color for all icon backgrounds to match the inspiration
-  const iconBgColor = 'bg-neutral-700'; // Subtle gray that matches the inspiration
-  
-  // Determine which icon to use - merchant specific or category fallback
-  const iconName = transaction.merchant?.toLowerCase() || transaction.icon;
+  const iconBgColor = 'bg-neutral-700'; // Closer to #3b3b3b // Subtle gray that matches the inspiration
 
   return (
     <div className={`flex items-center justify-between py-3 hover:bg-neutral-700/30 px-4 rounded-lg transition-colors ${!isLastInGroup ? 'border-b border-gray-700/30' : ''}`}>
       <div className="flex items-center">
         <div className={`${iconBgColor} w-10 h-10 rounded-full flex items-center justify-center mr-3`}>
-          <Icon name={iconName} className="w-5 h-5 text-white" />
+          <Icon name={transaction.icon} className="w-5 h-5 text-white" />
         </div>
         <div>
           <div className="font-medium tracking-tight text-white">{transaction.merchant}</div>
@@ -39,3 +36,4 @@ const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, isLastIn
 };
 
 export default TransactionItem;
+

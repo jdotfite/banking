@@ -1,4 +1,4 @@
-export type CardType = {
+﻿export type CardType = {
   id: string;
   type: 'VISA' | 'MASTERCARD' | 'AMEX';
   number: string;
@@ -15,8 +15,7 @@ export type TransactionType = {
   isIncoming: boolean;
   timestamp: string;
   message?: string;
-  icon: string; // Updated to allow any icon name
-  category?: string; // Optional category for fallback icons
+  icon: 'shopping' | 'transfer' | 'subscription' | 'entertainment';
 };
 
 export type TransactionDateGroup = {

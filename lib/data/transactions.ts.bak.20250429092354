@@ -13,7 +13,6 @@ export const transactions: TransactionDateGroup[] = [
         isIncoming: false,
         timestamp: '1:22PM',
         icon: 'shopping',
-        category: 'clothes',
       },
       {
         id: '2',
@@ -31,8 +30,7 @@ export const transactions: TransactionDateGroup[] = [
         amount: 18.50,
         isIncoming: false,
         timestamp: '10:15AM',
-        icon: 'coffee',
-        category: 'dining',
+        icon: 'shopping',
       },
     ],
   },
@@ -47,7 +45,6 @@ export const transactions: TransactionDateGroup[] = [
         isIncoming: false,
         timestamp: '12:45PM',
         icon: 'subscription',
-        category: 'entertainment',
       },
       {
         id: '5',
@@ -60,13 +57,12 @@ export const transactions: TransactionDateGroup[] = [
       },
       {
         id: '6',
-        merchant: 'Uber',
-        location: 'Downtown Harrisburg',
-        amount: 35.50,
-        isIncoming: false,
-        timestamp: '9:10AM',
-        icon: 'car',
-        category: 'transport',
+              merchant: 'Uber',
+      location: 'Downtown Harrisburg',
+      amount: 35.50,
+      isIncoming: false,
+      timestamp: '9:10AM',
+      icon: 'car',
       },
     ],
   },
@@ -81,7 +77,6 @@ export const transactions: TransactionDateGroup[] = [
         isIncoming: false,
         timestamp: '3:20PM',
         icon: 'subscription',
-        category: 'entertainment',
       },
       {
         id: '8',
@@ -91,7 +86,6 @@ export const transactions: TransactionDateGroup[] = [
         isIncoming: false,
         timestamp: '11:30AM',
         icon: 'shopping',
-        category: 'shopping',
       },
       {
         id: '9',
@@ -101,7 +95,6 @@ export const transactions: TransactionDateGroup[] = [
         isIncoming: true,
         timestamp: '9:00AM',
         icon: 'transfer',
-        category: 'income',
       },
     ],
   },
@@ -110,3 +103,4 @@ export const transactions: TransactionDateGroup[] = [
 export const getTransactions = (): TransactionDateGroup[] => {
   return transactions;
 };
+

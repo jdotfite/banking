@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion } from 'framer-motion';
+import { CreditCard as CreditCardIcon, Settings } from 'lucide-react';
 import { getDefaultCard } from '@/lib/data/cards';
 import { getTransactions } from '@/lib/data/transactions';
-import CreditCard from '../ui/card/CreditCard'; 
+import CreditCardComponent from '../ui/card/CreditCard'; 
 import TransactionContainer from '../ui/transactions/TransactionContainer';
 import Header from '../ui/navigation/Header';
 import LoadingSpinner from '../ui/common/LoadingSpinner';
@@ -103,7 +104,7 @@ const Home: React.FC = () => {
             delay: 0.1 
           }}
         >
-          <CreditCard 
+          <CreditCardComponent 
             card={card} 
             balance={balance} 
             showInfoState={[showInfo, setShowInfo]}
@@ -114,18 +115,7 @@ const Home: React.FC = () => {
         <div ref={payButtonsRef} className="flex gap-4 mb-4 z-10">
           <button className="flex-1 bg-[#212121] text-white py-3 px-4 rounded-full flex items-center">
             <div className="bg-card-red p-2 rounded-full mr-3">
-              <svg 
-                className="w-5 h-5" 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="currentColor" 
-                strokeWidth="2" 
-                strokeLinecap="round" 
-                strokeLinejoin="round"
-              >
-                <rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect>
-                <line x1="1" y1="10" x2="23" y2="10"></line>
-              </svg>
+              <CreditCardIcon className="w-5 h-5" />
             </div>
             Pay
           </button>
@@ -134,18 +124,7 @@ const Home: React.FC = () => {
             onClick={handleManageClick}
           >
             <div className="bg-card-red p-2 rounded-full mr-3">
-              <svg 
-                className="w-5 h-5" 
-                viewBox="0 0 24 24" 
-                fill="none" 
-                stroke="currentColor" 
-                strokeWidth="2" 
-                strokeLinecap="round" 
-                strokeLinejoin="round"
-              >
-                <circle cx="12" cy="12" r="3"></circle>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
-              </svg>
+              <Settings className="w-5 h-5" />
             </div>
             Manage
           </button>
