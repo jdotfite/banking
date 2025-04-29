@@ -1,6 +1,6 @@
 // app/layout.tsx
 import type { Metadata } from 'next';
-import { Outfit } from 'next/font/google';
+import { Outfit } from 'next/font/google'; // Changed from @next/font to next/font
 import './globals.css';
 import { ThemeProvider } from '@/lib/context/ThemeContext';
 import AppContainer from '@/components/layout/AppContainer';
