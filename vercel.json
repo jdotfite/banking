@@ -1,0 +1,10 @@
+{
+    "buildCommand": "next build",
+    "installCommand": "npm install",
+    "framework": "nextjs",
+    "rewrites": [
+      { "source": "/(.*)", "destination": "/" }
+    ],
+    "cleanUrls": true,
+    "trailingSlash": false
+  }
