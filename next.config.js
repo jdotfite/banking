@@ -11,8 +11,6 @@ const nextConfig = {
       }
     ];
   },
-  // This ensures proper Vercel deployment
-  output: 'standalone'
 };
 
 module.exports = nextConfig;
