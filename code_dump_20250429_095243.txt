@@ -1,0 +1,3137 @@
+﻿PROJECT ANALYSIS
+Generated: 04/29/2025 09:52:43
+Directory: C:\_websites\banking
+===========================================
+ENVIRONMENT INFORMATION
+===========================================
+PowerShell Version: 5.1.19041.5737
+OS: Microsoft Windows 10 Pro
+Computer Name: OFFICE
+
+============================================================
+
+FILE CONTENTS:
+
+============================================================
+
+FILE: .\.gitignore
+SIZE: 0.75 KB
+LAST MODIFIED: 04/29/2025 08:45:54
+
+# â€”â€”â€”â€”â€”â€” Node & package managers â€”â€”â€”â€”â€”â€”
+/node_modules/
+/.pnp/
+/.pnp.js
+
+# â€”â€”â€”â€”â€”â€” Next.js build output â€”â€”â€”â€”â€”â€”
+/.next/
+/out/
+/build/
+
+# â€”â€”â€”â€”â€”â€” Static export artifacts â€”â€”â€”â€”â€”â€”
+/.next/static/
+/out/_next/static/
+
+# â€”â€”â€”â€”â€”â€” Env files (never commit secrets) â€”â€”â€”â€”â€”â€”
+.env
+.env.*.local
+
+# â€”â€”â€”â€”â€”â€” Logs & debug â€”â€”â€”â€”â€”â€”
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# â€”â€”â€”â€”â€”â€” Coverage reports â€”â€”â€”â€”â€”â€”
+/coverage/
+
+# â€”â€”â€”â€”â€”â€” Editor + OS cruft â€”â€”â€”â€”â€”â€”
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# â€”â€”â€”â€”â€”â€” Backup & swap files â€”â€”â€”â€”â€”â€”
+*.bak
+*.swp
+*~
+*.orig
+
+
+============================================================
+
+FILE: .\.nojekyll
+SIZE: 0.12 KB
+LAST MODIFIED: 04/29/2025 09:42:29
+
+# This file ensures that GitHub Pages doesn't use Jekyll processing
+# It can also help with certain Vercel deployments
+
+============================================================
+
+FILE: .\middleware.ts
+SIZE: 0.33 KB
+LAST MODIFIED: 04/29/2025 09:41:04
+
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|images|api).*)',
+  ],
+};
+
+============================================================
+
+FILE: .\next-env.d.ts
+SIZE: 0.2 KB
+LAST MODIFIED: 04/25/2025 14:58:42
+
+/// <reference types="next" />
+/// <reference types="next/image-types/global" />
+
+// NOTE: This file should not be edited
+// see https://nextjs.org/docs/basic-features/typescript for more information.
+
+
+============================================================
+
+FILE: .\next.config.js
+SIZE: 0.34 KB
+LAST MODIFIED: 04/29/2025 09:40:59
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  swcMinify: true,
+  async redirects() {
+    return [
+      {
+        source: '/home',
+        destination: '/',
+        permanent: true,
+      }
+    ];
+  },
+  // This ensures proper Vercel deployment
+  output: 'standalone'
+};
+
+module.exports = nextConfig;
+
+============================================================
+
+FILE: .\package.json
+SIZE: 0.89 KB
+LAST MODIFIED: 04/29/2025 09:45:55
+
+{
+  "name": "banking-app",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@use-gesture/react": "^10.3.1",
+    "framer-motion": "^12.9.2",
+    "lucide-react": "^0.263.1",
+    "next": "^14.0.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-spring": "^9.7.5",
+    "react-spring-bottom-sheet": "^3.4.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.31",
+    "@types/react": "^18.3.20",
+    "@types/react-dom": "^18.3.6",
+    "autoprefixer": "^10.4.21",
+    "eslint": "^8.57.1",
+    "eslint-config-next": "^14.2.28",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^3.4.17",
+    "typescript": "^5.8.3"
+  },
+  "main": "next.config.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": ""
+}
+
+============================================================
+
+FILE: .\postcss.config.js
+SIZE: 0.08 KB
+LAST MODIFIED: 04/25/2025 14:54:07
+
+module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}
+
+
+============================================================
+
+FILE: .\tailwind.config.js
+SIZE: 0.98 KB
+LAST MODIFIED: 04/25/2025 17:08:47
+
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    fontFamily: {
+      outfit: ['var(--font-outfit)'],
+    },
+    extend: {
+      colors: {
+        card: {
+          red: '#E53E3E', // Slightly adjusted red
+          redLight: '#F56565', // For gradient
+          redDark: '#C53030', // For gradient
+        },
+        app: {
+        customGray: '#1A1A1A', // Exact gray from example
+          black: '#121212', // Pure black for background
+          darkGray: '#151515', // For transaction container
+          mediumGray: '#2D3748', // For inactive icons
+          lightGray: '#718096', // For text
+          green: '#48BB78', // For positive transactions
+        },
+      },
+      boxShadow: {
+        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1)',
+      }
+    },
+  },
+  plugins: [],
+};
+
+
+
+
+
+
+
+============================================================
+
+FILE: .\tailwind.config.js.bak
+SIZE: 0.33 KB
+LAST MODIFIED: 04/25/2025 14:49:35
+
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    extend: {
+      colors: {
+        card: {
+          red: '#e53935',
+        },
+      },
+    },
+  },
+  plugins: [],
+};
+
+
+============================================================
+
+FILE: .\tsconfig.json
+SIZE: 0.63 KB
+LAST MODIFIED: 04/25/2025 14:49:36
+
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": ["./*"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}
+
+
+============================================================
+
+FILE: .\vercel.json
+SIZE: 0.23 KB
+LAST MODIFIED: 04/29/2025 09:40:46
+
+{
+    "buildCommand": "next build",
+    "installCommand": "npm install",
+    "framework": "nextjs",
+    "rewrites": [
+      { "source": "/(.*)", "destination": "/" }
+    ],
+    "cleanUrls": true,
+    "trailingSlash": false
+  }
+
+============================================================
+
+FILE: .\app\globals.css
+SIZE: 3.4 KB
+LAST MODIFIED: 04/25/2025 17:10:45
+
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+
+@tailwind base;
+
+:root {
+  --font-outfit: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-outfit);
+  }
+}
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  background-color: black;
+  color: white;
+  font-family: "Outfit", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: #27272a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 4px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Animation utilities */
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.5s ease-out;
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Transition utilities */
+.transition-height {
+  transition-property: height;
+}
+
+/* Custom card styling */
+.credit-card {
+  transition: all 0.3s ease;
+  backface-visibility: hidden;
+}
+
+.credit-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom handle styling */
+.drag-handle {
+  touch-action: none;
+  user-select: none;
+}
+
+/* Smoother transitions */
+.transition-all {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Custom card styling */
+.credit-card {
+  transition: all 0.3s ease;
+  backface-visibility: hidden;
+}
+
+.credit-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom handle styling */
+.drag-handle {
+  touch-action: none;
+  user-select: none;
+}
+
+/* Smoother transitions */
+.transition-all {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Transaction container overlay */
+.transaction-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 15;
+  pointer-events: none;
+}
+
+/* Improved drag handle */
+.drag-handle {
+  width: 40px;
+  height: 4px;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  margin: 8px auto;
+  cursor: grab;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+/* Stylized cutout handle for transaction container */
+.drag-handle-container {
+  position: relative;
+  width: 100%;
+  height: 20px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  margin-top: -10px;
+}
+
+
+.drag-handle {
+  width: 40px;
+  height: 5px;
+  background-color: #212121; /* Transaction area color */
+  border-radius: 2.5px;
+  position: relative;
+  cursor: grab;
+  margin-top: 7px;
+}
+
+
+.drag-handle-container:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 20px;
+  background-color: #121212; /* App background color */
+  border-bottom-left-radius: 50px;
+  border-bottom-right-radius: 50px;
+}
+
+/* When dragging */
+.drag-handle:active {
+  cursor: grabbing;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+
+
+
+
+
+
+============================================================
+
+FILE: .\app\layout.tsx
+SIZE: 0.93 KB
+LAST MODIFIED: 04/29/2025 09:45:18
+
+// app/layout.tsx
+import type { Metadata } from 'next';
+import { Outfit } from 'next/font/google'; // Changed from @next/font to next/font
+import './globals.css';
+import { ThemeProvider } from '@/lib/context/ThemeContext';
+import AppContainer from '@/components/layout/AppContainer';
+
+// Properly load and configure the Outfit font
+const outfit = Outfit({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600'],
+  display: 'swap',
+  variable: '--font-outfit',
+});
+
+export const metadata: Metadata = {
+  title: 'Credit Card App',
+  description: 'A modern credit card app UI',
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en" className={outfit.variable}>
+      <body className={`${outfit.className} bg-gray-900 min-h-screen font-outfit`}>
+        <ThemeProvider>
+          <AppContainer>{children}</AppContainer>
+        </ThemeProvider>
+      </body>
+    </html>
+  );
+}
+
+============================================================
+
+FILE: .\app\page.tsx
+SIZE: 0.62 KB
+LAST MODIFIED: 04/25/2025 16:45:26
+
+'use client';
+
+import React from 'react';
+import Home from '@/components/screens/Home';
+import BottomNav from '@/components/ui/navigation/BottomNav';
+import { NavItemType } from '@/lib/types';
+
+const navItems: NavItemType[] = [
+  { name: 'Home', icon: 'home', href: '/' },
+  { name: 'Insights', icon: 'insights', href: '/insights' },
+  { name: 'Add', icon: 'add', href: '/new' },
+  { name: 'Wallet', icon: 'wallet', href: '/wallet' },
+  { name: 'More', icon: 'more', href: '/more' },
+];
+
+export default function Page() {
+  return (
+    <main className="relative min-h-screen">
+      <Home />
+      <BottomNav />
+    </main>
+  );
+}
+
+
+
+============================================================
+
+FILE: .\app\deposit\page.tsx
+SIZE: 0.39 KB
+LAST MODIFIED: 04/25/2025 16:45:26
+
+'use client';
+
+import React from 'react';
+import BottomNav from '@/components/ui/navigation/BottomNav';
+
+export default function DepositPage() {
+  return (
+    <main className="relative min-h-screen">
+      <div className="flex items-center justify-center h-screen bg-black text-white">
+        <h1 className="text-2xl font-bold">Mobile Deposit</h1>
+      </div>
+      <BottomNav />
+    </main>
+  );
+}
+
+
+============================================================
+
+FILE: .\app\insights\page.tsx
+SIZE: 0.64 KB
+LAST MODIFIED: 04/25/2025 16:45:26
+
+'use client';
+
+import React from 'react';
+import Insights from '@/components/screens/Insights';
+import BottomNav from '@/components/ui/navigation/BottomNav';
+import { NavItemType } from '@/lib/types';
+
+const navItems: NavItemType[] = [
+  { name: 'Home', icon: 'home', href: '/' },
+  { name: 'Insights', icon: 'insights', href: '/insights' },
+  { name: 'Add', icon: 'add', href: '/new' },
+  { name: 'Wallet', icon: 'wallet', href: '/wallet' },
+  { name: 'More', icon: 'more', href: '/more' },
+];
+
+export default function InsightsPage() {
+  return (
+    <main className="relative min-h-screen">
+      <Insights />
+      <BottomNav />
+    </main>
+  );
+}
+
+
+
+============================================================
+
+FILE: .\app\more\page.tsx
+SIZE: 0.62 KB
+LAST MODIFIED: 04/25/2025 16:45:26
+
+'use client';
+
+import React from 'react';
+import More from '@/components/screens/More';
+import BottomNav from '@/components/ui/navigation/BottomNav';
+import { NavItemType } from '@/lib/types';
+
+const navItems: NavItemType[] = [
+  { name: 'Home', icon: 'home', href: '/' },
+  { name: 'Insights', icon: 'insights', href: '/insights' },
+  { name: 'Add', icon: 'add', href: '/new' },
+  { name: 'Wallet', icon: 'wallet', href: '/wallet' },
+  { name: 'More', icon: 'more', href: '/more' },
+];
+
+export default function MorePage() {
+  return (
+    <main className="relative min-h-screen">
+      <More />
+      <BottomNav />
+    </main>
+  );
+}
+
+
+
+============================================================
+
+FILE: .\app\new\page.tsx
+SIZE: 0.65 KB
+LAST MODIFIED: 04/25/2025 16:45:26
+
+'use client';
+
+import React from 'react';
+import NewOperation from '@/components/screens/NewOperation';
+import BottomNav from '@/components/ui/navigation/BottomNav';
+import { NavItemType } from '@/lib/types';
+
+const navItems: NavItemType[] = [
+  { name: 'Home', icon: 'home', href: '/' },
+  { name: 'Insights', icon: 'insights', href: '/insights' },
+  { name: 'Add', icon: 'add', href: '/new' },
+  { name: 'Wallet', icon: 'wallet', href: '/wallet' },
+  { name: 'More', icon: 'more', href: '/more' },
+];
+
+export default function NewPage() {
+  return (
+    <main className="relative min-h-screen">
+      <NewOperation />
+      <BottomNav />
+    </main>
+  );
+}
+
+
+
+============================================================
+
+FILE: .\app\transfer\page.tsx
+SIZE: 0.39 KB
+LAST MODIFIED: 04/25/2025 16:45:26
+
+'use client';
+
+import React from 'react';
+import BottomNav from '@/components/ui/navigation/BottomNav';
+
+export default function TransferPage() {
+  return (
+    <main className="relative min-h-screen">
+      <div className="flex items-center justify-center h-screen bg-black text-white">
+        <h1 className="text-2xl font-bold">Transfer</h1>
+      </div>
+      <BottomNav />
+    </main>
+  );
+}
+
+
+============================================================
+
+FILE: .\app\wallet\page.tsx
+SIZE: 0.63 KB
+LAST MODIFIED: 04/25/2025 16:45:26
+
+'use client';
+
+import React from 'react';
+import Wallet from '@/components/screens/Wallet';
+import BottomNav from '@/components/ui/navigation/BottomNav';
+import { NavItemType } from '@/lib/types';
+
+const navItems: NavItemType[] = [
+  { name: 'Home', icon: 'home', href: '/' },
+  { name: 'Insights', icon: 'insights', href: '/insights' },
+  { name: 'Add', icon: 'add', href: '/new' },
+  { name: 'Wallet', icon: 'wallet', href: '/wallet' },
+  { name: 'More', icon: 'more', href: '/more' },
+];
+
+export default function WalletPage() {
+  return (
+    <main className="relative min-h-screen">
+      <Wallet />
+      <BottomNav />
+    </main>
+  );
+}
+
+
+
+============================================================
+
+FILE: .\components\layout\AppContainer.tsx
+SIZE: 1.39 KB
+LAST MODIFIED: 04/26/2025 14:25:50
+
+// components/layout/AppContainer.tsx
+'use client';
+
+import React from 'react';
+import { useTheme } from '@/lib/context/ThemeContext';
+
+interface AppContainerProps {
+  children: React.ReactNode;
+}
+
+const AppContainer: React.FC<AppContainerProps> = ({ children }) => {
+  const { theme } = useTheme();
+  
+  return (
+    <div className="min-h-screen flex justify-center bg-neutral-800">
+      {/* Main container with proper constraints */}
+      <div className="w-full relative min-h-screen bg-app-black text-white overflow-hidden
+        md:max-w-sm lg:max-w-md xl:max-w-md 
+        md:my-5 lg:my-10 xl:my-10
+        md:rounded-2xl lg:rounded-2xl xl:rounded-2xl
+        md:shadow-2xl lg:shadow-2xl xl:shadow-2xl
+        md:border md:border-gray-800 lg:border lg:border-gray-800 xl:border xl:border-gray-800
+        md:min-h-[650px] lg:min-h-[750px] xl:min-h-[750px]
+        md:max-h-[90vh] lg:max-h-[90vh] xl:max-h-[90vh]
+        transition-all duration-300"
+      >
+        {/* Phone frame styling for desktop view */}
+        <div className="hidden md:block absolute top-3 w-28 h-6 bg-black rounded-b-2xl left-1/2 transform -translate-x-1/2"></div>
+        
+        {/* Content with proper padding for bottom elements */}
+        <div className="md:mt-6 pb-16 md:pb-0 h-full flex flex-col">
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default AppContainer;
+
+============================================================
+
+FILE: .\components\screens\Home.tsx
+SIZE: 4.71 KB
+LAST MODIFIED: 04/29/2025 09:27:21
+
+'use client';
+
+import React, { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
+import { CreditCard as CreditCardIcon, Settings } from 'lucide-react';
+import { getDefaultCard } from '@/lib/data/cards';
+import { getTransactions } from '@/lib/data/transactions';
+import CreditCardComponent from '../ui/card/CreditCard'; 
+import TransactionContainer from '../ui/transactions/TransactionContainer';
+import Header from '../ui/navigation/Header';
+import LoadingSpinner from '../ui/common/LoadingSpinner';
+
+const Home: React.FC = () => {
+  const card = getDefaultCard();
+  const transactions = getTransactions();
+  const [isLoading, setIsLoading] = useState(true);
+  const [showInfo, setShowInfo] = useState(false);
+  const [balance] = useState(25552.92);
+  const payButtonsRef = useRef<HTMLDivElement>(null);
+  const [buttonBottomPosition, setButtonBottomPosition] = useState(0);
+  const [isTransactionCollapsed, setIsTransactionCollapsed] = useState(false);
+  const isManageClickRef = useRef(false);
+
+  // Loading simulation
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 800);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // When page loads or card info is toggled, calculate positions
+  useEffect(() => {
+    if (!isLoading) {
+      const calculatePositions = () => {
+        if (payButtonsRef.current) {
+          const rect = payButtonsRef.current.getBoundingClientRect();
+          if (rect.bottom > 0) {
+            setButtonBottomPosition(rect.bottom);
+          }
+        }
+      };
+      
+      // Calculate immediately
+      calculatePositions();
+      
+      // And after a short delay to account for animations
+      const animationDelay = setTimeout(calculatePositions, 350);
+      
+      // Also listen for window resize events
+      window.addEventListener('resize', calculatePositions);
+      
+      return () => {
+        clearTimeout(animationDelay);
+        window.removeEventListener('resize', calculatePositions);
+      };
+    }
+  }, [isLoading, showInfo]); // Recalculate when info is toggled
+
+  // Handle manage button click with debouncing
+  const handleManageClick = () => {
+    // Set a flag to indicate this is from manage button
+    isManageClickRef.current = true;
+    
+    // Toggle the state
+    setIsTransactionCollapsed(!isTransactionCollapsed);
+    
+    // Clear the flag after a delay
+    setTimeout(() => {
+      isManageClickRef.current = false;
+    }, 100);
+  };
+
+  // Handle collapse state changes from the container
+  const handleCollapseChange = (collapsed: boolean) => {
+    // Only update if coming from the container (not from manage button)
+    if (!isManageClickRef.current && collapsed !== isTransactionCollapsed) {
+      setIsTransactionCollapsed(collapsed);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-app-black">
+        <LoadingSpinner size="large" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative min-h-screen bg-app-black text-white animate-fade-in">
+      <Header userName="Jess" />
+      
+      <div className="px-5">
+        {/* Card with simple animation */}
+        <motion.div 
+          className="mb-4"
+          initial={{ y: 50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ 
+            type: "spring", 
+            damping: 25, 
+            stiffness: 120,
+            delay: 0.1 
+          }}
+        >
+          <CreditCardComponent 
+            card={card} 
+            balance={balance} 
+            showInfoState={[showInfo, setShowInfo]}
+          />
+        </motion.div>
+        
+        {/* Pay/Manage buttons with ref for positioning */}
+        <div ref={payButtonsRef} className="flex gap-4 mb-4 z-10">
+          <button className="flex-1 bg-[#212121] text-white py-3 px-4 rounded-full flex items-center">
+            <div className="bg-card-red p-2 rounded-full mr-3">
+              <CreditCardIcon className="w-5 h-5" />
+            </div>
+            Pay
+          </button>
+          <button 
+            className="flex-1 bg-[#212121] text-white py-3 px-4 rounded-full flex items-center"
+            onClick={handleManageClick}
+          >
+            <div className="bg-card-red p-2 rounded-full mr-3">
+              <Settings className="w-5 h-5" />
+            </div>
+            Manage
+          </button>
+        </div>
+      </div>
+      
+      {/* Only render TransactionContainer when we have a valid position */}
+      {buttonBottomPosition > 0 && (
+        <TransactionContainer 
+          transactionGroups={transactions}
+          buttonBottomPosition={buttonBottomPosition}
+          isCollapsed={isTransactionCollapsed}
+          onCollapseChange={handleCollapseChange}
+        />
+      )}
+    </div>
+  );
+};
+
+export default Home;
+
+============================================================
+
+FILE: .\components\screens\Insights.tsx
+SIZE: 0.26 KB
+LAST MODIFIED: 04/25/2025 14:48:00
+
+import React from 'react';
+
+const Insights: React.FC = () => {
+  return (
+    <div className="flex items-center justify-center h-screen bg-black text-white">
+      <h1 className="text-2xl font-bold">Insights View</h1>
+    </div>
+  );
+};
+
+export default Insights;
+
+
+============================================================
+
+FILE: .\components\screens\More.tsx
+SIZE: 0.25 KB
+LAST MODIFIED: 04/25/2025 14:48:29
+
+import React from 'react';
+
+const More: React.FC = () => {
+  return (
+    <div className="flex items-center justify-center h-screen bg-black text-white">
+      <h1 className="text-2xl font-bold">More View</h1>
+    </div>
+  );
+};
+
+export default More;
+
+
+============================================================
+
+FILE: .\components\screens\NewOperation.tsx
+SIZE: 0.27 KB
+LAST MODIFIED: 04/25/2025 14:48:00
+
+import React from 'react';
+
+const NewOperation: React.FC = () => {
+  return (
+    <div className="flex items-center justify-center h-screen bg-black text-white">
+      <h1 className="text-2xl font-bold">New Operation View</h1>
+    </div>
+  );
+};
+
+export default NewOperation;
+
+
+============================================================
+
+FILE: .\components\screens\Wallet.tsx
+SIZE: 0.25 KB
+LAST MODIFIED: 04/25/2025 14:48:29
+
+import React from 'react';
+
+const Wallet: React.FC = () => {
+  return (
+    <div className="flex items-center justify-center h-screen bg-black text-white">
+      <h1 className="text-2xl font-bold">Wallet View</h1>
+    </div>
+  );
+};
+
+export default Wallet;
+
+
+============================================================
+
+FILE: .\components\ui\card\CardInfo.tsx
+SIZE: 0 KB
+LAST MODIFIED: 04/25/2025 14:43:16
+
+
+============================================================
+
+FILE: .\components\ui\card\CardSelector.tsx
+SIZE: 1.44 KB
+LAST MODIFIED: 04/25/2025 15:06:36
+
+'use client';
+
+import React, { useState } from 'react';
+import { CardType } from '@/lib/types';
+import CreditCard from './CreditCard';
+
+interface CardSelectorProps {
+  cards: CardType[];
+  activeCardId: string;
+  onCardChange: (cardId: string) => void;
+}
+
+const CardSelector: React.FC<CardSelectorProps> = ({ cards, activeCardId, onCardChange }) => {
+  const [currentIndex, setCurrentIndex] = useState(
+    cards.findIndex(card => card.id === activeCardId) || 0
+  );
+
+  const handleCardChange = (index: number) => {
+    setCurrentIndex(index);
+    onCardChange(cards[index].id);
+  };
+
+  return (
+    <div className="w-full">
+      <div className="relative overflow-hidden">
+        {/* Current card */}
+        <div className="transition-all duration-300 ease-in-out">
+          <CreditCard card={cards[currentIndex]} />
+        </div>
+        
+        {/* Card indicators */}
+        {cards.length > 1 && (
+          <div className="flex justify-center mt-4 space-x-2">
+            {cards.map((card, index) => (
+              <button
+                key={card.id}
+                className={`w-2 h-2 rounded-full transition-all ${
+                  index === currentIndex ? 'bg-white scale-125' : 'bg-gray-600'
+                }`}
+                onClick={() => handleCardChange(index)}
+                aria-label={`Select card ${index + 1}`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default CardSelector;
+
+
+
+============================================================
+
+FILE: .\components\ui\card\CreditCard.tsx
+SIZE: 3.29 KB
+LAST MODIFIED: 04/29/2025 09:27:33
+
+// components/ui/card/CreditCard.tsx
+'use client';
+
+import React, { useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Info } from 'lucide-react';
+import { CardType } from '@/lib/types';
+
+interface CreditCardProps {
+  card: CardType;
+  balance?: number;
+  showInfoState?: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
+}
+
+const CreditCard: React.FC<CreditCardProps> = ({ 
+  card, 
+  balance = 25552.92,
+  showInfoState
+}) => {
+  // Use local or parent-controlled state for showInfo
+  const [showInfo, setShowInfo] = showInfoState || React.useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  return (
+    <div className="w-full" ref={cardRef}>
+      {/* Credit Card with balance directly inside */}
+      <div
+        className="relative w-full rounded-xl overflow-hidden shadow-lg transform transition-all duration-300 hover:scale-[1.01]"
+        style={{
+          backgroundColor: '#7b2528', // Flat red color
+        }}
+      >
+        {/* Card content */}
+        <div className="p-5 flex flex-col">
+          {/* Card top section with balance and info button */}
+          <div className="flex justify-between items-start">
+            <div className="text-white">
+              <p className="text-gray-300 text-sm">Your Balance</p>
+              <h1 className="text-white text-4xl font-semibold">${balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</h1>
+            </div>
+            <button
+              onClick={() => setShowInfo(!showInfo)}
+              className="bg-white/30 px-3 py-1 rounded-full text-white text-xs flex items-center transition-all hover:bg-white/40"
+            >
+              <Info className="w-4 h-4 mr-1" />
+              Show info
+            </button>
+          </div>
+          
+          {/* Additional card info - Animated slide down */}
+          <AnimatePresence>
+            {showInfo && (
+              <motion.div 
+                className="mt-4 text-white"
+                initial={{ height: 0, opacity: 0, marginTop: 0 }}
+                animate={{ height: "auto", opacity: 1, marginTop: 16 }}
+                exit={{ height: 0, opacity: 0, marginTop: 0 }}
+                transition={{ 
+                  duration: 0.3, 
+                  ease: "easeInOut"
+                }}
+              >
+                <div className="grid grid-cols-2 gap-1">
+                  <div className="text-gray-300">Available Credit:</div>
+                  <div className="text-right font-medium">$3,914.65</div>
+                  
+                  <div className="text-gray-300">Minimum Payment:</div>
+                  <div className="text-right font-medium">$0.00</div>
+                  
+                  <div className="text-gray-300">Due Date:</div>
+                  <div className="text-right font-medium">5/25/2025</div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          
+          {/* VISA bar at bottom */}
+          <div className="relative mt-4 -mx-5 -mb-5 bg-black/40 py-3 px-5 flex justify-between items-center">
+            <div className="text-white text-xl font-bold">VISA</div>
+            <div className="text-white text-base">â€¢â€¢â€¢â€¢ 9891</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CreditCard;
+
+============================================================
+
+FILE: .\components\ui\common\CustomBottomSheet.tsx
+SIZE: 3.59 KB
+LAST MODIFIED: 04/28/2025 12:28:55
+
+'use client';
+
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useSpring, useMotionValue } from 'framer-motion';
+
+interface CustomBottomSheetProps {
+  children: React.ReactNode;
+  snapPoints: number[];
+  defaultSnap?: number;
+  expandOnContentDrag?: boolean;
+  onSnap?: (index: number) => void;
+}
+
+const CustomBottomSheet: React.FC<CustomBottomSheetProps> = ({
+  children,
+  snapPoints,
+  defaultSnap = 0,
+  expandOnContentDrag = false,
+  onSnap,
+}) => {
+  const [currentSnap, setCurrentSnap] = useState(defaultSnap);
+  const [isDragging, setIsDragging] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const y = useMotionValue(0);
+  
+  // Update height whenever snap changes
+  useEffect(() => {
+    if (snapPoints && snapPoints.length > currentSnap) {
+      y.set(0); // Reset drag position
+    }
+  }, [currentSnap, snapPoints, y]);
+
+  // Find closest snap point on drag end
+  const findClosestSnapPoint = (dragY: number) => {
+    if (!snapPoints || snapPoints.length === 0) return 0;
+    
+    // Current position is the current snap point minus the drag amount
+    const currentHeight = snapPoints[currentSnap];
+    const targetHeight = currentHeight - dragY;
+    
+    // Find the closest snap point to the target height
+    let closestIndex = 0;
+    let closestDistance = Math.abs(snapPoints[0] - targetHeight);
+    
+    snapPoints.forEach((snap, index) => {
+      const distance = Math.abs(snap - targetHeight);
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestIndex = index;
+      }
+    });
+    
+    return closestIndex;
+  };
+
+  const handleDragEnd = (event: any, info: any) => {
+    // Find closest snap point based on drag velocity and position
+    const newSnapIndex = findClosestSnapPoint(info.offset.y);
+    setCurrentSnap(newSnapIndex);
+    
+    if (onSnap) {
+      onSnap(newSnapIndex);
+    }
+  };
+
+  return (
+    <motion.div
+      className="fixed bottom-0 left-0 right-0 bg-app-darkGray rounded-t-2xl shadow-lg z-10 overflow-hidden
+                md:left-1/2 md:transform md:-translate-x-1/2 md:max-w-md"
+      style={{ height: snapPoints[currentSnap] || 300 }}
+      initial={{ height: snapPoints[defaultSnap] || 300 }}
+      animate={{ height: snapPoints[currentSnap] || 300 }}
+      transition={{ type: "spring", damping: 20, stiffness: 300 }}
+    >
+      {/* Drag handle */}
+      <motion.div 
+        className="drag-handle-container cursor-grab active:cursor-grabbing"
+        drag="y"
+        dragConstraints={{ top: 0, bottom: 0 }}
+        dragElastic={0.1}
+        dragMomentum={false}
+        onDragStart={() => setIsDragging(true)}
+        onDragEnd={(e, info) => {
+          setIsDragging(false);
+          handleDragEnd(e, info);
+        }}
+        style={{ y }}
+      >
+        <div className="drag-handle"></div>
+      </motion.div>
+      
+      {/* Content */}
+      <motion.div 
+        ref={contentRef}
+        className="overflow-y-auto max-h-full"
+        drag={expandOnContentDrag ? "y" : false}
+        dragConstraints={{ top: 0, bottom: 0 }}
+        dragElastic={0.1}
+        dragMomentum={false}
+        onDragStart={() => expandOnContentDrag && setIsDragging(true)}
+        onDragEnd={(e, info) => {
+          if (expandOnContentDrag) {
+            setIsDragging(false);
+            handleDragEnd(e, info);
+          }
+        }}
+        style={{ touchAction: expandOnContentDrag ? 'none' : 'auto' }}
+      >
+        {children}
+      </motion.div>
+    </motion.div>
+  );
+};
+
+export default CustomBottomSheet;
+
+============================================================
+
+FILE: .\components\ui\common\LoadingSpinner.tsx
+SIZE: 0.9 KB
+LAST MODIFIED: 04/25/2025 14:52:04
+
+import React from 'react';
+
+interface LoadingSpinnerProps {
+  size?: 'small' | 'medium' | 'large';
+  color?: string;
+}
+
+const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ 
+  size = 'medium', 
+  color = 'text-white' 
+}) => {
+  const sizeClasses = {
+    small: 'w-4 h-4',
+    medium: 'w-8 h-8',
+    large: 'w-12 h-12',
+  };
+
+  return (
+    <div className="flex justify-center items-center">
+      <div className={`${sizeClasses[size]} ${color} animate-spin`}>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+      </div>
+    </div>
+  );
+};
+
+export default LoadingSpinner;
+
+
+============================================================
+
+FILE: .\components\ui\common\SimpleDraggableSheet.tsx
+SIZE: 3.16 KB
+LAST MODIFIED: 04/28/2025 12:35:14
+
+'use client';
+
+import React, { useState, useRef, useEffect } from 'react';
+
+interface SimpleDraggableSheetProps {
+  children: React.ReactNode;
+  minHeight: number;
+  maxHeight: number;
+  initialHeight?: number;
+}
+
+const SimpleDraggableSheet: React.FC<SimpleDraggableSheetProps> = ({
+  children,
+  minHeight,
+  maxHeight,
+  initialHeight = minHeight,
+}) => {
+  const [height, setHeight] = useState(initialHeight);
+  const [isDragging, setIsDragging] = useState(false);
+  const startYRef = useRef(0);
+  const startHeightRef = useRef(initialHeight);
+  const sheetRef = useRef<HTMLDivElement>(null);
+
+  // Handle drag start
+  const handleTouchStart = (e: React.TouchEvent | React.MouseEvent) => {
+    const clientY = 'touches' in e ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
+    startYRef.current = clientY;
+    startHeightRef.current = height;
+    setIsDragging(true);
+  };
+
+  // Handle drag move
+  const handleTouchMove = (e: TouchEvent | MouseEvent) => {
+    if (!isDragging) return;
+    
+    const clientY = 'touches' in e ? e.touches[0].clientY : (e as MouseEvent).clientY;
+    const deltaY = startYRef.current - clientY;
+    const newHeight = Math.min(maxHeight, Math.max(minHeight, startHeightRef.current + deltaY));
+    
+    setHeight(newHeight);
+  };
+
+  // Handle drag end
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+    
+    // Snap to closest position (min or max)
+    const midPoint = (minHeight + maxHeight) / 2;
+    if (height < midPoint) {
+      setHeight(minHeight);
+    } else {
+      setHeight(maxHeight);
+    }
+  };
+
+  // Add and remove event listeners
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => handleTouchMove(e);
+    const handleMouseUp = () => handleTouchEnd();
+    
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener('touchmove', handleTouchMove);
+      document.addEventListener('touchend', handleTouchEnd);
+    }
+    
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [isDragging]);
+
+  return (
+    <div 
+      ref={sheetRef}
+      className="fixed bottom-0 left-0 right-0 bg-[#212121] rounded-t-xl transition-all duration-300 ease-in-out overflow-hidden
+        md:left-1/2 md:transform md:-translate-x-1/2 md:max-w-md"
+      style={{ 
+        height: `${height}px`,
+        transition: isDragging ? 'none' : 'height 0.3s ease'
+      }}
+    >
+      {/* Drag handle */}
+      <div 
+        className="w-full flex justify-center py-2 cursor-grab"
+        onTouchStart={handleTouchStart}
+        onMouseDown={handleTouchStart}
+      >
+        <div className="w-10 h-1 bg-gray-600 rounded-full"></div>
+      </div>
+      
+      {/* Content */}
+      <div className="overflow-y-auto h-[calc(100%-24px)]">
+        {children}
+      </div>
+    </div>
+  );
+};
+
+export default SimpleDraggableSheet;
+
+============================================================
+
+FILE: .\components\ui\icons\Icon.tsx
+SIZE: 1.69 KB
+LAST MODIFIED: 04/29/2025 09:23:53
+
+import React from 'react';
+import * as LucideIcons from 'lucide-react';
+
+interface IconProps {
+  name: string;
+  className?: string;
+}
+
+const Icon: React.FC<IconProps> = ({ name, className = 'w-6 h-6' }) => {
+  // Map for standard icons (navigation, UI elements, etc.)
+  const standardIconMap: Record<string, any> = {
+    car: LucideIcons.Car,
+    deposit: LucideIcons.PlusCircle,
+    home: LucideIcons.Home,
+    insights: LucideIcons.LineChart,
+    add: LucideIcons.Plus,
+    wallet: LucideIcons.Wallet,
+    more: LucideIcons.MoreHorizontal,
+    shopping: LucideIcons.ShoppingBag,
+    transfer: LucideIcons.ArrowLeftRight,
+    subscription: LucideIcons.Repeat,
+    entertainment: LucideIcons.Music,
+    notificationBell: LucideIcons.Bell,
+  };
+
+  // Map for merchant-specific icons
+  const merchantIconMap: Record<string, any> = {
+    netflix: LucideIcons.Tv,
+    spotify: LucideIcons.Music,
+    amazon: LucideIcons.ShoppingCart,
+    uber: LucideIcons.Car,
+    starbucks: LucideIcons.Coffee,
+    zara: LucideIcons.ShoppingBag,
+    payroll: LucideIcons.Landmark,
+  };
+
+  // Map for category-specific icons
+  const categoryIconMap: Record<string, any> = {
+    food: LucideIcons.UtensilsCrossed,
+    dining: LucideIcons.UtensilsCrossed,
+    travel: LucideIcons.Plane,
+    transport: LucideIcons.Bus,
+    utilities: LucideIcons.Lightbulb,
+    health: LucideIcons.Stethoscope,
+    coffee: LucideIcons.Coffee,
+  };
+
+  // Try to render the icon based on name
+  // First check standard icons, then merchant icons, then category icons
+  const IconComponent = standardIconMap[name] || merchantIconMap[name] || categoryIconMap[name] || LucideIcons.CreditCard;
+  
+  return <IconComponent className={className} />;
+};
+
+export default Icon;
+
+
+============================================================
+
+FILE: .\components\ui\icons\Icon.tsx.bak.20250429092353
+SIZE: 5.31 KB
+LAST MODIFIED: 04/25/2025 16:49:35
+
+import React from 'react';
+
+interface IconProps {
+  name: string;
+  className?: string;
+}
+
+const Icon: React.FC<IconProps> = ({ name, className = 'w-6 h-6' }) => {
+  // This is a simplistic implementation - in a real app, you might use a library like heroicons
+  const iconMap: Record<string, React.ReactNode> = {
+    car: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={className}
+      >
+        <path d="M14 16H9m10 0h3v-3.15a1 1 0 00-.84-.99L16 11l-2.7-3.6a1 1 0 00-.8-.4H5.24a2 2 0 00-1.8 1.1l-.8 1.63A6 6 0 002 12.42V16h2" />
+        <circle cx="6.5" cy="16.5" r="2.5" />
+        <circle cx="16.5" cy="16.5" r="2.5" />
+      </svg>
+    ),
+    deposit: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={className}
+      >
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+        <line x1="12" y1="8" x2="12" y2="16" />
+        <line x1="8" y1="12" x2="16" y2="12" />
+      </svg>
+    ),
+    home: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={className}
+      >
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+        <polyline points="9 22 9 12 15 12 15 22" />
+      </svg>
+    ),
+    insights: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={className}
+      >
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+      </svg>
+    ),
+    add: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={className}
+      >
+        <line x1="12" y1="5" x2="12" y2="19" />
+        <line x1="5" y1="12" x2="19" y2="12" />
+      </svg>
+    ),
+    wallet: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={className}
+      >
+        <rect x="2" y="4" width="20" height="16" rx="2" />
+        <path d="M16 12h.01" />
+      </svg>
+    ),
+    more: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={className}
+      >
+        <circle cx="12" cy="12" r="1" />
+        <circle cx="19" cy="12" r="1" />
+        <circle cx="5" cy="12" r="1" />
+      </svg>
+    ),
+    shopping: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={className}
+      >
+        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" />
+        <line x1="3" y1="6" x2="21" y2="6" />
+        <path d="M16 10a4 4 0 0 1-8 0" />
+      </svg>
+    ),
+    transfer: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={className}
+      >
+        <path d="M17 1l4 4-4 4" />
+        <path d="M21 5H9" />
+        <path d="M7 23l-4-4 4-4" />
+        <path d="M3 19h12" />
+      </svg>
+    ),
+    subscription: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={className}
+      >
+        <path d="M12 2L2 7l10 5 10-5-10-5z" />
+        <path d="M2 17l10 5 10-5" />
+        <path d="M2 12l10 5 10-5" />
+      </svg>
+    ),
+    entertainment: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={className}
+      >
+        <path d="M4 11a9 9 0 0 1 9 9" />
+        <path d="M4 4a16 16 0 0 1 16 16" />
+        <circle cx="5" cy="19" r="1" />
+      </svg>
+    ),
+    notificationBell: (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={className}
+      >
+        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+        <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+      </svg>
+    ),
+  };
+
+  return <>{iconMap[name] || <div className={className} />}</>;
+};
+
+export default Icon;
+
+
+
+
+============================================================
+
+FILE: .\components\ui\navigation\BottomNav.tsx
+SIZE: 1.79 KB
+LAST MODIFIED: 04/29/2025 09:23:55
+
+// components/ui/navigation/BottomNav.tsx
+import React from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import Icon from '../icons/Icon';
+import { NavItemType } from '@/lib/types';
+
+const BottomNav: React.FC = () => {
+  const pathname = usePathname();
+  
+  // Define the navigation items with new arrangement
+  const items: NavItemType[] = [
+    { name: 'Deposit', icon: 'deposit', href: '/deposit' },
+    { name: 'Insights', icon: 'insights', href: '/insights' },
+    { name: 'Accounts', icon: 'wallet', href: '/' },
+    { name: 'Transfer', icon: 'transfer', href: '/transfer' },
+    { name: 'More', icon: 'more', href: '/more' },
+  ];
+
+  return (
+    <div className="fixed bottom-0 left-0 right-0 bg-[#212121] py-3 px-4 flex justify-between items-center z-20
+      md:left-1/2 md:transform md:-translate-x-1/2 md:max-w-md
+      lg:max-w-md xl:max-w-md">
+      {items.map((item) => {
+        const isActive = pathname === item.href;
+        const isSpecial = item.name === 'Accounts';
+
+        return (
+          <Link 
+            key={item.name} 
+            href={item.href}
+            className="flex flex-col items-center"
+          >
+            <div
+              className={`
+                ${isActive ? 'text-white' : 'text-gray-400'} 
+                ${isSpecial ? 'bg-red-600 p-3 rounded-full -mt-8 shadow-lg border border-red-700' : ''}
+                transition-all duration-200
+              `}
+            >
+              <Icon name={item.icon} className={`${isSpecial ? 'w-6 h-6' : 'w-5 h-5'}`} />
+            </div>
+            <span
+              className={`text-xs mt-1 ${isActive ? 'text-white' : 'text-gray-400'}`}
+            >
+              {item.name}
+            </span>
+          </Link>
+        );
+      })}
+    </div>
+  );
+};
+
+export default BottomNav;
+
+
+============================================================
+
+FILE: .\components\ui\navigation\BottomNav.tsx.bak.20250429092354
+SIZE: 1.79 KB
+LAST MODIFIED: 04/26/2025 14:30:09
+
+// components/ui/navigation/BottomNav.tsx
+import React from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import Icon from '../icons/Icon';
+import { NavItemType } from '@/lib/types';
+
+const BottomNav: React.FC = () => {
+  const pathname = usePathname();
+  
+  // Define the navigation items with new arrangement
+  const items: NavItemType[] = [
+    { name: 'Deposit', icon: 'deposit', href: '/deposit' },
+    { name: 'Insights', icon: 'insights', href: '/insights' },
+    { name: 'Accounts', icon: 'wallet', href: '/' },
+    { name: 'Transfer', icon: 'transfer', href: '/transfer' },
+    { name: 'More', icon: 'more', href: '/more' },
+  ];
+
+  return (
+    <div className="fixed bottom-0 left-0 right-0 bg-[#212121] py-3 px-4 flex justify-between items-center z-20
+      md:left-1/2 md:transform md:-translate-x-1/2 md:max-w-md
+      lg:max-w-md xl:max-w-md">
+      {items.map((item) => {
+        const isActive = pathname === item.href;
+        const isSpecial = item.name === 'Accounts';
+
+        return (
+          <Link 
+            key={item.name} 
+            href={item.href}
+            className="flex flex-col items-center"
+          >
+            <div
+              className={`
+                ${isActive ? 'text-white' : 'text-gray-400'} 
+                ${isSpecial ? 'bg-red-600 p-3 rounded-full -mt-8 shadow-lg border border-red-700' : ''}
+                transition-all duration-200
+              `}
+            >
+              <Icon name={item.icon} className={`${isSpecial ? 'w-6 h-6' : 'w-5 h-5'}`} />
+            </div>
+            <span
+              className={`text-xs mt-1 ${isActive ? 'text-white' : 'text-gray-400'}`}
+            >
+              {item.name}
+            </span>
+          </Link>
+        );
+      })}
+    </div>
+  );
+};
+
+export default BottomNav;
+
+
+
+
+============================================================
+
+FILE: .\components\ui\navigation\Header.tsx
+SIZE: 0.99 KB
+LAST MODIFIED: 04/29/2025 09:23:55
+
+// components/ui/navigation/Header.tsx
+import React from 'react';
+import { Bell } from 'lucide-react';
+
+interface HeaderProps {
+  userName: string;
+}
+
+const Header: React.FC<HeaderProps> = ({ userName }) => {
+  return (
+    <div className="px-5 pt-8 pb-6">
+      <div className="flex justify-between items-center">
+        <div className="flex items-center">
+          <div className="w-10 h-10 rounded-full mr-3 overflow-hidden">
+            <img 
+              src="/images/avatar/jess-coleman.png" 
+              alt="Profile" 
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="text-xl font-medium tracking-tight">Welcome, {userName}!</div>
+        </div>
+        <button className="relative p-1">
+          <Bell className="w-6 h-6" />
+          <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full transform -translate-y-1/4 translate-x-1/4"></span>
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default Header;
+
+
+============================================================
+
+FILE: .\components\ui\navigation\Header.tsx.bak.20250429092355
+SIZE: 0.99 KB
+LAST MODIFIED: 04/25/2025 21:28:53
+
+// components/ui/navigation/Header.tsx
+import React from 'react';
+import Icon from '../icons/Icon';
+
+interface HeaderProps {
+  userName: string;
+}
+
+const Header: React.FC<HeaderProps> = ({ userName }) => {
+  return (
+    <div className="px-5 pt-8 pb-6">
+      <div className="flex justify-between items-center">
+        <div className="flex items-center">
+          <div className="w-10 h-10 rounded-full mr-3 overflow-hidden">
+            <img 
+              src="/images/avatar/jess-coleman.png" 
+              alt="Profile" 
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="text-xl font-medium tracking-tight">Welcome, {userName}!</div>
+        </div>
+        <button className="relative p-1">
+          <Icon name="notificationBell" />
+          <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full transform -translate-y-1/4 translate-x-1/4"></span>
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default Header;
+
+
+============================================================
+
+FILE: .\components\ui\transactions\TransactionContainer.tsx
+SIZE: 9.6 KB
+LAST MODIFIED: 04/28/2025 13:15:30
+
+'use client';
+
+import React, { useState, useRef, useEffect } from 'react';
+import { useSpring, animated } from 'react-spring';
+import { useDrag } from '@use-gesture/react';
+import TransactionList from './TransactionList';
+import { TransactionDateGroup } from '@/lib/types';
+
+interface TransactionContainerProps {
+  transactionGroups: TransactionDateGroup[];
+  buttonBottomPosition: number;
+  isCollapsed?: boolean;
+  onCollapseChange?: (collapsed: boolean) => void;
+}
+
+const TransactionContainer: React.FC<TransactionContainerProps> = ({ 
+  transactionGroups,
+  buttonBottomPosition,
+  isCollapsed = false,
+  onCollapseChange
+}) => {
+  // Track internal view state
+  const [viewMode, setViewMode] = useState<'collapsed' | 'default' | 'fullscreen'>(
+    isCollapsed ? 'collapsed' : 'default'
+  );
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isDraggingRef = useRef(false);
+  const isAnimatingRef = useRef(false);
+  const pendingStateChangeRef = useRef<'collapsed' | 'default' | 'fullscreen' | null>(null);
+  
+  // Heights for each state
+  const [collapsedHeight, setCollapsedHeight] = useState(80); // Just enough for header
+  const [defaultHeight, setDefaultHeight] = useState(500);
+  const [fullscreenHeight, setFullscreenHeight] = useState(window.innerHeight);
+  const [navbarHeight] = useState(64); // Bottom navigation height
+  
+  // Synchronize with parent's collapsed state, but only when not dragging
+  useEffect(() => {
+    if (!isDraggingRef.current && !isAnimatingRef.current) {
+      if (isCollapsed && viewMode !== 'collapsed') {
+        setViewMode('collapsed');
+      } else if (!isCollapsed && viewMode === 'collapsed') {
+        setViewMode('default');
+      }
+    }
+  }, [isCollapsed, viewMode]);
+  
+  // Calculate heights based on content position
+  useEffect(() => {
+    if (buttonBottomPosition <= 0) return;
+    
+    const calculateHeights = () => {
+      const viewportHeight = window.innerHeight;
+      
+      // Calculate the available space between buttons and navbar
+      const availableHeight = viewportHeight - buttonBottomPosition - navbarHeight;
+      
+      // Collapsed height - just enough for title and drag handle
+      const calculatedCollapsedHeight = 80;
+      
+      // Default height - uses most of available space
+      const calculatedDefaultHeight = Math.max(
+        availableHeight - 20, // Leave a small gap
+        Math.min(availableHeight * 0.95, 400) // Ensure minimum height
+      );
+      
+      // Fullscreen - covers from top of viewport to navbar
+      const calculatedFullscreenHeight = viewportHeight - navbarHeight;
+      
+      setCollapsedHeight(calculatedCollapsedHeight);
+      setDefaultHeight(calculatedDefaultHeight);
+      setFullscreenHeight(calculatedFullscreenHeight);
+    };
+    
+    calculateHeights();
+    window.addEventListener('resize', calculateHeights);
+    return () => window.removeEventListener('resize', calculateHeights);
+  }, [buttonBottomPosition, navbarHeight]);
+  
+  // Get current height based on view mode
+  const getCurrentHeight = (mode = viewMode) => {
+    switch (mode) {
+      case 'collapsed': return collapsedHeight;
+      case 'default': return defaultHeight;
+      case 'fullscreen': return fullscreenHeight;
+    }
+  };
+  
+  // Apply state change after animation completes
+  const applyPendingStateChange = () => {
+    if (pendingStateChangeRef.current) {
+      setViewMode(pendingStateChangeRef.current);
+      pendingStateChangeRef.current = null;
+    }
+  };
+  
+  // Set up spring animation
+  const [{ height }, api] = useSpring(() => ({
+    from: { height: isCollapsed ? collapsedHeight : defaultHeight },
+    to: { height: isCollapsed ? collapsedHeight : defaultHeight },
+    config: { mass: 1, tension: 280, friction: 25 },
+    immediate: false,
+    onRest: () => {
+      isAnimatingRef.current = false;
+      applyPendingStateChange();
+      
+      // Notify parent about collapse state changes
+      if (onCollapseChange && (viewMode === 'collapsed') !== isCollapsed) {
+        onCollapseChange(viewMode === 'collapsed');
+      }
+    }
+  }));
+  
+  // Update spring when view mode or heights change
+  useEffect(() => {
+    if (isDraggingRef.current) return;
+    
+    const targetHeight = getCurrentHeight();
+    if (targetHeight > 0) {
+      isAnimatingRef.current = true;
+      
+      api.start({ 
+        height: targetHeight,
+        immediate: false,
+        config: { mass: 1, tension: 280, friction: 25 }
+      });
+    }
+  }, [viewMode, collapsedHeight, defaultHeight, fullscreenHeight, api]);
+  
+  // Handle expand button click (from collapsed state)
+  const handleExpandClick = () => {
+    if (isAnimatingRef.current) return;
+    
+    // When expanding from collapsed, always go to default view (not fullscreen)
+    setViewMode('default');
+  };
+  
+  // Handle fullscreen toggle (from default state)
+  const handleFullscreenToggle = () => {
+    if (isAnimatingRef.current) return;
+    
+    setViewMode(viewMode === 'fullscreen' ? 'default' : 'fullscreen');
+  };
+  
+  // Set up drag gesture
+  const bind = useDrag(({ movement: [_, my], last, velocity, first, active }) => {
+    // Handle drag start
+    if (first) {
+      isDraggingRef.current = true;
+      pendingStateChangeRef.current = null;
+    }
+    
+    // During active drag
+    if (active && !last) {
+      // Calculate new height based on drag
+      const currentHeight = getCurrentHeight();
+      const newHeight = currentHeight - my;
+      const minHeight = collapsedHeight - 5;
+      const maxHeight = fullscreenHeight + 5;
+      
+      // Apply constraints and update immediately
+      const constrainedHeight = Math.max(minHeight, Math.min(maxHeight, newHeight));
+      api.start({
+        height: constrainedHeight,
+        immediate: true
+      });
+    }
+    
+    // Handle drag end
+    if (last) {
+      // Calculate velocity and thresholds
+      const [, vy] = velocity;
+      const isFlick = Math.abs(vy) > 0.5;
+      const dragThreshold = isFlick ? 20 : 60;
+      
+      // Determine target state based on current state, drag distance and velocity
+      let targetMode = viewMode;
+      
+      if (viewMode === 'fullscreen') {
+        // From fullscreen, dragging down
+        if (my > dragThreshold) {
+          targetMode = my > 150 || vy > 1 ? 'collapsed' : 'default';
+        }
+      } else if (viewMode === 'default') {
+        // From default, dragging up or down
+        if (my < -dragThreshold || vy < -0.5) {
+          targetMode = 'fullscreen';
+        } else if (my > dragThreshold || vy > 0.5) {
+          targetMode = 'collapsed';
+        }
+      } else if (viewMode === 'collapsed') {
+        // From collapsed, dragging up - always go to default first, not fullscreen
+        if (my < -dragThreshold || vy < -0.5) {
+          targetMode = 'default';
+        }
+      }
+      
+      // Animate to the target height
+      if (targetMode !== viewMode) {
+        isAnimatingRef.current = true;
+        
+        // Start animating to the target height
+        api.start({
+          height: getCurrentHeight(targetMode),
+          immediate: false,
+          config: { 
+            mass: 1, 
+            tension: 280, 
+            friction: 25 
+          },
+          onRest: () => {
+            isAnimatingRef.current = false;
+            // Set the view mode after animation completes
+            setViewMode(targetMode);
+            
+            // Notify parent if needed
+            if (onCollapseChange && (targetMode === 'collapsed') !== isCollapsed) {
+              onCollapseChange(targetMode === 'collapsed');
+            }
+          }
+        });
+      } else {
+        // If no change in mode, still animate back to current height
+        isAnimatingRef.current = true;
+        api.start({
+          height: getCurrentHeight(),
+          immediate: false
+        });
+      }
+      
+      // Clear dragging flag after a short delay
+      setTimeout(() => {
+        isDraggingRef.current = false;
+      }, 50);
+    }
+  });
+
+  return (
+    <animated.div
+      ref={containerRef}
+      className={`
+        fixed left-0 right-0 z-10 
+        md:left-1/2 md:transform md:-translate-x-1/2 md:max-w-md
+        ${viewMode === 'fullscreen' ? 'bg-app-black rounded-none' : 'bg-[#212121] rounded-t-3xl'}`
+      }
+      style={{ 
+        height,
+        bottom: navbarHeight, // Position above bottom navigation
+        top: viewMode === 'fullscreen' ? 0 : 'auto', // When fullscreen, attach to top
+      }}
+    >
+      {/* Drag handle */}
+      <div 
+        className="drag-handle-container"
+        {...bind()}
+      >
+        <div className="drag-handle" />
+      </div>
+      
+      {/* Header with title and controls */}
+      <div className="flex justify-between items-center px-6 py-2">
+        <h2 className="text-white text-xl font-medium">
+          Transactions
+        </h2>
+        
+        {viewMode !== 'collapsed' && (
+          <button 
+            className="text-gray-400 text-sm hover:text-white transition-colors"
+            onClick={handleFullscreenToggle}
+          >
+            {viewMode === 'fullscreen' ? 'Collapse' : 'Full records'}
+          </button>
+        )}
+        
+        {viewMode === 'collapsed' && (
+          <button 
+            className="text-gray-400 text-sm hover:text-white transition-colors"
+            onClick={handleExpandClick}
+          >
+            Expand
+          </button>
+        )}
+      </div>
+      
+      {/* Transaction list with proper overflow handling */}
+      <div 
+        className="overflow-y-auto" 
+        style={{ 
+          height: viewMode === 'collapsed' ? 0 : 'calc(100% - 60px)',
+          opacity: viewMode === 'collapsed' ? 0 : 1,
+          transition: 'opacity 0.2s ease-in-out' 
+        }}
+      > 
+        <TransactionList transactionGroups={transactionGroups} />
+      </div>
+    </animated.div>
+  );
+};
+
+export default TransactionContainer;
+
+============================================================
+
+FILE: .\components\ui\transactions\TransactionItem.tsx
+SIZE: 1.7 KB
+LAST MODIFIED: 04/29/2025 09:23:54
+
+// components/ui/transactions/TransactionItem.tsx
+import React from 'react';
+import Icon from '../icons/Icon';
+import { TransactionType } from '@/lib/types';
+
+interface TransactionItemProps {
+  transaction: TransactionType;
+  isLastInGroup?: boolean;
+}
+
+const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, isLastInGroup = false }) => {
+  // Use a consistent gray color for all icon backgrounds to match the inspiration
+  const iconBgColor = 'bg-neutral-700'; // Subtle gray that matches the inspiration
+  
+  // Determine which icon to use - merchant specific or category fallback
+  const iconName = transaction.merchant?.toLowerCase() || transaction.icon;
+
+  return (
+    <div className={`flex items-center justify-between py-3 hover:bg-neutral-700/30 px-4 rounded-lg transition-colors ${!isLastInGroup ? 'border-b border-gray-700/30' : ''}`}>
+      <div className="flex items-center">
+        <div className={`${iconBgColor} w-10 h-10 rounded-full flex items-center justify-center mr-3`}>
+          <Icon name={iconName} className="w-5 h-5 text-white" />
+        </div>
+        <div>
+          <div className="font-medium tracking-tight text-white">{transaction.merchant}</div>
+          <div className="text-gray-400 text-sm">
+            {transaction.location || transaction.message}
+          </div>
+        </div>
+      </div>
+      <div className="text-right">
+        <div className={`font-medium tracking-tight ${transaction.isIncoming ? 'text-green-500' : 'text-white'}`}>
+          {transaction.isIncoming ? '+' : ''}${transaction.amount.toFixed(2)}
+        </div>
+        <div className="text-gray-400 text-sm">{transaction.timestamp}</div>
+      </div>
+    </div>
+  );
+};
+
+export default TransactionItem;
+
+
+============================================================
+
+FILE: .\components\ui\transactions\TransactionItem.tsx.bak.20250429092354
+SIZE: 1.61 KB
+LAST MODIFIED: 04/25/2025 23:20:30
+
+// components/ui/transactions/TransactionItem.tsx
+import React from 'react';
+import Icon from '../icons/Icon';
+import { TransactionType } from '@/lib/types';
+
+interface TransactionItemProps {
+  transaction: TransactionType;
+  isLastInGroup?: boolean;
+}
+
+const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, isLastInGroup = false }) => {
+  // Use a consistent gray color for all icon backgrounds to match the inspiration
+  const iconBgColor = 'bg-neutral-700'; // Closer to #3b3b3b // Subtle gray that matches the inspiration
+
+  return (
+    <div className={`flex items-center justify-between py-3 hover:bg-neutral-700/30 px-4 rounded-lg transition-colors ${!isLastInGroup ? 'border-b border-gray-700/30' : ''}`}>
+      <div className="flex items-center">
+        <div className={`${iconBgColor} w-10 h-10 rounded-full flex items-center justify-center mr-3`}>
+          <Icon name={transaction.icon} className="w-5 h-5 text-white" />
+        </div>
+        <div>
+          <div className="font-medium tracking-tight text-white">{transaction.merchant}</div>
+          <div className="text-gray-400 text-sm">
+            {transaction.location || transaction.message}
+          </div>
+        </div>
+      </div>
+      <div className="text-right">
+        <div className={`font-medium tracking-tight ${transaction.isIncoming ? 'text-green-500' : 'text-white'}`}>
+          {transaction.isIncoming ? '+' : ''}${transaction.amount.toFixed(2)}
+        </div>
+        <div className="text-gray-400 text-sm">{transaction.timestamp}</div>
+      </div>
+    </div>
+  );
+};
+
+export default TransactionItem;
+
+
+
+============================================================
+
+FILE: .\components\ui\transactions\TransactionList.tsx
+SIZE: 0.89 KB
+LAST MODIFIED: 04/25/2025 17:04:48
+
+import React from 'react';
+import TransactionItem from './TransactionItem';
+import { TransactionDateGroup } from '@/lib/types';
+
+interface TransactionListProps {
+  transactionGroups: TransactionDateGroup[];
+}
+
+const TransactionList: React.FC<TransactionListProps> = ({ transactionGroups }) => {
+  return (
+    <div className="px-4 pt-2 pb-32">
+      {transactionGroups.map((group, groupIndex) => (
+        <div key={groupIndex}>
+          <div className="text-gray-500 text-xs py-3">{group.date}</div>
+          <div>
+            {group.transactions.map((transaction, transactionIndex) => (
+              <TransactionItem 
+                key={transaction.id} 
+                transaction={transaction} 
+                isLastInGroup={transactionIndex === group.transactions.length - 1}
+              />
+            ))}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+};
+
+export default TransactionList;
+
+
+============================================================
+
+FILE: .\lib\context\ThemeContext.tsx
+SIZE: 1.43 KB
+LAST MODIFIED: 04/25/2025 15:06:36
+
+'use client';
+
+import React, { createContext, useContext, useState, useEffect } from 'react';
+
+type Theme = 'light' | 'dark';
+
+interface ThemeContextType {
+  theme: Theme;
+  toggleTheme: () => void;
+}
+
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
+export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [theme, setTheme] = useState<Theme>('dark');
+
+  const toggleTheme = () => {
+    setTheme(prevTheme => {
+      const newTheme = prevTheme === 'light' ? 'dark' : 'light';
+      localStorage.setItem('app-theme', newTheme);
+      return newTheme;
+    });
+  };
+
+  // Initialize theme from localStorage or system preference
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('app-theme') as Theme | null;
+    
+    if (savedTheme) {
+      setTheme(savedTheme);
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      setTheme('dark');
+    }
+    
+    // Apply theme class to body
+    document.body.className = theme === 'dark' ? 'bg-black text-white' : 'bg-white text-black';
+  }, [theme]);
+
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+};
+
+export const useTheme = (): ThemeContextType => {
+  const context = useContext(ThemeContext);
+  if (context === undefined) {
+    throw new Error('useTheme must be used within a ThemeProvider');
+  }
+  return context;
+};
+
+
+
+============================================================
+
+FILE: .\lib\data\cards.ts
+SIZE: 0.49 KB
+LAST MODIFIED: 04/25/2025 15:16:37
+
+import { CardType } from '../types';
+
+export const cards: CardType[] = [
+  {
+    id: '1',
+    type: 'VISA',
+    number: '•••• 9891',
+    expiry: '••/••',
+    cvv: '•••',
+    color: '#E53E3E', // Updated red color that better matches the inspiration
+  },
+  // You can add more cards here
+];
+
+export const getCard = (id: string): CardType | undefined => {
+  return cards.find(card => card.id === id);
+};
+
+export const getDefaultCard = (): CardType => {
+  return cards[0];
+};
+
+
+============================================================
+
+FILE: .\lib\data\cards.ts.bak
+SIZE: 0.47 KB
+LAST MODIFIED: 04/25/2025 14:52:53
+
+import { CardType } from '../types';
+
+export const cards: CardType[] = [
+  {
+    id: '1',
+    type: 'VISA',
+    number: '•••• 9891',
+    expiry: '••/••',
+    cvv: '•••',
+    color: '#e53935', // Red color similar to the screenshot
+  },
+  // You can add more cards here
+];
+
+export const getCard = (id: string): CardType | undefined => {
+  return cards.find(card => card.id === id);
+};
+
+export const getDefaultCard = (): CardType => {
+  return cards[0];
+};
+
+
+============================================================
+
+FILE: .\lib\data\transactions.ts
+SIZE: 2.43 KB
+LAST MODIFIED: 04/29/2025 09:23:54
+
+// lib/data/transactions.ts
+import { TransactionType, TransactionDateGroup } from '../types';
+
+export const transactions: TransactionDateGroup[] = [
+  {
+    date: 'TODAY',
+    transactions: [
+      {
+        id: '1',
+        merchant: 'Zara',
+        location: 'Harrisburg Mall',
+        amount: 432.29,
+        isIncoming: false,
+        timestamp: '1:22PM',
+        icon: 'shopping',
+        category: 'clothes',
+      },
+      {
+        id: '2',
+        merchant: 'Mark Coleman',
+        message: 'Thanks for the dinner!',
+        amount: 128.00,
+        isIncoming: true,
+        timestamp: '12:32PM',
+        icon: 'transfer',
+      },
+      {
+        id: '3',
+        merchant: 'Starbucks',
+        location: 'Business Bay',
+        amount: 18.50,
+        isIncoming: false,
+        timestamp: '10:15AM',
+        icon: 'coffee',
+        category: 'dining',
+      },
+    ],
+  },
+  {
+    date: 'YESTERDAY',
+    transactions: [
+      {
+        id: '4',
+        merchant: 'Netflix',
+        message: 'Subscription',
+        amount: 18.00,
+        isIncoming: false,
+        timestamp: '12:45PM',
+        icon: 'subscription',
+        category: 'entertainment',
+      },
+      {
+        id: '5',
+        merchant: 'Damien Light',
+        message: 'You won!',
+        amount: 20.00,
+        isIncoming: true,
+        timestamp: '10:22AM',
+        icon: 'entertainment',
+      },
+      {
+        id: '6',
+        merchant: 'Uber',
+        location: 'Downtown Harrisburg',
+        amount: 35.50,
+        isIncoming: false,
+        timestamp: '9:10AM',
+        icon: 'car',
+        category: 'transport',
+      },
+    ],
+  },
+  {
+    date: 'APR 23, 2025',
+    transactions: [
+      {
+        id: '7',
+        merchant: 'Spotify',
+        message: 'Premium Subscription',
+        amount: 9.99,
+        isIncoming: false,
+        timestamp: '3:20PM',
+        icon: 'subscription',
+        category: 'entertainment',
+      },
+      {
+        id: '8',
+        merchant: 'Amazon',
+        message: 'Online order',
+        amount: 125.45,
+        isIncoming: false,
+        timestamp: '11:30AM',
+        icon: 'shopping',
+        category: 'shopping',
+      },
+      {
+        id: '9',
+        merchant: 'Payroll',
+        message: 'Monthly salary',
+        amount: 5280.00,
+        isIncoming: true,
+        timestamp: '9:00AM',
+        icon: 'transfer',
+        category: 'income',
+      },
+    ],
+  },
+];
+
+export const getTransactions = (): TransactionDateGroup[] => {
+  return transactions;
+};
+
+
+============================================================
+
+FILE: .\lib\data\transactions.ts.bak.20250429092354
+SIZE: 2.22 KB
+LAST MODIFIED: 04/25/2025 16:49:35
+
+// lib/data/transactions.ts
+import { TransactionType, TransactionDateGroup } from '../types';
+
+export const transactions: TransactionDateGroup[] = [
+  {
+    date: 'TODAY',
+    transactions: [
+      {
+        id: '1',
+        merchant: 'Zara',
+        location: 'Harrisburg Mall',
+        amount: 432.29,
+        isIncoming: false,
+        timestamp: '1:22PM',
+        icon: 'shopping',
+      },
+      {
+        id: '2',
+        merchant: 'Mark Coleman',
+        message: 'Thanks for the dinner!',
+        amount: 128.00,
+        isIncoming: true,
+        timestamp: '12:32PM',
+        icon: 'transfer',
+      },
+      {
+        id: '3',
+        merchant: 'Starbucks',
+        location: 'Business Bay',
+        amount: 18.50,
+        isIncoming: false,
+        timestamp: '10:15AM',
+        icon: 'shopping',
+      },
+    ],
+  },
+  {
+    date: 'YESTERDAY',
+    transactions: [
+      {
+        id: '4',
+        merchant: 'Netflix',
+        message: 'Subscription',
+        amount: 18.00,
+        isIncoming: false,
+        timestamp: '12:45PM',
+        icon: 'subscription',
+      },
+      {
+        id: '5',
+        merchant: 'Damien Light',
+        message: 'You won!',
+        amount: 20.00,
+        isIncoming: true,
+        timestamp: '10:22AM',
+        icon: 'entertainment',
+      },
+      {
+        id: '6',
+              merchant: 'Uber',
+      location: 'Downtown Harrisburg',
+      amount: 35.50,
+      isIncoming: false,
+      timestamp: '9:10AM',
+      icon: 'car',
+      },
+    ],
+  },
+  {
+    date: 'APR 23, 2025',
+    transactions: [
+      {
+        id: '7',
+        merchant: 'Spotify',
+        message: 'Premium Subscription',
+        amount: 9.99,
+        isIncoming: false,
+        timestamp: '3:20PM',
+        icon: 'subscription',
+      },
+      {
+        id: '8',
+        merchant: 'Amazon',
+        message: 'Online order',
+        amount: 125.45,
+        isIncoming: false,
+        timestamp: '11:30AM',
+        icon: 'shopping',
+      },
+      {
+        id: '9',
+        merchant: 'Payroll',
+        message: 'Monthly salary',
+        amount: 5280.00,
+        isIncoming: true,
+        timestamp: '9:00AM',
+        icon: 'transfer',
+      },
+    ],
+  },
+];
+
+export const getTransactions = (): TransactionDateGroup[] => {
+  return transactions;
+};
+
+
+
+============================================================
+
+FILE: .\lib\hooks\useContainerPosition.tsx
+SIZE: 2.89 KB
+LAST MODIFIED: 04/27/2025 22:59:54
+
+// lib/hooks/useContainerPosition.tsx
+'use client';
+
+import { useState, useEffect, useRef, RefObject } from 'react';
+
+interface ContainerPositionOptions {
+  referenceRef: RefObject<HTMLElement>; // The element we position relative to
+  containerRef: RefObject<HTMLElement>; // The container to position
+  bottomOffset?: number; // Space for bottom navigation or other elements
+  collapsedRatio?: number; // Ratio of available space for collapsed state
+  expandedRatio?: number; // Ratio of available space for expanded state
+}
+
+interface ContainerPositionResult {
+  collapsedHeight: number;
+  expandedHeight: number;
+  isCalculated: boolean;
+  updatePosition: () => void;
+}
+
+export function useContainerPosition({
+  referenceRef,
+  containerRef,
+  bottomOffset = 80,
+  collapsedRatio = 0.7,
+  expandedRatio = 0.9,
+}: ContainerPositionOptions): ContainerPositionResult {
+  const [collapsedHeight, setCollapsedHeight] = useState(0);
+  const [expandedHeight, setExpandedHeight] = useState(0);
+  const [isCalculated, setIsCalculated] = useState(false);
+
+  // Function to calculate positioning
+  const calculatePositioning = () => {
+    if (!containerRef.current || !referenceRef.current) return;
+    
+    // Get the bottom position of the reference element (pay buttons)
+    const referenceRect = referenceRef.current.getBoundingClientRect();
+    const referenceBottom = referenceRect.bottom;
+    
+    // Set the top of the container to the bottom of the reference element
+    if (containerRef.current) {
+      containerRef.current.style.top = `${referenceBottom}px`;
+    }
+    
+    // Update the height of the container
+    const viewportHeight = window.innerHeight;
+    
+    const availableHeight = viewportHeight - referenceBottom - bottomOffset;
+    const newCollapsedHeight = Math.min(availableHeight * collapsedRatio, availableHeight);
+    const newExpandedHeight = Math.min(availableHeight * expandedRatio, availableHeight);
+    
+    // Update state
+    setCollapsedHeight(newCollapsedHeight);
+    setExpandedHeight(newExpandedHeight);
+    setIsCalculated(true);
+  };
+
+  useEffect(() => {
+    // Calculate on mount and when window is resized
+    calculatePositioning();
+    window.addEventListener('resize', calculatePositioning);
+    
+    // Also observe the reference element for any changes in height/position
+    if (referenceRef.current) {
+      const observer = new ResizeObserver(calculatePositioning);
+      observer.observe(referenceRef.current);
+      
+      return () => {
+        observer.disconnect();
+        window.removeEventListener('resize', calculatePositioning);
+      };
+    }
+    
+    return () => window.removeEventListener('resize', calculatePositioning);
+  }, [referenceRef, containerRef]);
+
+  return {
+    collapsedHeight,
+    expandedHeight,
+    isCalculated,
+    updatePosition: calculatePositioning
+  };
+}
+
+export default useContainerPosition;
+
+============================================================
+
+FILE: .\lib\hooks\useSwipeableContainer.ts
+SIZE: 4.14 KB
+LAST MODIFIED: 04/25/2025 15:16:38
+
+'use client';
+
+import { useState, useRef, useEffect } from 'react';
+
+interface UseSwipeableContainerOptions {
+  initialHeight: number;
+  maxHeight: number;
+  minHeight: number;
+  snapPoints?: number[];
+}
+
+export const useSwipeableContainer = ({
+  initialHeight,
+  maxHeight,
+  minHeight,
+  snapPoints = [],
+}: UseSwipeableContainerOptions) => {
+  const [height, setHeight] = useState(initialHeight);
+  const [isDragging, setIsDragging] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const startYRef = useRef<number | null>(null);
+  const startHeightRef = useRef<number>(initialHeight);
+
+  const handleDragStart = (clientY: number) => {
+    startYRef.current = clientY;
+    startHeightRef.current = height;
+    setIsDragging(true);
+    
+    // Add a class to the body to prevent scrolling while dragging
+    document.body.classList.add('overflow-hidden');
+  };
+
+  const handleDrag = (clientY: number) => {
+    if (!isDragging || startYRef.current === null) {
+      return;
+    }
+
+    const deltaY = startYRef.current - clientY;
+    const newHeight = Math.min(maxHeight, Math.max(minHeight, startHeightRef.current + deltaY));
+    setHeight(newHeight);
+  };
+
+  const handleDragEnd = () => {
+    setIsDragging(false);
+    startYRef.current = null;
+    
+    // Remove the class from the body
+    document.body.classList.remove('overflow-hidden');
+
+    // Find the closest snap point, including min and max
+    const allSnapPoints = [...snapPoints, minHeight, maxHeight];
+    
+    if (allSnapPoints.length > 0) {
+      const closestSnapPoint = allSnapPoints.reduce((prev, curr) => {
+        return Math.abs(curr - height) < Math.abs(prev - height) ? curr : prev;
+      });
+      
+      // Animate to the snap point
+      setHeight(closestSnapPoint);
+    }
+  };
+
+  // Add a function to programmatically set the container height to a specific snap point
+  const snapTo = (snapPoint: number) => {
+    const validSnapPoint = Math.min(maxHeight, Math.max(minHeight, snapPoint));
+    setHeight(validSnapPoint);
+  };
+
+  useEffect(() => {
+    const handleTouchStart = (e: TouchEvent) => {
+      const handle = containerRef.current?.querySelector('.drag-handle');
+      if (handle && e.target instanceof Node && handle.contains(e.target)) {
+        e.preventDefault(); // Prevent default to avoid scroll interference
+        handleDragStart(e.touches[0].clientY);
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (isDragging) {
+        e.preventDefault(); // Prevent scrolling while dragging
+        handleDrag(e.touches[0].clientY);
+      }
+    };
+
+    const handleTouchEnd = () => {
+      if (isDragging) {
+        handleDragEnd();
+      }
+    };
+
+    // Mouse events for desktop support
+    const handleMouseDown = (e: MouseEvent) => {
+      const handle = containerRef.current?.querySelector('.drag-handle');
+      if (handle && e.target instanceof Node && handle.contains(e.target)) {
+        handleDragStart(e.clientY);
+      }
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isDragging) {
+        handleDrag(e.clientY);
+      }
+    };
+
+    const handleMouseUp = () => {
+      if (isDragging) {
+        handleDragEnd();
+      }
+    };
+
+    // Touch events
+    document.addEventListener('touchstart', handleTouchStart, { passive: false });
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    document.addEventListener('touchend', handleTouchEnd);
+
+    // Mouse events
+    document.addEventListener('mousedown', handleMouseDown);
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      // Clean up touch events
+      document.removeEventListener('touchstart', handleTouchStart);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
+
+      // Clean up mouse events
+      document.removeEventListener('mousedown', handleMouseDown);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging, height, minHeight, maxHeight]);
+
+  return { containerRef, height, isDragging, snapTo };
+};
+
+
+============================================================
+
+FILE: .\lib\types\index.ts
+SIZE: 0.62 KB
+LAST MODIFIED: 04/29/2025 09:23:54
+
+export type CardType = {
+  id: string;
+  type: 'VISA' | 'MASTERCARD' | 'AMEX';
+  number: string;
+  expiry: string;
+  cvv: string;
+  color: string;
+};
+
+export type TransactionType = {
+  id: string;
+  merchant: string;
+  location?: string;
+  amount: number;
+  isIncoming: boolean;
+  timestamp: string;
+  message?: string;
+  icon: string; // Updated to allow any icon name
+  category?: string; // Optional category for fallback icons
+};
+
+export type TransactionDateGroup = {
+  date: 'TODAY' | 'YESTERDAY' | string;
+  transactions: TransactionType[];
+};
+
+export type NavItemType = {
+  name: string;
+  icon: string;
+  href: string;
+};
+
+
+============================================================
+
+FILE: .\lib\types\index.ts.bak.20250429092354
+SIZE: 0.58 KB
+LAST MODIFIED: 04/25/2025 14:52:53
+
+export type CardType = {
+  id: string;
+  type: 'VISA' | 'MASTERCARD' | 'AMEX';
+  number: string;
+  expiry: string;
+  cvv: string;
+  color: string;
+};
+
+export type TransactionType = {
+  id: string;
+  merchant: string;
+  location?: string;
+  amount: number;
+  isIncoming: boolean;
+  timestamp: string;
+  message?: string;
+  icon: 'shopping' | 'transfer' | 'subscription' | 'entertainment';
+};
+
+export type TransactionDateGroup = {
+  date: 'TODAY' | 'YESTERDAY' | string;
+  transactions: TransactionType[];
+};
+
+export type NavItemType = {
+  name: string;
+  icon: string;
+  href: string;
+};
+
+
+============================================================
+
+FILE: .\lib\utils\formatters.ts
+SIZE: 1.26 KB
+LAST MODIFIED: 04/25/2025 14:51:24
+
+/**
+ * Format currency amount with proper symbol and decimal places
+ */
+export const formatCurrency = (amount: number, currency = 'USD', locale = 'en-US'): string => {
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount);
+};
+
+/**
+ * Format date in desired format
+ */
+export const formatDate = (date: Date | string, format = 'short'): string => {
+  if (typeof date === 'string') {
+    date = new Date(date);
+  }
+  
+  if (format === 'time') {
+    return date.toLocaleTimeString('en-US', { 
+      hour: 'numeric', 
+      minute: '2-digit',
+      hour12: true 
+    });
+  }
+  
+  if (format === 'short') {
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric'
+    });
+  }
+  
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
+};
+
+/**
+ * Group transactions by date
+ */
+export const groupTransactionsByDate = (transactions: any[]): { [key: string]: any[] } => {
+  const grouped = transactions.reduce((acc, transaction) => {
+    const date = transaction.date;
+    if (!acc[date]) {
+      acc[date] = [];
+    }
+    acc[date].push(transaction);
+    return acc;
+  }, {});
+  
+  return grouped;
+};
+
