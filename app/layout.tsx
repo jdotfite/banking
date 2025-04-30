@@ -1,4 +1,4 @@
-// ✅ This is now a server component – DO NOT add "use client"
+// ✅ This is a server component – DO NOT add "use client"
 
 import type { Metadata } from 'next';
 import { Outfit } from 'next/font/google';
@@ -6,7 +6,7 @@ import './globals.css';
 import IOSFullscreen from '@/components/IOSFullScreen';
 import { ThemeProvider } from '@/lib/context/ThemeContext';
 import AppContainer from '@/components/layout/AppContainer';
-import Script from 'next/script';
+import RegisterServiceWorker from '@/components/RegisterServiceWorker';
 
 // Font config
 const outfit = Outfit({
@@ -37,34 +37,15 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  useEffect(() => {
-    setupIOSFullscreen();
-  }, []);
-
   return (
     <html lang="en" className={outfit.variable}>
       <body className={`${outfit.className} bg-gray-900 min-h-screen font-outfit`}>
         <ThemeProvider>
           <AppContainer>{children}</AppContainer>
         </ThemeProvider>
-        <Script id="service-worker" strategy="afterInteractive">
-          {`
-            if ('serviceWorker' in navigator) {
-              window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/sw.js').then(
-                  function(registration) {
-                    console.log('Service Worker registration successful', registration.scope);
-                  },
-                  function(err) {
-                    console.log('Service Worker registration failed', err);
-                  }
-                );
-              });
-            }
-          `}
-        </Script>
-        <AppContainer>{children}</AppContainer>
-<IOSFullscreen />
+
+        <IOSFullscreen />
+        <RegisterServiceWorker />
       </body>
     </html>
   );
