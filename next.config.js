@@ -1,4 +1,12 @@
-﻿/** @type {import('next').NextConfig} */
+﻿// next.config.js
+const withPWA = require('next-pwa')({
+  dest: 'public',            // where sw.js and other assets go
+  register: true,            // automatically register service worker
+  skipWaiting: true,         // activate new service worker immediately
+  disable: process.env.NODE_ENV === 'development', // don't run PWA in dev
+});
+
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
@@ -8,7 +16,7 @@ const nextConfig = {
         source: '/home',
         destination: '/',
         permanent: true,
-      }
+      },
     ];
   },
   async headers() {
@@ -36,7 +44,6 @@ const nextConfig = {
       },
     ];
   },
-  // Ensure Next.js doesn't attempt to optimize the service worker
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
@@ -48,4 +55,4 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+module.exports = withPWA(nextConfig);
