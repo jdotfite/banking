@@ -1,3 +1,4 @@
+// components/ui/icons/Icon.tsx
 import React from 'react';
 import * as LucideIcons from 'lucide-react';
 
@@ -17,10 +18,11 @@ const Icon: React.FC<IconProps> = ({ name, className = 'w-6 h-6' }) => {
     wallet: LucideIcons.Wallet,
     more: LucideIcons.MoreHorizontal,
     shopping: LucideIcons.ShoppingBag,
-    transfer: LucideIcons.ArrowLeftRight,
+    transfer: LucideIcons.ArrowLeftRight, // Using the correct name from documentation
     subscription: LucideIcons.Repeat,
     entertainment: LucideIcons.Music,
     notificationBell: LucideIcons.Bell,
+    repeat: LucideIcons.Repeat, // For pay button
   };
 
   // Map for merchant-specific icons

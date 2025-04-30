@@ -1,3 +1,4 @@
+// components/ui/transactions/TransactionContainer.tsx
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
@@ -5,6 +6,7 @@ import { useSpring, animated } from 'react-spring';
 import { useDrag } from '@use-gesture/react';
 import TransactionList from './TransactionList';
 import { TransactionDateGroup } from '@/lib/types';
+import SpendingChart from '../charts/SpendingChart';
 
 interface TransactionContainerProps {
   transactionGroups: TransactionDateGroup[];
@@ -21,12 +23,15 @@ const TransactionContainer: React.FC<TransactionContainerProps> = ({
 }) => {
   // Track internal view state
   const [viewMode, setViewMode] = useState<'collapsed' | 'default' | 'fullscreen'>(
-    isCollapsed ? 'collapsed' : 'default'
+    isCollapsed ? 'collapsed' : 'fullscreen' // Default to fullscreen when opening
   );
+  
+  // Shared period state for both chart and transactions
+  const [selectedPeriod, setSelectedPeriod] = useState('month');
+  
   const containerRef = useRef<HTMLDivElement>(null);
   const isDraggingRef = useRef(false);
   const isAnimatingRef = useRef(false);
-  const pendingStateChangeRef = useRef<'collapsed' | 'default' | 'fullscreen' | null>(null);
   
   // Heights for each state
   const [collapsedHeight, setCollapsedHeight] = useState(80); // Just enough for header
@@ -34,16 +39,15 @@ const TransactionContainer: React.FC<TransactionContainerProps> = ({
   const [fullscreenHeight, setFullscreenHeight] = useState(window.innerHeight);
   const [navbarHeight] = useState(64); // Bottom navigation height
   
-  // Synchronize with parent's collapsed state, but only when not dragging
+  // Synchronize with parent's collapsed state
   useEffect(() => {
-    if (!isDraggingRef.current && !isAnimatingRef.current) {
-      if (isCollapsed && viewMode !== 'collapsed') {
-        setViewMode('collapsed');
-      } else if (!isCollapsed && viewMode === 'collapsed') {
-        setViewMode('default');
-      }
+    console.log("isCollapsed prop changed:", isCollapsed);
+    if (isCollapsed) {
+      setViewMode('collapsed');
+    } else {
+      setViewMode('fullscreen'); // Open in fullscreen
     }
-  }, [isCollapsed, viewMode]);
+  }, [isCollapsed]);
   
   // Calculate heights based on content position
   useEffect(() => {
@@ -86,26 +90,18 @@ const TransactionContainer: React.FC<TransactionContainerProps> = ({
     }
   };
   
-  // Apply state change after animation completes
-  const applyPendingStateChange = () => {
-    if (pendingStateChangeRef.current) {
-      setViewMode(pendingStateChangeRef.current);
-      pendingStateChangeRef.current = null;
-    }
-  };
-  
-  // Set up spring animation
+  // Set up spring animation for the height
   const [{ height }, api] = useSpring(() => ({
-    from: { height: isCollapsed ? collapsedHeight : defaultHeight },
-    to: { height: isCollapsed ? collapsedHeight : defaultHeight },
+    from: { height: isCollapsed ? collapsedHeight : fullscreenHeight },
+    to: { height: isCollapsed ? collapsedHeight : fullscreenHeight },
     config: { mass: 1, tension: 280, friction: 25 },
     immediate: false,
     onRest: () => {
       isAnimatingRef.current = false;
-      applyPendingStateChange();
       
       // Notify parent about collapse state changes
       if (onCollapseChange && (viewMode === 'collapsed') !== isCollapsed) {
+        console.log("Notifying parent of collapse change:", viewMode === 'collapsed');
         onCollapseChange(viewMode === 'collapsed');
       }
     }
@@ -131,15 +127,26 @@ const TransactionContainer: React.FC<TransactionContainerProps> = ({
   const handleExpandClick = () => {
     if (isAnimatingRef.current) return;
     
-    // When expanding from collapsed, always go to default view (not fullscreen)
-    setViewMode('default');
+    // When expanding from collapsed, go to fullscreen view
+    setViewMode('fullscreen');
+    
+    // Notify parent
+    if (onCollapseChange) {
+      onCollapseChange(false);
+    }
   };
   
-  // Handle fullscreen toggle (from default state)
-  const handleFullscreenToggle = () => {
-    if (isAnimatingRef.current) return;
-    
-    setViewMode(viewMode === 'fullscreen' ? 'default' : 'fullscreen');
+  // Filter options
+  const periodOptions = [
+    { id: 'day', name: 'Day', label: 'today' },
+    { id: 'week', name: 'Week', label: 'this week' },
+    { id: 'month', name: 'Month', label: 'this month' },
+    { id: 'year', name: 'Year', label: 'this year' },
+  ];
+  
+  // Handle period change - unified for both chart and transactions
+  const handlePeriodChange = (period: string) => {
+    setSelectedPeriod(period);
   };
   
   // Set up drag gesture
@@ -147,7 +154,6 @@ const TransactionContainer: React.FC<TransactionContainerProps> = ({
     // Handle drag start
     if (first) {
       isDraggingRef.current = true;
-      pendingStateChangeRef.current = null;
     }
     
     // During active drag
@@ -189,15 +195,16 @@ const TransactionContainer: React.FC<TransactionContainerProps> = ({
           targetMode = 'collapsed';
         }
       } else if (viewMode === 'collapsed') {
-        // From collapsed, dragging up - always go to default first, not fullscreen
+        // From collapsed, dragging up - always go to fullscreen
         if (my < -dragThreshold || vy < -0.5) {
-          targetMode = 'default';
+          targetMode = 'fullscreen';
         }
       }
       
       // Animate to the target height
       if (targetMode !== viewMode) {
         isAnimatingRef.current = true;
+        setViewMode(targetMode);
         
         // Start animating to the target height
         api.start({
@@ -207,18 +214,14 @@ const TransactionContainer: React.FC<TransactionContainerProps> = ({
             mass: 1, 
             tension: 280, 
             friction: 25 
-          },
-          onRest: () => {
-            isAnimatingRef.current = false;
-            // Set the view mode after animation completes
-            setViewMode(targetMode);
-            
-            // Notify parent if needed
-            if (onCollapseChange && (targetMode === 'collapsed') !== isCollapsed) {
-              onCollapseChange(targetMode === 'collapsed');
-            }
           }
         });
+        
+        // Notify parent if needed
+        if (onCollapseChange && (targetMode === 'collapsed') !== isCollapsed) {
+          console.log("Drag ended - notifying parent:", targetMode === 'collapsed');
+          onCollapseChange(targetMode === 'collapsed');
+        }
       } else {
         // If no change in mode, still animate back to current height
         isAnimatingRef.current = true;
@@ -239,14 +242,16 @@ const TransactionContainer: React.FC<TransactionContainerProps> = ({
     <animated.div
       ref={containerRef}
       className={`
-        fixed left-0 right-0 z-10 
+        fixed left-0 right-0 z-20 overflow-hidden
         md:left-1/2 md:transform md:-translate-x-1/2 md:max-w-md
-        ${viewMode === 'fullscreen' ? 'bg-app-black rounded-none' : 'bg-[#212121] rounded-t-3xl'}`
+        ${viewMode === 'fullscreen' ? 'bg-app-black rounded-none' : 'bg-[#212121] rounded-t-3xl shadow-lg'}`
       }
       style={{ 
         height,
         bottom: navbarHeight, // Position above bottom navigation
-        top: viewMode === 'fullscreen' ? 0 : 'auto', // When fullscreen, attach to top
+        top: 'auto', // Never attach to top
+        maxHeight: viewMode === 'fullscreen' ? `calc(100vh - ${navbarHeight}px)` : 'none',
+        zIndex: 50, // Lower z-index to ensure it's below bottom navigation
       }}
     >
       {/* Drag handle */}
@@ -263,12 +268,19 @@ const TransactionContainer: React.FC<TransactionContainerProps> = ({
           Transactions
         </h2>
         
-        {viewMode !== 'collapsed' && (
+        {viewMode === 'fullscreen' && (
           <button 
             className="text-gray-400 text-sm hover:text-white transition-colors"
-            onClick={handleFullscreenToggle}
+            onClick={() => {
+              // Direct collapse
+              setViewMode('collapsed');
+              if (onCollapseChange) {
+                console.log("Collapse button clicked");
+                onCollapseChange(true);
+              }
+            }}
           >
-            {viewMode === 'fullscreen' ? 'Collapse' : 'Full records'}
+            Collapse
           </button>
         )}
         
@@ -282,16 +294,50 @@ const TransactionContainer: React.FC<TransactionContainerProps> = ({
         )}
       </div>
       
+      {/* Chart section - Spending Chart First */}
+      {viewMode === 'fullscreen' && (
+        <div className="px-6 mt-4 mb-4">
+          <SpendingChart 
+            selectedPeriod={selectedPeriod} 
+            periodOptions={periodOptions}
+          />
+        </div>
+      )}
+      
+      {/* Period selector tabs - MOVED BELOW the chart to match inspiration */}
+      {viewMode === 'fullscreen' && (
+        <div className="px-6 mb-6">
+          <div className="flex justify-between rounded-lg overflow-hidden" style={{ backgroundColor: '#1a1a1a' }}>
+            {periodOptions.map((option) => (
+              <button
+                key={option.id}
+                className={`flex-1 py-3 text-center text-sm font-medium transition-colors ${
+                  selectedPeriod === option.id
+                    ? 'bg-[#333333] text-white'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+                onClick={() => handlePeriodChange(option.id)}
+              >
+                {option.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+      
       {/* Transaction list with proper overflow handling */}
       <div 
         className="overflow-y-auto" 
         style={{ 
-          height: viewMode === 'collapsed' ? 0 : 'calc(100% - 60px)',
+          height: viewMode === 'collapsed' ? 0 : viewMode === 'fullscreen' ? 'calc(100% - 340px)' : 'calc(100% - 60px)',
           opacity: viewMode === 'collapsed' ? 0 : 1,
           transition: 'opacity 0.2s ease-in-out' 
         }}
       > 
-        <TransactionList transactionGroups={transactionGroups} />
+        <TransactionList 
+          transactionGroups={transactionGroups} 
+          selectedPeriod={selectedPeriod}
+        />
       </div>
     </animated.div>
   );

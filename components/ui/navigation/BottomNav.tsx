@@ -18,9 +18,11 @@ const BottomNav: React.FC = () => {
   ];
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-[#212121] py-3 px-4 flex justify-between items-center z-20
+    <div className="fixed bottom-0 left-0 right-0 bg-[#212121] py-3 px-4 flex justify-between items-center z-100
       md:left-1/2 md:transform md:-translate-x-1/2 md:max-w-md
-      lg:max-w-md xl:max-w-md">
+      lg:max-w-md xl:max-w-md"
+      style={{ zIndex: 100 }} // Higher z-index to ensure it's above the transaction panel
+    >
       {items.map((item) => {
         const isActive = pathname === item.href;
         const isSpecial = item.name === 'Accounts';

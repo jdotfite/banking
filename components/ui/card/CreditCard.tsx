@@ -27,7 +27,7 @@ const CreditCard: React.FC<CreditCardProps> = ({
       <div
         className="relative w-full rounded-xl overflow-hidden shadow-lg transform transition-all duration-300 hover:scale-[1.01]"
         style={{
-          backgroundColor: '#7b2528', // Flat red color
+          backgroundColor: '#7b2528', // Keep original red color
         }}
       >
         {/* Card content */}
@@ -51,31 +51,36 @@ const CreditCard: React.FC<CreditCardProps> = ({
           <AnimatePresence>
             {showInfo && (
               <motion.div 
-                className="mt-4 text-white"
-                initial={{ height: 0, opacity: 0, marginTop: 0 }}
-                animate={{ height: "auto", opacity: 1, marginTop: 16 }}
+                className="mt-1 text-white"
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
                 exit={{ height: 0, opacity: 0, marginTop: 0 }}
                 transition={{ 
                   duration: 0.3, 
                   ease: "easeInOut"
                 }}
               >
-                <div className="grid grid-cols-2 gap-1">
-                  <div className="text-gray-300">Available Credit:</div>
-                  <div className="text-right font-medium">$3,914.65</div>
+                <div className="grid grid-cols-2">
+                  <div className="text-gray-300 text-sm">Available Credit:</div>
+                  <div className="text-right font-medium text-sm">$3,914.65</div>
                   
-                  <div className="text-gray-300">Minimum Payment:</div>
-                  <div className="text-right font-medium">$0.00</div>
+                  <div className="text-gray-300 text-sm">Minimum Payment:</div>
+                  <div className="text-right font-medium text-sm">$0.00</div>
                   
-                  <div className="text-gray-300">Due Date:</div>
-                  <div className="text-right font-medium">5/25/2025</div>
+                  <div className="text-gray-300 text-sm">Due Date:</div>
+                  <div className="text-right font-medium text-sm">5/25/2025</div>
+                  
+                  <div className="text-gray-300 text-sm mt-1">AutoPay:</div>
+                  <div className="text-right font-medium text-sm mt-1">
+                    ON | <a href="#" className="text-neutral-400 hover:underline">Settings</a>
+                  </div>
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
           
           {/* VISA bar at bottom */}
-          <div className="relative mt-4 -mx-5 -mb-5 bg-black/40 py-3 px-5 flex justify-between items-center">
+          <div className="relative mt-4 -mx-5 -mb-5 bg-black/40 py-2 px-5 flex justify-between items-center">
             <div className="text-white text-xl font-bold">VISA</div>
             <div className="text-white text-base">•••• 9891</div>
           </div>
