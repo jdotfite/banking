@@ -7,8 +7,6 @@ import IOSFullscreen from '@/components/IOSFullscreen';
 import { ThemeProvider } from '@/lib/context/ThemeContext';
 import AppContainer from '@/components/layout/AppContainer';
 import Script from 'next/script';
-import { setupIOSFullscreen } from '@/lib/utils/iosFullscreen';
-import { useEffect } from 'react';
 
 // Font config
 const outfit = Outfit({
