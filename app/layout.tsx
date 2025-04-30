@@ -1,5 +1,4 @@
-// app/layout.tsx
-'use client';
+// ✅ This is now a server component – DO NOT add "use client"
 
 import type { Metadata } from 'next';
 import { Outfit } from 'next/font/google';
@@ -7,10 +6,10 @@ import './globals.css';
 import { ThemeProvider } from '@/lib/context/ThemeContext';
 import AppContainer from '@/components/layout/AppContainer';
 import Script from 'next/script';
-import { useEffect } from 'react';
 import { setupIOSFullscreen } from '@/lib/utils/iosFullscreen';
+import { useEffect } from 'react';
 
-// Properly load and configure the Outfit font
+// Font config
 const outfit = Outfit({
   subsets: ['latin'],
   weight: ['300', '400', '500', '600'],
@@ -23,20 +22,15 @@ export const metadata: Metadata = {
   description: 'A modern banking app UI',
   manifest: '/manifest.json',
   themeColor: '#121212',
-  viewport: {
-    width: 'device-width',
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
-  },
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Banking App'
+    title: 'Banking App',
   },
   formatDetection: {
-    telephone: false
-  }
+    telephone: false,
+  },
 };
 
 export default function RootLayout({
@@ -44,28 +38,16 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  // Setup iOS fullscreen handling
   useEffect(() => {
     setupIOSFullscreen();
   }, []);
 
   return (
     <html lang="en" className={outfit.variable}>
-      <head>
-        <link rel="apple-touch-icon" href="/icons/apple-icon-180.png" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        
-        {/* Additional meta tag to help with iOS fullscreen */}
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-      </head>
       <body className={`${outfit.className} bg-gray-900 min-h-screen font-outfit`}>
         <ThemeProvider>
           <AppContainer>{children}</AppContainer>
         </ThemeProvider>
-        
-        {/* Register service worker */}
         <Script id="service-worker" strategy="afterInteractive">
           {`
             if ('serviceWorker' in navigator) {
