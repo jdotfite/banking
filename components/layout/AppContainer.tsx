@@ -3,6 +3,13 @@
 
 import React from 'react';
 import { useTheme } from '@/lib/context/ThemeContext';
+import dynamic from 'next/dynamic';
+
+// Dynamically import the PWA install prompt to avoid SSR issues
+const PWAInstallPrompt = dynamic(
+  () => import('../ui/common/PWAInstallPrompt'),
+  { ssr: false }
+);
 
 interface AppContainerProps {
   children: React.ReactNode;
@@ -31,6 +38,9 @@ const AppContainer: React.FC<AppContainerProps> = ({ children }) => {
         <div className="md:mt-6 pb-16 md:pb-0 h-full flex flex-col">
           {children}
         </div>
+        
+        {/* PWA Install Prompt - only shown in client */}
+        <PWAInstallPrompt />
       </div>
     </div>
   );
