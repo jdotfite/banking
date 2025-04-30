@@ -3,6 +3,7 @@
 import type { Metadata } from 'next';
 import { Outfit } from 'next/font/google';
 import './globals.css';
+import IOSFullscreen from '@/components/IOSFullscreen';
 import { ThemeProvider } from '@/lib/context/ThemeContext';
 import AppContainer from '@/components/layout/AppContainer';
 import Script from 'next/script';
@@ -64,6 +65,8 @@ export default function RootLayout({
             }
           `}
         </Script>
+        <AppContainer>{children}</AppContainer>
+<IOSFullscreen />
       </body>
     </html>
   );
