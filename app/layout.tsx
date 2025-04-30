@@ -6,9 +6,7 @@ import './globals.css';
 import IOSFullscreen from '@/components/IOSFullScreen';
 import { ThemeProvider } from '@/lib/context/ThemeContext';
 import AppContainer from '@/components/layout/AppContainer';
-import RegisterServiceWorker from '@/components/RegisterServiceWorker';
 
-// Font config
 const outfit = Outfit({
   subsets: ['latin'],
   weight: ['300', '400', '500', '600'],
@@ -19,17 +17,6 @@ const outfit = Outfit({
 export const metadata: Metadata = {
   title: 'Banking App',
   description: 'A modern banking app UI',
-  manifest: '/manifest.json',
-  themeColor: '#121212',
-  viewport: 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover',
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: 'black-translucent',
-    title: 'Banking App',
-  },
-  formatDetection: {
-    telephone: false,
-  },
 };
 
 export default function RootLayout({
@@ -39,13 +26,21 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={outfit.variable}>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+        <meta name="theme-color" content="#121212" />
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Banking App" />
+      </head>
       <body className={`${outfit.className} bg-gray-900 min-h-screen font-outfit`}>
         <ThemeProvider>
           <AppContainer>{children}</AppContainer>
         </ThemeProvider>
-
         <IOSFullscreen />
-        <RegisterServiceWorker />
+        <script src="/sw-register.js" defer></script>
       </body>
     </html>
   );
