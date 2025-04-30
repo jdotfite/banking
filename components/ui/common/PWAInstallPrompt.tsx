@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X } from 'lucide-react';
+import { X, Download, Share } from 'lucide-react';
 
 // Define BeforeInstallPromptEvent interface
 interface BeforeInstallPromptEvent extends Event {
@@ -12,8 +12,24 @@ interface BeforeInstallPromptEvent extends Event {
 const PWAInstallPrompt: React.FC = () => {
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showPrompt, setShowPrompt] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
   
   useEffect(() => {
+    // Check if the app is running on iOS
+    const iosCheck = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+    setIsIOS(iosCheck);
+    
+    // Check if the app is already in standalone mode (installed as PWA)
+    const isStandalone = 
+      window.matchMedia('(display-mode: standalone)').matches || 
+      (window.navigator as any).standalone || 
+      document.referrer.includes('android-app://');
+    
+    if (isStandalone) {
+      setShowPrompt(false);
+      return;
+    }
+    
     const handler = (e: Event) => {
       // Prevent the default browser install prompt
       e.preventDefault();
@@ -30,10 +46,11 @@ const PWAInstallPrompt: React.FC = () => {
     // Add the event listener
     window.addEventListener('beforeinstallprompt', handler);
     
-    // Check if the app is already installed
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches;
-    if (isStandalone) {
-      setShowPrompt(false);
+    // Also show the prompt if the user hasn't seen it before, even on iOS
+    // which doesn't fire the beforeinstallprompt event
+    const hasSeenPrompt = localStorage.getItem('pwaPromptSeen');
+    if (!hasSeenPrompt && !isStandalone) {
+      setShowPrompt(true);
     }
 
     return () => {
@@ -42,19 +59,15 @@ const PWAInstallPrompt: React.FC = () => {
   }, []);
 
   const handleInstall = async () => {
-    if (!installPrompt) return;
+    if (installPrompt) {
+      // If we have the installPrompt, use it (non-iOS)
+      await installPrompt.prompt();
+      const choiceResult = await installPrompt.userChoice;
+      setInstallPrompt(null);
+    }
     
-    // Show the install prompt
-    await installPrompt.prompt();
-    
-    // Wait for the user's choice
-    const choiceResult = await installPrompt.userChoice;
-    
-    // Reset the installPrompt
-    setInstallPrompt(null);
+    // Mark as seen and hide
     setShowPrompt(false);
-    
-    // Remember that we've shown the prompt
     localStorage.setItem('pwaPromptSeen', 'true');
   };
 
@@ -75,14 +88,33 @@ const PWAInstallPrompt: React.FC = () => {
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <h3 className="text-white font-semibold text-lg mb-1">Install Banking App</h3>
-          <p className="text-gray-300 text-sm mb-3">Add to your home screen for a better experience!</p>
+          
+          {isIOS ? (
+            // iOS specific instructions
+            <div>
+              <p className="text-gray-300 text-sm mb-3">
+                To install this app on your iPhone:
+              </p>
+              <ol className="text-gray-300 text-sm ml-4 list-decimal mb-3">
+                <li>Tap the <Share className="inline-block w-4 h-4 mb-1" /> share icon</li>
+                <li>Scroll down and tap "Add to Home Screen"</li>
+                <li>Tap "Add" in the top right</li>
+              </ol>
+            </div>
+          ) : (
+            // Standard instructions for Android/other browsers
+            <p className="text-gray-300 text-sm mb-3">Add to your home screen for a better experience!</p>
+          )}
+          
           <div className="flex space-x-3">
-            <button
-              onClick={handleInstall}
-              className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium"
-            >
-              Install
-            </button>
+            {!isIOS && (
+              <button
+                onClick={handleInstall}
+                className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium"
+              >
+                Install
+              </button>
+            )}
             <button
               onClick={handleDismiss}
               className="bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
