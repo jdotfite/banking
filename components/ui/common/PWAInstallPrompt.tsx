@@ -30,9 +30,12 @@ const PWAInstallPrompt: React.FC = () => {
       return;
     }
     
+    // Handler for install prompt
     const handler = (e: Event) => {
       // Prevent the default browser install prompt
       e.preventDefault();
+      console.log('beforeinstallprompt fired', e);
+      
       // Store the event for later use
       setInstallPrompt(e as BeforeInstallPromptEvent);
       
@@ -43,8 +46,15 @@ const PWAInstallPrompt: React.FC = () => {
       }
     };
 
-    // Add the event listener
+    // Add the event listeners
     window.addEventListener('beforeinstallprompt', handler);
+    
+    // Listen for successful installation
+    window.addEventListener('appinstalled', (e) => {
+      console.log('App was successfully installed', e);
+      setShowPrompt(false);
+      localStorage.setItem('pwaPromptSeen', 'true');
+    });
     
     // Also show the prompt if the user hasn't seen it before, even on iOS
     // which doesn't fire the beforeinstallprompt event
@@ -60,15 +70,33 @@ const PWAInstallPrompt: React.FC = () => {
 
   const handleInstall = async () => {
     if (installPrompt) {
-      // If we have the installPrompt, use it (non-iOS)
-      await installPrompt.prompt();
-      const choiceResult = await installPrompt.userChoice;
-      setInstallPrompt(null);
+      try {
+        // Explicitly prompt the user to install
+        await installPrompt.prompt();
+        
+        // Wait for the user's choice
+        const choiceResult = await installPrompt.userChoice;
+        console.log('User installation choice:', choiceResult.outcome);
+        
+        // Clear the saved prompt
+        setInstallPrompt(null);
+        
+        // If user accepted the install, hide the prompt
+        if (choiceResult.outcome === 'accepted') {
+          console.log('User accepted the install prompt');
+          setShowPrompt(false);
+          localStorage.setItem('pwaPromptSeen', 'true');
+        } else {
+          console.log('User dismissed the install prompt');
+        }
+      } catch (error) {
+        console.error('Error during installation:', error);
+      }
+    } else {
+      // For iOS or when installPrompt is not available
+      setShowPrompt(false);
+      localStorage.setItem('pwaPromptSeen', 'true');
     }
-    
-    // Mark as seen and hide
-    setShowPrompt(false);
-    localStorage.setItem('pwaPromptSeen', 'true');
   };
 
   const handleDismiss = () => {
