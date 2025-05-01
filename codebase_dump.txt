@@ -1,0 +1,3427 @@
+==== File: middleware.ts ====
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|images|api).*)',
+  ],
+};
+
+
+
+==== File: next-env.d.ts ====
+/// <reference types="next" />
+/// <reference types="next/image-types/global" />
+/// <reference types="next/navigation-types/compat/navigation" />
+
+// NOTE: This file should not be edited
+// see https://nextjs.org/docs/basic-features/typescript for more information.
+
+
+
+
+==== File: next.config.js ====
+// next.config.js
+const withPWA = require('next-pwa')({
+  dest: 'public',            // where sw.js and other assets go
+  register: true,            // automatically register service worker
+  skipWaiting: true,         // activate new service worker immediately
+  disable: process.env.NODE_ENV === 'development', // don't run PWA in dev
+});
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  swcMinify: true,
+  async redirects() {
+    return [
+      {
+        source: '/home',
+        destination: '/',
+        permanent: true,
+      },
+    ];
+  },
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
+          },
+        ],
+      },
+    ];
+  },
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        fs: false,
+        path: false,
+      };
+    }
+    return config;
+  },
+};
+
+module.exports = withPWA(nextConfig);
+
+
+
+
+==== File: postcss.config.js ====
+module.exports = {
+  plugins: {
+    tailwindcss: {},
+    autoprefixer: {},
+  },
+}
+
+
+
+
+==== File: tailwind.config.js ====
+/** @type {import('tailwindcss').Config} */
+module.exports = {
+  content: [
+    './pages/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    fontFamily: {
+      outfit: ['var(--font-outfit)'],
+    },
+    extend: {
+      colors: {
+        card: {
+          red: '#E53E3E', // Slightly adjusted red
+          redLight: '#F56565', // For gradient
+          redDark: '#C53030', // For gradient
+        },
+        app: {
+        customGray: '#1A1A1A', // Exact gray from example
+          black: '#121212', // Pure black for background
+          darkGray: '#151515', // For transaction container
+          mediumGray: '#2D3748', // For inactive icons
+          lightGray: '#718096', // For text
+          green: '#48BB78', // For positive transactions
+        },
+      },
+      boxShadow: {
+        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1)',
+      }
+    },
+  },
+  plugins: [],
+};
+
+
+
+
+
+
+
+
+
+==== File: app\globals.css ====
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+
+@tailwind base;
+
+:root {
+  --font-outfit: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-outfit);
+  }
+}
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  background-color: black;
+  color: white;
+  font-family: "Outfit", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: #27272a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 4px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Animation utilities */
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.5s ease-out;
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Transition utilities */
+.transition-height {
+  transition-property: height;
+}
+
+/* Custom card styling */
+.credit-card {
+  transition: all 0.3s ease;
+  backface-visibility: hidden;
+}
+
+.credit-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom handle styling */
+.drag-handle {
+  touch-action: none;
+  user-select: none;
+}
+
+/* Smoother transitions */
+.transition-all {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Custom card styling */
+.credit-card {
+  transition: all 0.3s ease;
+  backface-visibility: hidden;
+}
+
+.credit-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom handle styling */
+.drag-handle {
+  touch-action: none;
+  user-select: none;
+}
+
+/* Smoother transitions */
+.transition-all {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Transaction container overlay */
+.transaction-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 15;
+  pointer-events: none;
+}
+
+/* Improved drag handle */
+.drag-handle {
+  width: 40px;
+  height: 4px;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  margin: 8px auto;
+  cursor: grab;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+/* Stylized cutout handle for transaction container */
+.drag-handle-container {
+  position: relative;
+  width: 100%;
+  height: 20px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  margin-top: -10px;
+}
+
+
+.drag-handle {
+  width: 40px;
+  height: 5px;
+  background-color: #212121; /* Transaction area color */
+  border-radius: 2.5px;
+  position: relative;
+  cursor: grab;
+  margin-top: 7px;
+}
+
+
+.drag-handle-container:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 20px;
+  background-color: #121212; /* App background color */
+  border-bottom-left-radius: 50px;
+  border-bottom-right-radius: 50px;
+}
+
+/* When dragging */
+.drag-handle:active {
+  cursor: grabbing;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+
+
+
+/* Add these styles to the end of your globals.css file */
+
+/* iOS-specific PWA styles */
+@supports (-webkit-touch-callout: none) {
+  /* iOS devices only */
+  html {
+    /* Fill the screen properly even with the notch/home indicator */
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    height: -webkit-fill-available;
+  }
+  
+  body {
+    /* Prevent elastic scrolling */
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    /* Prevent overscroll effects */
+    overflow: hidden;
+    min-height: -webkit-fill-available;
+  }
+  
+  /* Main app container should handle scrolling */
+  #app-container {
+    overflow-y: auto;
+    height: 100%;
+    /* Enable momentum scrolling on iOS */
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Style when iOS has scrolled (address bar is hidden) */
+  body.ios-scrolled {
+    /* Styles to apply when address bar is hidden */
+  }
+}
+
+/* Make sure anchor elements with PWA handle back properly */
+a {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+/* Prevent text selection in app */
+.app-no-select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+
+
+
+
+
+
+
+==== File: app\layout.tsx ====
+// âœ… This is a server component â€“ DO NOT add "use client"
+
+import type { Metadata } from 'next';
+import { Outfit } from 'next/font/google';
+import './globals.css';
+import IOSFullscreen from '@/components/IOSFullScreen';
+import { ThemeProvider } from '@/lib/context/ThemeContext';
+import AppContainer from '@/components/layout/AppContainer';
+
+const outfit = Outfit({
+  subsets: ['latin'],
+  weight: ['300', '400', '500', '600'],
+  display: 'swap',
+  variable: '--font-outfit',
+});
+
+export const metadata: Metadata = {
+  title: 'Banking App',
+  description: 'A modern banking app UI',
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  return (
+    <html lang="en" className={outfit.variable}>
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+        <meta name="theme-color" content="#121212" />
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Banking App" />
+      </head>
+      <body className={`${outfit.className} bg-gray-900 min-h-screen font-outfit`}>
+        <ThemeProvider>
+          <AppContainer>{children}</AppContainer>
+        </ThemeProvider>
+        <IOSFullscreen />
+        <script src="/sw-register.js" defer></script>
+      </body>
+    </html>
+  );
+}
+
+
+
+
+==== File: app\page.tsx ====
+'use client';
+
+import React from 'react';
+import Home from '@/components/screens/Home';
+import BottomNav from '@/components/ui/navigation/BottomNav';
+import { NavItemType } from '@/lib/types';
+
+const navItems: NavItemType[] = [
+  { name: 'Home', icon: 'home', href: '/' },
+  { name: 'Insights', icon: 'insights', href: '/insights' },
+  { name: 'Add', icon: 'add', href: '/new' },
+  { name: 'Wallet', icon: 'wallet', href: '/wallet' },
+  { name: 'More', icon: 'more', href: '/more' },
+];
+
+export default function Page() {
+  return (
+    <main className="relative min-h-screen">
+      <Home />
+      <BottomNav />
+    </main>
+  );
+}
+
+
+
+
+
+==== File: app\deposit\page.tsx ====
+'use client';
+
+import React from 'react';
+import BottomNav from '@/components/ui/navigation/BottomNav';
+
+export default function DepositPage() {
+  return (
+    <main className="relative min-h-screen">
+      <div className="flex items-center justify-center h-screen bg-black text-white">
+        <h1 className="text-2xl font-bold">Mobile Deposit</h1>
+      </div>
+      <BottomNav />
+    </main>
+  );
+}
+
+
+
+
+==== File: app\insights\page.tsx ====
+'use client';
+
+import React from 'react';
+import Insights from '@/components/screens/Insights';
+import BottomNav from '@/components/ui/navigation/BottomNav';
+import { NavItemType } from '@/lib/types';
+
+const navItems: NavItemType[] = [
+  { name: 'Home', icon: 'home', href: '/' },
+  { name: 'Insights', icon: 'insights', href: '/insights' },
+  { name: 'Add', icon: 'add', href: '/new' },
+  { name: 'Wallet', icon: 'wallet', href: '/wallet' },
+  { name: 'More', icon: 'more', href: '/more' },
+];
+
+export default function InsightsPage() {
+  return (
+    <main className="relative min-h-screen">
+      <Insights />
+      <BottomNav />
+    </main>
+  );
+}
+
+
+
+
+
+==== File: app\more\page.tsx ====
+'use client';
+
+import React from 'react';
+import More from '@/components/screens/More';
+import BottomNav from '@/components/ui/navigation/BottomNav';
+import { NavItemType } from '@/lib/types';
+
+const navItems: NavItemType[] = [
+  { name: 'Home', icon: 'home', href: '/' },
+  { name: 'Insights', icon: 'insights', href: '/insights' },
+  { name: 'Add', icon: 'add', href: '/new' },
+  { name: 'Wallet', icon: 'wallet', href: '/wallet' },
+  { name: 'More', icon: 'more', href: '/more' },
+];
+
+export default function MorePage() {
+  return (
+    <main className="relative min-h-screen">
+      <More />
+      <BottomNav />
+    </main>
+  );
+}
+
+
+
+
+
+==== File: app\new\page.tsx ====
+'use client';
+
+import React from 'react';
+import NewOperation from '@/components/screens/NewOperation';
+import BottomNav from '@/components/ui/navigation/BottomNav';
+import { NavItemType } from '@/lib/types';
+
+const navItems: NavItemType[] = [
+  { name: 'Home', icon: 'home', href: '/' },
+  { name: 'Insights', icon: 'insights', href: '/insights' },
+  { name: 'Add', icon: 'add', href: '/new' },
+  { name: 'Wallet', icon: 'wallet', href: '/wallet' },
+  { name: 'More', icon: 'more', href: '/more' },
+];
+
+export default function NewPage() {
+  return (
+    <main className="relative min-h-screen">
+      <NewOperation />
+      <BottomNav />
+    </main>
+  );
+}
+
+
+
+
+
+==== File: app\transfer\page.tsx ====
+'use client';
+
+import React from 'react';
+import BottomNav from '@/components/ui/navigation/BottomNav';
+
+export default function TransferPage() {
+  return (
+    <main className="relative min-h-screen">
+      <div className="flex items-center justify-center h-screen bg-black text-white">
+        <h1 className="text-2xl font-bold">Transfer</h1>
+      </div>
+      <BottomNav />
+    </main>
+  );
+}
+
+
+
+
+==== File: app\wallet\page.tsx ====
+'use client';
+
+import React from 'react';
+import Wallet from '@/components/screens/Wallet';
+import BottomNav from '@/components/ui/navigation/BottomNav';
+import { NavItemType } from '@/lib/types';
+
+const navItems: NavItemType[] = [
+  { name: 'Home', icon: 'home', href: '/' },
+  { name: 'Insights', icon: 'insights', href: '/insights' },
+  { name: 'Add', icon: 'add', href: '/new' },
+  { name: 'Wallet', icon: 'wallet', href: '/wallet' },
+  { name: 'More', icon: 'more', href: '/more' },
+];
+
+export default function WalletPage() {
+  return (
+    <main className="relative min-h-screen">
+      <Wallet />
+      <BottomNav />
+    </main>
+  );
+}
+
+
+
+
+
+==== File: components\IOSFullScreen.tsx ====
+'use client';
+
+import { useEffect } from 'react';
+import { setupIOSFullscreen } from '@/lib/utils/iosFullscreen';
+
+export default function IOSFullscreen() {
+  useEffect(() => {
+    setupIOSFullscreen();
+  }, []);
+
+  return null;
+}
+
+
+
+
+==== File: components\RegisterServiceWorker.tsx ====
+'use client';
+
+import { useEffect } from 'react';
+
+export default function RegisterServiceWorker() {
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js').then(
+          (registration) => {
+            console.log('Service Worker registration successful:', registration.scope);
+          },
+          (err) => {
+            console.log('Service Worker registration failed:', err);
+          }
+        );
+      });
+    }
+  }, []);
+
+  return null;
+}
+
+
+
+
+==== File: components\layout\AppContainer.tsx ====
+// components/layout/AppContainer.tsx
+'use client';
+
+import React, { useEffect } from 'react';
+import { useTheme } from '@/lib/context/ThemeContext';
+import dynamic from 'next/dynamic';
+
+// Dynamically import the PWA install prompt to avoid SSR issues
+const PWAInstallPrompt = dynamic(
+  () => import('../ui/common/PWAInstallPrompt'),
+  { ssr: false }
+);
+
+interface AppContainerProps {
+  children: React.ReactNode;
+}
+
+const AppContainer: React.FC<AppContainerProps> = ({ children }) => {
+  const { theme } = useTheme();
+  
+  // Add class to body when in standalone mode (PWA)
+  useEffect(() => {
+    const isStandalone = 
+      window.matchMedia('(display-mode: standalone)').matches ||
+      (window.navigator as any).standalone ||
+      document.referrer.includes('android-app://');
+    
+    if (isStandalone) {
+      document.body.classList.add('pwa-mode');
+    }
+    
+    // Listen for display mode changes
+    const mediaQuery = window.matchMedia('(display-mode: standalone)');
+    const handleChange = (e: MediaQueryListEvent) => {
+      if (e.matches) {
+        document.body.classList.add('pwa-mode');
+      } else {
+        document.body.classList.remove('pwa-mode');
+      }
+    };
+    
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, []);
+  
+  return (
+    <div className="min-h-screen flex justify-center bg-neutral-800">
+      {/* Main container with proper constraints - add id for iOS scrolling */}
+      <div 
+        id="app-container" 
+        className="w-full relative min-h-screen bg-app-black text-white overflow-hidden app-no-select
+          md:max-w-sm lg:max-w-md xl:max-w-md 
+          md:my-5 lg:my-10 xl:my-10
+          md:rounded-2xl lg:rounded-2xl xl:rounded-2xl
+          md:shadow-2xl lg:shadow-2xl xl:shadow-2xl
+          md:border md:border-gray-800 lg:border lg:border-gray-800 xl:border xl:border-gray-800
+          md:min-h-[650px] lg:min-h-[750px] xl:min-h-[750px]
+          md:max-h-[90vh] lg:max-h-[90vh] xl:max-h-[90vh]
+          transition-all duration-300"
+      >
+        {/* Phone frame styling for desktop view */}
+        <div className="hidden md:block absolute top-3 w-28 h-6 bg-black rounded-b-2xl left-1/2 transform -translate-x-1/2"></div>
+        
+        {/* Content with proper padding for bottom elements */}
+        <div className="md:mt-6 pb-16 md:pb-0 h-full flex flex-col">
+          {children}
+        </div>
+        
+        {/* PWA Install Prompt - only shown in client */}
+        <PWAInstallPrompt />
+      </div>
+    </div>
+  );
+};
+
+export default AppContainer;
+
+
+
+==== File: components\screens\Home.tsx ====
+// components/screens/Home.tsx
+'use client';
+
+import React, { useState, useEffect, useRef } from 'react';
+import { motion } from 'framer-motion';
+import { CreditCard, Settings, ArrowLeftRight, AlertCircle, Lock } from 'lucide-react';
+import { getDefaultCard } from '@/lib/data/cards';
+import { getTransactions } from '@/lib/data/transactions';
+import CreditCardComponent from '../ui/card/CreditCard'; 
+import TransactionContainer from '../ui/transactions/TransactionContainer';
+import Header from '../ui/navigation/Header';
+import LoadingSpinner from '../ui/common/LoadingSpinner';
+import Icon from '../ui/icons/Icon';
+import SpendingChart from '../ui/charts/SpendingChart';
+
+const Home: React.FC = () => {
+  const card = getDefaultCard();
+  const transactions = getTransactions();
+  const [isLoading, setIsLoading] = useState(true);
+  const [showInfo, setShowInfo] = useState(false);
+  const [balance] = useState(25552.92);
+  const payButtonsRef = useRef<HTMLDivElement>(null);
+  const [buttonBottomPosition, setButtonBottomPosition] = useState(0);
+  const [isTransactionCollapsed, setIsTransactionCollapsed] = useState(true); // Start collapsed by default
+  const [showTransactions, setShowTransactions] = useState(false); // Initially hidden
+  const isManageClickRef = useRef(false);
+
+  // Loading simulation
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 800);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // When page loads or card info is toggled, calculate positions
+  useEffect(() => {
+    if (!isLoading) {
+      const calculatePositions = () => {
+        if (payButtonsRef.current) {
+          const rect = payButtonsRef.current.getBoundingClientRect();
+          if (rect.bottom > 0) {
+            setButtonBottomPosition(rect.bottom);
+          }
+        }
+      };
+      
+      // Calculate immediately
+      calculatePositions();
+      
+      // And after a short delay to account for animations
+      const animationDelay = setTimeout(calculatePositions, 350);
+      
+      // Also listen for window resize events
+      window.addEventListener('resize', calculatePositions);
+      
+      return () => {
+        clearTimeout(animationDelay);
+        window.removeEventListener('resize', calculatePositions);
+      };
+    }
+  }, [isLoading, showInfo]); 
+
+  // Handle transactions card click - load full screen immediately
+  const handleTransactionsClick = () => {
+    // Show the transactions panel
+    setShowTransactions(true);
+    // Directly set to fullscreen
+    setIsTransactionCollapsed(false);
+  };
+
+  // Handle manage button click with debouncing
+  const handleManageClick = () => {
+    isManageClickRef.current = true;
+    setIsTransactionCollapsed(!isTransactionCollapsed);
+    
+    // If showing transactions and we're expanding
+    if (showTransactions === false && !isTransactionCollapsed) {
+      setShowTransactions(true);
+    }
+    
+    setTimeout(() => {
+      isManageClickRef.current = false;
+    }, 100);
+  };
+
+  // Handle collapse state changes from the container
+  const handleCollapseChange = (collapsed: boolean) => {
+    console.log("Collapse state change:", collapsed); // Add debugging
+    setIsTransactionCollapsed(collapsed);
+    
+    // If fully collapsed, hide the transaction container after a delay
+    if (collapsed) {
+      setTimeout(() => {
+        setShowTransactions(false);
+      }, 300); // Wait for collapse animation to finish
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-app-black">
+        <LoadingSpinner size="large" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="relative min-h-screen bg-app-black text-white animate-fade-in">
+      <Header userName="Jess" />
+      
+      <div className="px-5">
+        {/* Card with simple animation */}
+        <motion.div 
+          className="mb-4"
+          initial={{ y: 50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ 
+            type: "spring", 
+            damping: 25, 
+            stiffness: 120,
+            delay: 0.1 
+          }}
+        >
+          <CreditCardComponent 
+            card={card} 
+            balance={balance} 
+            showInfoState={[showInfo, setShowInfo]}
+          />
+        </motion.div>
+        
+        {/* Feature grid */}
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          {/* Transactions button */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="bg-[#212121] rounded-xl p-4 cursor-pointer h-28"
+            onClick={handleTransactionsClick}
+          >
+            <h3 className="font-medium mb-1">Transactions</h3>
+            <p className="text-gray-400 text-sm mb-3">Spent in April</p>
+            <div className="flex space-x-1">
+              <div className="w-10 h-3 bg-purple-600 rounded-md"></div>
+              <div className="w-6 h-3 bg-red-500 rounded-md"></div>
+              <div className="w-4 h-3 bg-blue-500 rounded-md"></div>
+              <div className="w-8 h-3 bg-yellow-400 rounded-md"></div>
+            </div>
+          </motion.div>
+
+          {/* Rewards */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="bg-[#212121] rounded-xl p-4 h-28"
+          >
+            <h3 className="font-medium mb-1">Rewards</h3>
+            <p className="text-gray-400 text-sm mb-2">Cash back earned</p>
+            <p className="text-xl font-bold text-green-500">$342.89</p>
+          </motion.div>
+        </div>
+
+        {/* Second row of buttons */}
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          {/* Pay button */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="bg-[#212121] rounded-xl p-4 flex items-center cursor-pointer"
+          >
+            <div className="bg-neutral-700 p-2 rounded-full mr-3">
+              <Icon name="repeat" className="w-5 h-5" />
+            </div>
+            <span>Pay</span>
+          </motion.div>
+
+          {/* Manage */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.5 }}
+            className="bg-[#212121] rounded-xl p-4 flex items-center cursor-pointer"
+            onClick={handleManageClick}
+          >
+            <div className="bg-neutral-700 p-2 rounded-full mr-3">
+              <Settings className="w-5 h-5" />
+            </div>
+            <span>Manage</span>
+          </motion.div>
+        </div>
+
+        {/* Refer and Earn card with image */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          className="bg-[#212121] rounded-xl p-4 mb-4 overflow-hidden relative"
+        >
+          <div className="flex justify-between items-center">
+            <div className="w-3/5">
+              <h3 className="font-medium mb-1">Refer and Earn</h3>
+              <p className="text-gray-400 text-sm mb-3">Share a referral link to your friend and get rewarded</p>
+              <button className="bg-neutral-800 text-white px-4 py-2 rounded-full text-sm">
+                Learn more
+              </button>
+            </div>
+            <div className="absolute right-0 bottom-0">
+              <img 
+                src="/images/refer/refer-friend.png" 
+                alt="Refer a friend" 
+                className="h-24 object-contain"
+              />
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Action buttons row - Updated to match pay/manage styling */}
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          {/* Balance Transfer */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8 }}
+            className="bg-[#212121] rounded-xl p-4 flex items-center cursor-pointer"
+          >
+            <div className="bg-neutral-700 p-2 rounded-full mr-3">
+              <ArrowLeftRight className="w-5 h-5" />
+            </div>
+            <span>Balance Transfer</span>
+          </motion.div>
+
+          {/* Lock/Unlock */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.9 }}
+            className="bg-[#212121] rounded-xl p-4 flex items-center cursor-pointer"
+          >
+            <div className="bg-neutral-700 p-2 rounded-full mr-3">
+              <Lock className="w-5 h-5" />
+            </div>
+            <span>Lock/Unlock</span>
+          </motion.div>
+        </div>
+        
+        {/* Statements and Documents full-width card */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 1.0 }}
+          className="bg-[#212121] rounded-xl p-4 mb-4 flex items-center justify-between cursor-pointer"
+          ref={payButtonsRef}
+        >
+          <span className="font-medium">Statements and Documents</span>
+          <span className="text-gray-400 text-sm">View All</span>
+        </motion.div>
+        
+        {/* Adding bottom margin */}
+        <div className="mb-20"></div>
+      </div>
+      
+      {/* Transaction Container - Only show when showTransactions is true */}
+      {showTransactions && buttonBottomPosition > 0 && (
+        <motion.div
+          initial={{ y: 300, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ 
+            type: "spring", 
+            damping: 25, 
+            stiffness: 120
+          }}
+        >
+          <TransactionContainer 
+            transactionGroups={transactions}
+            buttonBottomPosition={buttonBottomPosition}
+            isCollapsed={isTransactionCollapsed}
+            onCollapseChange={handleCollapseChange}
+          />
+        </motion.div>
+      )}
+    </div>
+  );
+};
+
+export default Home;
+
+
+
+==== File: components\screens\Insights.tsx ====
+import React from 'react';
+
+const Insights: React.FC = () => {
+  return (
+    <div className="flex items-center justify-center h-screen bg-black text-white">
+      <h1 className="text-2xl font-bold">Insights View</h1>
+    </div>
+  );
+};
+
+export default Insights;
+
+
+
+
+==== File: components\screens\More.tsx ====
+import React from 'react';
+
+const More: React.FC = () => {
+  return (
+    <div className="flex items-center justify-center h-screen bg-black text-white">
+      <h1 className="text-2xl font-bold">More View</h1>
+    </div>
+  );
+};
+
+export default More;
+
+
+
+
+==== File: components\screens\NewOperation.tsx ====
+import React from 'react';
+
+const NewOperation: React.FC = () => {
+  return (
+    <div className="flex items-center justify-center h-screen bg-black text-white">
+      <h1 className="text-2xl font-bold">New Operation View</h1>
+    </div>
+  );
+};
+
+export default NewOperation;
+
+
+
+
+==== File: components\screens\Wallet.tsx ====
+import React from 'react';
+
+const Wallet: React.FC = () => {
+  return (
+    <div className="flex items-center justify-center h-screen bg-black text-white">
+      <h1 className="text-2xl font-bold">Wallet View</h1>
+    </div>
+  );
+};
+
+export default Wallet;
+
+
+
+
+==== File: components\ui\card\CardInfo.tsx ====
+
+
+
+==== File: components\ui\card\CardSelector.tsx ====
+'use client';
+
+import React, { useState } from 'react';
+import { CardType } from '@/lib/types';
+import CreditCard from './CreditCard';
+
+interface CardSelectorProps {
+  cards: CardType[];
+  activeCardId: string;
+  onCardChange: (cardId: string) => void;
+}
+
+const CardSelector: React.FC<CardSelectorProps> = ({ cards, activeCardId, onCardChange }) => {
+  const [currentIndex, setCurrentIndex] = useState(
+    cards.findIndex(card => card.id === activeCardId) || 0
+  );
+
+  const handleCardChange = (index: number) => {
+    setCurrentIndex(index);
+    onCardChange(cards[index].id);
+  };
+
+  return (
+    <div className="w-full">
+      <div className="relative overflow-hidden">
+        {/* Current card */}
+        <div className="transition-all duration-300 ease-in-out">
+          <CreditCard card={cards[currentIndex]} />
+        </div>
+        
+        {/* Card indicators */}
+        {cards.length > 1 && (
+          <div className="flex justify-center mt-4 space-x-2">
+            {cards.map((card, index) => (
+              <button
+                key={card.id}
+                className={`w-2 h-2 rounded-full transition-all ${
+                  index === currentIndex ? 'bg-white scale-125' : 'bg-gray-600'
+                }`}
+                onClick={() => handleCardChange(index)}
+                aria-label={`Select card ${index + 1}`}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default CardSelector;
+
+
+
+
+
+==== File: components\ui\card\CreditCard.tsx ====
+// components/ui/card/CreditCard.tsx
+'use client';
+
+import React, { useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Info } from 'lucide-react';
+import { CardType } from '@/lib/types';
+
+interface CreditCardProps {
+  card: CardType;
+  balance?: number;
+  showInfoState?: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
+}
+
+const CreditCard: React.FC<CreditCardProps> = ({ 
+  card, 
+  balance = 25552.92,
+  showInfoState
+}) => {
+  // Use local or parent-controlled state for showInfo
+  const [showInfo, setShowInfo] = showInfoState || React.useState(false);
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  return (
+    <div className="w-full" ref={cardRef}>
+      {/* Credit Card with balance directly inside */}
+      <div
+        className="relative w-full rounded-xl overflow-hidden shadow-lg transform transition-all duration-300 hover:scale-[1.01]"
+        style={{
+          backgroundColor: '#7b2528', // Keep original red color
+        }}
+      >
+        {/* Card content */}
+        <div className="p-5 flex flex-col">
+          {/* Card top section with balance and info button */}
+          <div className="flex justify-between items-start">
+            <div className="text-white">
+              <p className="text-gray-300 text-sm">Your Balance</p>
+              <h1 className="text-white text-4xl font-semibold">${balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</h1>
+            </div>
+            <button
+              onClick={() => setShowInfo(!showInfo)}
+              className="bg-white/30 px-3 py-1 rounded-full text-white text-xs flex items-center transition-all hover:bg-white/40"
+            >
+              <Info className="w-4 h-4 mr-1" />
+              Show info
+            </button>
+          </div>
+          
+          {/* Additional card info - Animated slide down */}
+          <AnimatePresence>
+            {showInfo && (
+              <motion.div 
+                className="mt-1 text-white"
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: "auto", opacity: 1 }}
+                exit={{ height: 0, opacity: 0, marginTop: 0 }}
+                transition={{ 
+                  duration: 0.3, 
+                  ease: "easeInOut"
+                }}
+              >
+                <div className="grid grid-cols-2">
+                  <div className="text-gray-300 text-sm">Available Credit:</div>
+                  <div className="text-right font-medium text-sm">$3,914.65</div>
+                  
+                  <div className="text-gray-300 text-sm">Minimum Payment:</div>
+                  <div className="text-right font-medium text-sm">$0.00</div>
+                  
+                  <div className="text-gray-300 text-sm">Due Date:</div>
+                  <div className="text-right font-medium text-sm">5/25/2025</div>
+                  
+                  <div className="text-gray-300 text-sm mt-1">AutoPay:</div>
+                  <div className="text-right font-medium text-sm mt-1">
+                    ON | <a href="#" className="text-neutral-400 hover:underline">Settings</a>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          
+          {/* VISA bar at bottom */}
+          <div className="relative mt-4 -mx-5 -mb-5 bg-black/40 py-2 px-5 flex justify-between items-center">
+            <div className="text-white text-xl font-bold">VISA</div>
+            <div className="text-white text-base">â€¢â€¢â€¢â€¢ 9891</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CreditCard;
+
+
+
+==== File: components\ui\charts\SpendingChart.tsx ====
+// components/ui/charts/SpendingChart.tsx
+'use client';
+
+import React from 'react';
+import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+
+interface SpendingData {
+  name: string;
+  value: number;
+  color: string;
+}
+
+interface PeriodOption {
+  id: string;
+  name: string;
+  label: string;
+}
+
+interface SpendingChartProps {
+  selectedPeriod: string;
+  periodOptions: PeriodOption[];
+}
+
+const SpendingChart: React.FC<SpendingChartProps> = ({ selectedPeriod, periodOptions }) => {
+  // Period-specific data with more accurate colors matching the inspiration image
+  const periodData = {
+    day: [
+      { name: 'Shopping', value: 120, color: '#8b5cf6' }, // Purple
+      { name: 'Food', value: 84, color: '#f87171' }, // Red
+      { name: 'Entertainment', value: 65, color: '#60a5fa' }, // Blue
+      { name: 'Transport', value: 48, color: '#fbbf24' }, // Yellow
+      { name: 'Other', value: 30, color: '#4ade80' }, // Green
+    ],
+    week: [
+      { name: 'Shopping', value: 280, color: '#8b5cf6' },
+      { name: 'Food', value: 175, color: '#f87171' },
+      { name: 'Entertainment', value: 120, color: '#60a5fa' },
+      { name: 'Transport', value: 95, color: '#fbbf24' },
+      { name: 'Other', value: 60, color: '#4ade80' },
+    ],
+    month: [
+      { name: 'Shopping', value: 450, color: '#8b5cf6' },
+      { name: 'Food', value: 300, color: '#f87171' },
+      { name: 'Entertainment', value: 250, color: '#60a5fa' },
+      { name: 'Transport', value: 244, color: '#fbbf24' },
+      { name: 'Other', value: 100, color: '#4ade80' },
+    ],
+    year: [
+      { name: 'Shopping', value: 4820, color: '#8b5cf6' },
+      { name: 'Food', value: 3600, color: '#f87171' },
+      { name: 'Entertainment', value: 2950, color: '#60a5fa' },
+      { name: 'Transport', value: 3100, color: '#fbbf24' },
+      { name: 'Other', value: 1200, color: '#4ade80' },
+    ],
+  };
+  
+  // Get data for the current period
+  const data = periodData[selectedPeriod as keyof typeof periodData];
+  
+  // Calculate total spent
+  const totalSpent = data.reduce((sum, item) => sum + item.value, 0);
+  
+  // Format as currency
+  const formatCurrency = (value: number) => {
+    return `$${value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  };
+  
+  // Get the label for the current period
+  const getPeriodLabel = () => {
+    const option = periodOptions.find(p => p.id === selectedPeriod);
+    return option ? option.label : 'this month';
+  };
+
+  return (
+    <div className="w-full">
+      {/* Chart container - reduced thickness to match inspiration better */}
+      <div className="relative" style={{ height: '260px' }}>
+        <ResponsiveContainer width="100%" height="100%">
+          <PieChart>
+            <Pie
+              data={data}
+              cx="50%"
+              cy="50%"
+              innerRadius={95}
+              outerRadius={115}
+              startAngle={90}
+              endAngle={-270}
+              dataKey="value"
+              strokeWidth={0}
+              paddingAngle={5} // Increased spacing between segments
+            >
+              {data.map((entry, index) => (
+                // Using type assertion to bypass TypeScript's type checking
+                <Cell 
+                  key={`cell-${index}`} 
+                  fill={entry.color} 
+                  strokeWidth={0}
+                  {...({ cornerRadius: 6 } as any)} // Type assertion to bypass TypeScript check
+                />
+              ))}
+            </Pie>
+          </PieChart>
+        </ResponsiveContainer>
+        
+        {/* Centered text overlay - adjusted font size */}
+        <div className="absolute flex flex-col items-center justify-center inset-0 pointer-events-none">
+          <p className="text-gray-400 mb-1" style={{ fontSize: '15px' }}>Spent {getPeriodLabel()}</p>
+          <p className="text-white font-semibold" style={{ fontSize: '36px' }}>{formatCurrency(totalSpent)}</p>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default SpendingChart;
+
+
+
+==== File: components\ui\common\CustomBottomSheet.tsx ====
+'use client';
+
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useSpring, useMotionValue } from 'framer-motion';
+
+interface CustomBottomSheetProps {
+  children: React.ReactNode;
+  snapPoints: number[];
+  defaultSnap?: number;
+  expandOnContentDrag?: boolean;
+  onSnap?: (index: number) => void;
+}
+
+const CustomBottomSheet: React.FC<CustomBottomSheetProps> = ({
+  children,
+  snapPoints,
+  defaultSnap = 0,
+  expandOnContentDrag = false,
+  onSnap,
+}) => {
+  const [currentSnap, setCurrentSnap] = useState(defaultSnap);
+  const [isDragging, setIsDragging] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const y = useMotionValue(0);
+  
+  // Update height whenever snap changes
+  useEffect(() => {
+    if (snapPoints && snapPoints.length > currentSnap) {
+      y.set(0); // Reset drag position
+    }
+  }, [currentSnap, snapPoints, y]);
+
+  // Find closest snap point on drag end
+  const findClosestSnapPoint = (dragY: number) => {
+    if (!snapPoints || snapPoints.length === 0) return 0;
+    
+    // Current position is the current snap point minus the drag amount
+    const currentHeight = snapPoints[currentSnap];
+    const targetHeight = currentHeight - dragY;
+    
+    // Find the closest snap point to the target height
+    let closestIndex = 0;
+    let closestDistance = Math.abs(snapPoints[0] - targetHeight);
+    
+    snapPoints.forEach((snap, index) => {
+      const distance = Math.abs(snap - targetHeight);
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestIndex = index;
+      }
+    });
+    
+    return closestIndex;
+  };
+
+  const handleDragEnd = (event: any, info: any) => {
+    // Find closest snap point based on drag velocity and position
+    const newSnapIndex = findClosestSnapPoint(info.offset.y);
+    setCurrentSnap(newSnapIndex);
+    
+    if (onSnap) {
+      onSnap(newSnapIndex);
+    }
+  };
+
+  return (
+    <motion.div
+      className="fixed bottom-0 left-0 right-0 bg-app-darkGray rounded-t-2xl shadow-lg z-10 overflow-hidden
+                md:left-1/2 md:transform md:-translate-x-1/2 md:max-w-md"
+      style={{ height: snapPoints[currentSnap] || 300 }}
+      initial={{ height: snapPoints[defaultSnap] || 300 }}
+      animate={{ height: snapPoints[currentSnap] || 300 }}
+      transition={{ type: "spring", damping: 20, stiffness: 300 }}
+    >
+      {/* Drag handle */}
+      <motion.div 
+        className="drag-handle-container cursor-grab active:cursor-grabbing"
+        drag="y"
+        dragConstraints={{ top: 0, bottom: 0 }}
+        dragElastic={0.1}
+        dragMomentum={false}
+        onDragStart={() => setIsDragging(true)}
+        onDragEnd={(e, info) => {
+          setIsDragging(false);
+          handleDragEnd(e, info);
+        }}
+        style={{ y }}
+      >
+        <div className="drag-handle"></div>
+      </motion.div>
+      
+      {/* Content */}
+      <motion.div 
+        ref={contentRef}
+        className="overflow-y-auto max-h-full"
+        drag={expandOnContentDrag ? "y" : false}
+        dragConstraints={{ top: 0, bottom: 0 }}
+        dragElastic={0.1}
+        dragMomentum={false}
+        onDragStart={() => expandOnContentDrag && setIsDragging(true)}
+        onDragEnd={(e, info) => {
+          if (expandOnContentDrag) {
+            setIsDragging(false);
+            handleDragEnd(e, info);
+          }
+        }}
+        style={{ touchAction: expandOnContentDrag ? 'none' : 'auto' }}
+      >
+        {children}
+      </motion.div>
+    </motion.div>
+  );
+};
+
+export default CustomBottomSheet;
+
+
+
+==== File: components\ui\common\LoadingSpinner.tsx ====
+import React from 'react';
+
+interface LoadingSpinnerProps {
+  size?: 'small' | 'medium' | 'large';
+  color?: string;
+}
+
+const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({ 
+  size = 'medium', 
+  color = 'text-white' 
+}) => {
+  const sizeClasses = {
+    small: 'w-4 h-4',
+    medium: 'w-8 h-8',
+    large: 'w-12 h-12',
+  };
+
+  return (
+    <div className="flex justify-center items-center">
+      <div className={`${sizeClasses[size]} ${color} animate-spin`}>
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+      </div>
+    </div>
+  );
+};
+
+export default LoadingSpinner;
+
+
+
+
+==== File: components\ui\common\PWAInstallPrompt.tsx ====
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { X, Download, Share } from 'lucide-react';
+
+// Define BeforeInstallPromptEvent interface
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
+}
+
+const PWAInstallPrompt: React.FC = () => {
+  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [showPrompt, setShowPrompt] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
+  
+  useEffect(() => {
+    // Check if the app is running on iOS
+    const iosCheck = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+    setIsIOS(iosCheck);
+    
+    // Check if the app is already in standalone mode (installed as PWA)
+    const isStandalone = 
+      window.matchMedia('(display-mode: standalone)').matches || 
+      (window.navigator as any).standalone || 
+      document.referrer.includes('android-app://');
+    
+    if (isStandalone) {
+      setShowPrompt(false);
+      return;
+    }
+    
+    // Handler for install prompt
+    const handler = (e: Event) => {
+      // Prevent the default browser install prompt
+      e.preventDefault();
+      console.log('beforeinstallprompt fired', e);
+      
+      // Store the event for later use
+      setInstallPrompt(e as BeforeInstallPromptEvent);
+      
+      // Check if user has already seen the prompt
+      const hasSeenPrompt = localStorage.getItem('pwaPromptSeen');
+      if (!hasSeenPrompt) {
+        setShowPrompt(true);
+      }
+    };
+
+    // Add the event listeners
+    window.addEventListener('beforeinstallprompt', handler);
+    
+    // Listen for successful installation
+    window.addEventListener('appinstalled', (e) => {
+      console.log('App was successfully installed', e);
+      setShowPrompt(false);
+      localStorage.setItem('pwaPromptSeen', 'true');
+    });
+    
+    // Also show the prompt if the user hasn't seen it before, even on iOS
+    // which doesn't fire the beforeinstallprompt event
+    const hasSeenPrompt = localStorage.getItem('pwaPromptSeen');
+    if (!hasSeenPrompt && !isStandalone) {
+      setShowPrompt(true);
+    }
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handler);
+    };
+  }, []);
+
+  const handleInstall = async () => {
+    if (installPrompt) {
+      try {
+        // Explicitly prompt the user to install
+        await installPrompt.prompt();
+        
+        // Wait for the user's choice
+        const choiceResult = await installPrompt.userChoice;
+        console.log('User installation choice:', choiceResult.outcome);
+        
+        // Clear the saved prompt
+        setInstallPrompt(null);
+        
+        // If user accepted the install, hide the prompt
+        if (choiceResult.outcome === 'accepted') {
+          console.log('User accepted the install prompt');
+          setShowPrompt(false);
+          localStorage.setItem('pwaPromptSeen', 'true');
+        } else {
+          console.log('User dismissed the install prompt');
+        }
+      } catch (error) {
+        console.error('Error during installation:', error);
+      }
+    } else {
+      // For iOS or when installPrompt is not available
+      setShowPrompt(false);
+      localStorage.setItem('pwaPromptSeen', 'true');
+    }
+  };
+
+  const handleDismiss = () => {
+    setShowPrompt(false);
+    // Remember the dismissal for 7 days
+    localStorage.setItem('pwaPromptSeen', 'true');
+    setTimeout(() => {
+      localStorage.removeItem('pwaPromptSeen');
+    }, 7 * 24 * 60 * 60 * 1000);
+  };
+
+  if (!showPrompt) return null;
+
+  return (
+    <div className="fixed bottom-20 left-4 right-4 bg-gray-800 rounded-lg p-4 shadow-lg z-50
+      md:left-1/2 md:max-w-sm md:transform md:-translate-x-1/2">
+      <div className="flex items-start justify-between">
+        <div className="flex-1">
+          <h3 className="text-white font-semibold text-lg mb-1">Install Banking App</h3>
+          
+          {isIOS ? (
+            // iOS specific instructions
+            <div>
+              <p className="text-gray-300 text-sm mb-3">
+                To install this app on your iPhone:
+              </p>
+              <ol className="text-gray-300 text-sm ml-4 list-decimal mb-3">
+                <li>Tap the <Share className="inline-block w-4 h-4 mb-1" /> share icon</li>
+                <li>Scroll down and tap "Add to Home Screen"</li>
+                <li>Tap "Add" in the top right</li>
+              </ol>
+            </div>
+          ) : (
+            // Standard instructions for Android/other browsers
+            <p className="text-gray-300 text-sm mb-3">Add to your home screen for a better experience!</p>
+          )}
+          
+          <div className="flex space-x-3">
+            {!isIOS && (
+              <button
+                onClick={handleInstall}
+                className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium"
+              >
+                Install
+              </button>
+            )}
+            <button
+              onClick={handleDismiss}
+              className="bg-gray-700 text-white px-4 py-2 rounded-lg text-sm font-medium"
+            >
+              Not now
+            </button>
+          </div>
+        </div>
+        <button
+          onClick={handleDismiss}
+          className="text-gray-400 hover:text-white"
+          aria-label="Close"
+        >
+          <X size={20} />
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default PWAInstallPrompt;
+
+
+
+
+==== File: components\ui\common\SimpleDraggableSheet.tsx ====
+'use client';
+
+import React, { useState, useRef, useEffect } from 'react';
+
+interface SimpleDraggableSheetProps {
+  children: React.ReactNode;
+  minHeight: number;
+  maxHeight: number;
+  initialHeight?: number;
+}
+
+const SimpleDraggableSheet: React.FC<SimpleDraggableSheetProps> = ({
+  children,
+  minHeight,
+  maxHeight,
+  initialHeight = minHeight,
+}) => {
+  const [height, setHeight] = useState(initialHeight);
+  const [isDragging, setIsDragging] = useState(false);
+  const startYRef = useRef(0);
+  const startHeightRef = useRef(initialHeight);
+  const sheetRef = useRef<HTMLDivElement>(null);
+
+  // Handle drag start
+  const handleTouchStart = (e: React.TouchEvent | React.MouseEvent) => {
+    const clientY = 'touches' in e ? e.touches[0].clientY : (e as React.MouseEvent).clientY;
+    startYRef.current = clientY;
+    startHeightRef.current = height;
+    setIsDragging(true);
+  };
+
+  // Handle drag move
+  const handleTouchMove = (e: TouchEvent | MouseEvent) => {
+    if (!isDragging) return;
+    
+    const clientY = 'touches' in e ? e.touches[0].clientY : (e as MouseEvent).clientY;
+    const deltaY = startYRef.current - clientY;
+    const newHeight = Math.min(maxHeight, Math.max(minHeight, startHeightRef.current + deltaY));
+    
+    setHeight(newHeight);
+  };
+
+  // Handle drag end
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+    
+    // Snap to closest position (min or max)
+    const midPoint = (minHeight + maxHeight) / 2;
+    if (height < midPoint) {
+      setHeight(minHeight);
+    } else {
+      setHeight(maxHeight);
+    }
+  };
+
+  // Add and remove event listeners
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => handleTouchMove(e);
+    const handleMouseUp = () => handleTouchEnd();
+    
+    if (isDragging) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener('touchmove', handleTouchMove);
+      document.addEventListener('touchend', handleTouchEnd);
+    }
+    
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [isDragging]);
+
+  return (
+    <div 
+      ref={sheetRef}
+      className="fixed bottom-0 left-0 right-0 bg-[#212121] rounded-t-xl transition-all duration-300 ease-in-out overflow-hidden
+        md:left-1/2 md:transform md:-translate-x-1/2 md:max-w-md"
+      style={{ 
+        height: `${height}px`,
+        transition: isDragging ? 'none' : 'height 0.3s ease'
+      }}
+    >
+      {/* Drag handle */}
+      <div 
+        className="w-full flex justify-center py-2 cursor-grab"
+        onTouchStart={handleTouchStart}
+        onMouseDown={handleTouchStart}
+      >
+        <div className="w-10 h-1 bg-gray-600 rounded-full"></div>
+      </div>
+      
+      {/* Content */}
+      <div className="overflow-y-auto h-[calc(100%-24px)]">
+        {children}
+      </div>
+    </div>
+  );
+};
+
+export default SimpleDraggableSheet;
+
+
+
+==== File: components\ui\icons\Icon.tsx ====
+// components/ui/icons/Icon.tsx
+import React from 'react';
+import * as LucideIcons from 'lucide-react';
+
+interface IconProps {
+  name: string;
+  className?: string;
+}
+
+const Icon: React.FC<IconProps> = ({ name, className = 'w-6 h-6' }) => {
+  // Map for standard icons (navigation, UI elements, etc.)
+  const standardIconMap: Record<string, any> = {
+    car: LucideIcons.Car,
+    deposit: LucideIcons.PlusCircle,
+    home: LucideIcons.Home,
+    insights: LucideIcons.LineChart,
+    add: LucideIcons.Plus,
+    wallet: LucideIcons.Wallet,
+    more: LucideIcons.MoreHorizontal,
+    shopping: LucideIcons.ShoppingBag,
+    transfer: LucideIcons.ArrowLeftRight, // Using the correct name from documentation
+    subscription: LucideIcons.Repeat,
+    entertainment: LucideIcons.Music,
+    notificationBell: LucideIcons.Bell,
+    repeat: LucideIcons.Repeat, // For pay button
+  };
+
+  // Map for merchant-specific icons
+  const merchantIconMap: Record<string, any> = {
+    netflix: LucideIcons.Tv,
+    spotify: LucideIcons.Music,
+    amazon: LucideIcons.ShoppingCart,
+    uber: LucideIcons.Car,
+    starbucks: LucideIcons.Coffee,
+    zara: LucideIcons.ShoppingBag,
+    payroll: LucideIcons.Landmark,
+  };
+
+  // Map for category-specific icons
+  const categoryIconMap: Record<string, any> = {
+    food: LucideIcons.UtensilsCrossed,
+    dining: LucideIcons.UtensilsCrossed,
+    travel: LucideIcons.Plane,
+    transport: LucideIcons.Bus,
+    utilities: LucideIcons.Lightbulb,
+    health: LucideIcons.Stethoscope,
+    coffee: LucideIcons.Coffee,
+  };
+
+  // Try to render the icon based on name
+  // First check standard icons, then merchant icons, then category icons
+  const IconComponent = standardIconMap[name] || merchantIconMap[name] || categoryIconMap[name] || LucideIcons.CreditCard;
+  
+  return <IconComponent className={className} />;
+};
+
+export default Icon;
+
+
+
+==== File: components\ui\navigation\BottomNav.tsx ====
+// components/ui/navigation/BottomNav.tsx
+import React from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import Icon from '../icons/Icon';
+import { NavItemType } from '@/lib/types';
+
+const BottomNav: React.FC = () => {
+  const pathname = usePathname();
+  
+  // Define the navigation items with new arrangement
+  const items: NavItemType[] = [
+    { name: 'Deposit', icon: 'deposit', href: '/deposit' },
+    { name: 'Insights', icon: 'insights', href: '/insights' },
+    { name: 'Accounts', icon: 'wallet', href: '/' },
+    { name: 'Transfer', icon: 'transfer', href: '/transfer' },
+    { name: 'More', icon: 'more', href: '/more' },
+  ];
+
+  return (
+    <div className="fixed bottom-0 left-0 right-0 bg-[#212121] py-3 px-4 flex justify-between items-center z-100
+      md:left-1/2 md:transform md:-translate-x-1/2 md:max-w-md
+      lg:max-w-md xl:max-w-md"
+      style={{ zIndex: 100 }} // Higher z-index to ensure it's above the transaction panel
+    >
+      {items.map((item) => {
+        const isActive = pathname === item.href;
+        const isSpecial = item.name === 'Accounts';
+
+        return (
+          <Link 
+            key={item.name} 
+            href={item.href}
+            className="flex flex-col items-center"
+          >
+            <div
+              className={`
+                ${isActive ? 'text-white' : 'text-gray-400'} 
+                ${isSpecial ? 'bg-red-600 p-3 rounded-full -mt-8 shadow-lg border border-red-700' : ''}
+                transition-all duration-200
+              `}
+            >
+              <Icon name={item.icon} className={`${isSpecial ? 'w-6 h-6' : 'w-5 h-5'}`} />
+            </div>
+            <span
+              className={`text-xs mt-1 ${isActive ? 'text-white' : 'text-gray-400'}`}
+            >
+              {item.name}
+            </span>
+          </Link>
+        );
+      })}
+    </div>
+  );
+};
+
+export default BottomNav;
+
+
+
+==== File: components\ui\navigation\Header.tsx ====
+// components/ui/navigation/Header.tsx
+import React from 'react';
+import { Bell } from 'lucide-react';
+
+interface HeaderProps {
+  userName: string;
+}
+
+const Header: React.FC<HeaderProps> = ({ userName }) => {
+  return (
+    <div className="px-5 pt-8 pb-6">
+      <div className="flex justify-between items-center">
+        <div className="flex items-center">
+          <div className="w-10 h-10 rounded-full mr-3 overflow-hidden">
+            <img 
+              src="/images/avatar/jess-coleman.png" 
+              alt="Profile" 
+              className="w-full h-full object-cover"
+            />
+          </div>
+          <div className="text-xl font-medium tracking-tight">Welcome, {userName}!</div>
+        </div>
+        <button className="relative p-1">
+          <Bell className="w-6 h-6" />
+          <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full transform -translate-y-1/4 translate-x-1/4"></span>
+        </button>
+      </div>
+    </div>
+  );
+};
+
+export default Header;
+
+
+
+
+==== File: components\ui\transactions\TransactionContainer.tsx ====
+// components/ui/transactions/TransactionContainer.tsx
+'use client';
+
+import React, { useState, useRef, useEffect } from 'react';
+import { useSpring, animated } from 'react-spring';
+import { useDrag } from '@use-gesture/react';
+import TransactionList from './TransactionList';
+import { TransactionDateGroup } from '@/lib/types';
+import SpendingChart from '../charts/SpendingChart';
+
+interface TransactionContainerProps {
+  transactionGroups: TransactionDateGroup[];
+  buttonBottomPosition: number;
+  isCollapsed?: boolean;
+  onCollapseChange?: (collapsed: boolean) => void;
+}
+
+const TransactionContainer: React.FC<TransactionContainerProps> = ({ 
+  transactionGroups,
+  buttonBottomPosition,
+  isCollapsed = false,
+  onCollapseChange
+}) => {
+  // Track internal view state
+  const [viewMode, setViewMode] = useState<'collapsed' | 'default' | 'fullscreen'>(
+    isCollapsed ? 'collapsed' : 'fullscreen' // Default to fullscreen when opening
+  );
+  
+  // Shared period state for both chart and transactions
+  const [selectedPeriod, setSelectedPeriod] = useState('month');
+  
+  const containerRef = useRef<HTMLDivElement>(null);
+  const isDraggingRef = useRef(false);
+  const isAnimatingRef = useRef(false);
+  
+  // Heights for each state
+  const [collapsedHeight, setCollapsedHeight] = useState(80); // Just enough for header
+  const [defaultHeight, setDefaultHeight] = useState(500);
+  const [fullscreenHeight, setFullscreenHeight] = useState(window.innerHeight);
+  const [navbarHeight] = useState(64); // Bottom navigation height
+  
+  // Synchronize with parent's collapsed state
+  useEffect(() => {
+    console.log("isCollapsed prop changed:", isCollapsed);
+    if (isCollapsed) {
+      setViewMode('collapsed');
+    } else {
+      setViewMode('fullscreen'); // Open in fullscreen
+    }
+  }, [isCollapsed]);
+  
+  // Calculate heights based on content position
+  useEffect(() => {
+    if (buttonBottomPosition <= 0) return;
+    
+    const calculateHeights = () => {
+      const viewportHeight = window.innerHeight;
+      
+      // Calculate the available space between buttons and navbar
+      const availableHeight = viewportHeight - buttonBottomPosition - navbarHeight;
+      
+      // Collapsed height - just enough for title and drag handle
+      const calculatedCollapsedHeight = 80;
+      
+      // Default height - uses most of available space
+      const calculatedDefaultHeight = Math.max(
+        availableHeight - 20, // Leave a small gap
+        Math.min(availableHeight * 0.95, 400) // Ensure minimum height
+      );
+      
+      // Fullscreen - covers from top of viewport to navbar
+      const calculatedFullscreenHeight = viewportHeight - navbarHeight;
+      
+      setCollapsedHeight(calculatedCollapsedHeight);
+      setDefaultHeight(calculatedDefaultHeight);
+      setFullscreenHeight(calculatedFullscreenHeight);
+    };
+    
+    calculateHeights();
+    window.addEventListener('resize', calculateHeights);
+    return () => window.removeEventListener('resize', calculateHeights);
+  }, [buttonBottomPosition, navbarHeight]);
+  
+  // Get current height based on view mode
+  const getCurrentHeight = (mode = viewMode) => {
+    switch (mode) {
+      case 'collapsed': return collapsedHeight;
+      case 'default': return defaultHeight;
+      case 'fullscreen': return fullscreenHeight;
+    }
+  };
+  
+  // Set up spring animation for the height
+  const [{ height }, api] = useSpring(() => ({
+    from: { height: isCollapsed ? collapsedHeight : fullscreenHeight },
+    to: { height: isCollapsed ? collapsedHeight : fullscreenHeight },
+    config: { mass: 1, tension: 280, friction: 25 },
+    immediate: false,
+    onRest: () => {
+      isAnimatingRef.current = false;
+      
+      // Notify parent about collapse state changes
+      if (onCollapseChange && (viewMode === 'collapsed') !== isCollapsed) {
+        console.log("Notifying parent of collapse change:", viewMode === 'collapsed');
+        onCollapseChange(viewMode === 'collapsed');
+      }
+    }
+  }));
+  
+  // Update spring when view mode or heights change
+  useEffect(() => {
+    if (isDraggingRef.current) return;
+    
+    const targetHeight = getCurrentHeight();
+    if (targetHeight > 0) {
+      isAnimatingRef.current = true;
+      
+      api.start({ 
+        height: targetHeight,
+        immediate: false,
+        config: { mass: 1, tension: 280, friction: 25 }
+      });
+    }
+  }, [viewMode, collapsedHeight, defaultHeight, fullscreenHeight, api]);
+  
+  // Handle expand button click (from collapsed state)
+  const handleExpandClick = () => {
+    if (isAnimatingRef.current) return;
+    
+    // When expanding from collapsed, go to fullscreen view
+    setViewMode('fullscreen');
+    
+    // Notify parent
+    if (onCollapseChange) {
+      onCollapseChange(false);
+    }
+  };
+  
+  // Filter options
+  const periodOptions = [
+    { id: 'day', name: 'Day', label: 'today' },
+    { id: 'week', name: 'Week', label: 'this week' },
+    { id: 'month', name: 'Month', label: 'this month' },
+    { id: 'year', name: 'Year', label: 'this year' },
+  ];
+  
+  // Handle period change - unified for both chart and transactions
+  const handlePeriodChange = (period: string) => {
+    setSelectedPeriod(period);
+  };
+  
+  // Set up drag gesture
+  const bind = useDrag(({ movement: [_, my], last, velocity, first, active }) => {
+    // Handle drag start
+    if (first) {
+      isDraggingRef.current = true;
+    }
+    
+    // During active drag
+    if (active && !last) {
+      // Calculate new height based on drag
+      const currentHeight = getCurrentHeight();
+      const newHeight = currentHeight - my;
+      const minHeight = collapsedHeight - 5;
+      const maxHeight = fullscreenHeight + 5;
+      
+      // Apply constraints and update immediately
+      const constrainedHeight = Math.max(minHeight, Math.min(maxHeight, newHeight));
+      api.start({
+        height: constrainedHeight,
+        immediate: true
+      });
+    }
+    
+    // Handle drag end
+    if (last) {
+      // Calculate velocity and thresholds
+      const [, vy] = velocity;
+      const isFlick = Math.abs(vy) > 0.5;
+      const dragThreshold = isFlick ? 20 : 60;
+      
+      // Determine target state based on current state, drag distance and velocity
+      let targetMode = viewMode;
+      
+      if (viewMode === 'fullscreen') {
+        // From fullscreen, dragging down
+        if (my > dragThreshold) {
+          targetMode = my > 150 || vy > 1 ? 'collapsed' : 'default';
+        }
+      } else if (viewMode === 'default') {
+        // From default, dragging up or down
+        if (my < -dragThreshold || vy < -0.5) {
+          targetMode = 'fullscreen';
+        } else if (my > dragThreshold || vy > 0.5) {
+          targetMode = 'collapsed';
+        }
+      } else if (viewMode === 'collapsed') {
+        // From collapsed, dragging up - always go to fullscreen
+        if (my < -dragThreshold || vy < -0.5) {
+          targetMode = 'fullscreen';
+        }
+      }
+      
+      // Animate to the target height
+      if (targetMode !== viewMode) {
+        isAnimatingRef.current = true;
+        setViewMode(targetMode);
+        
+        // Start animating to the target height
+        api.start({
+          height: getCurrentHeight(targetMode),
+          immediate: false,
+          config: { 
+            mass: 1, 
+            tension: 280, 
+            friction: 25 
+          }
+        });
+        
+        // Notify parent if needed
+        if (onCollapseChange && (targetMode === 'collapsed') !== isCollapsed) {
+          console.log("Drag ended - notifying parent:", targetMode === 'collapsed');
+          onCollapseChange(targetMode === 'collapsed');
+        }
+      } else {
+        // If no change in mode, still animate back to current height
+        isAnimatingRef.current = true;
+        api.start({
+          height: getCurrentHeight(),
+          immediate: false
+        });
+      }
+      
+      // Clear dragging flag after a short delay
+      setTimeout(() => {
+        isDraggingRef.current = false;
+      }, 50);
+    }
+  });
+
+  return (
+    <animated.div
+      ref={containerRef}
+      className={`
+        fixed left-0 right-0 z-20 overflow-hidden
+        md:left-1/2 md:transform md:-translate-x-1/2 md:max-w-md
+        ${viewMode === 'fullscreen' ? 'bg-app-black rounded-none' : 'bg-[#212121] rounded-t-3xl shadow-lg'}`
+      }
+      style={{ 
+        height,
+        bottom: navbarHeight, // Position above bottom navigation
+        top: 'auto', // Never attach to top
+        maxHeight: viewMode === 'fullscreen' ? `calc(100vh - ${navbarHeight}px)` : 'none',
+        zIndex: 50, // Lower z-index to ensure it's below bottom navigation
+      }}
+    >
+      {/* Drag handle */}
+      <div 
+        className="drag-handle-container"
+        {...bind()}
+      >
+        <div className="drag-handle" />
+      </div>
+      
+      {/* Header with title and controls */}
+      <div className="flex justify-between items-center px-6 py-2">
+        <h2 className="text-white text-xl font-medium">
+          Transactions
+        </h2>
+        
+        {viewMode === 'fullscreen' && (
+          <button 
+            className="text-gray-400 text-sm hover:text-white transition-colors"
+            onClick={() => {
+              // Direct collapse
+              setViewMode('collapsed');
+              if (onCollapseChange) {
+                console.log("Collapse button clicked");
+                onCollapseChange(true);
+              }
+            }}
+          >
+            Collapse
+          </button>
+        )}
+        
+        {viewMode === 'collapsed' && (
+          <button 
+            className="text-gray-400 text-sm hover:text-white transition-colors"
+            onClick={handleExpandClick}
+          >
+            Expand
+          </button>
+        )}
+      </div>
+      
+      {/* Chart section - Spending Chart First */}
+      {viewMode === 'fullscreen' && (
+        <div className="px-6 mt-4 mb-4">
+          <SpendingChart 
+            selectedPeriod={selectedPeriod} 
+            periodOptions={periodOptions}
+          />
+        </div>
+      )}
+      
+      {/* Period selector tabs - MOVED BELOW the chart to match inspiration */}
+      {viewMode === 'fullscreen' && (
+        <div className="px-6 mb-6">
+          <div className="flex justify-between rounded-lg overflow-hidden" style={{ backgroundColor: '#1a1a1a' }}>
+            {periodOptions.map((option) => (
+              <button
+                key={option.id}
+                className={`flex-1 py-3 text-center text-sm font-medium transition-colors ${
+                  selectedPeriod === option.id
+                    ? 'bg-[#333333] text-white'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+                onClick={() => handlePeriodChange(option.id)}
+              >
+                {option.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+      
+      {/* Transaction list with proper overflow handling */}
+      <div 
+        className="overflow-y-auto" 
+        style={{ 
+          height: viewMode === 'collapsed' ? 0 : viewMode === 'fullscreen' ? 'calc(100% - 340px)' : 'calc(100% - 60px)',
+          opacity: viewMode === 'collapsed' ? 0 : 1,
+          transition: 'opacity 0.2s ease-in-out' 
+        }}
+      > 
+        <TransactionList 
+          transactionGroups={transactionGroups} 
+          selectedPeriod={selectedPeriod}
+        />
+      </div>
+    </animated.div>
+  );
+};
+
+export default TransactionContainer;
+
+
+
+==== File: components\ui\transactions\TransactionItem.tsx ====
+// components/ui/transactions/TransactionItem.tsx
+import React from 'react';
+import Icon from '../icons/Icon';
+import { TransactionType } from '@/lib/types';
+
+interface TransactionItemProps {
+  transaction: TransactionType;
+  isLastInGroup?: boolean;
+}
+
+const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, isLastInGroup = false }) => {
+  // Use a consistent gray color for all icon backgrounds to match the inspiration
+  const iconBgColor = 'bg-neutral-700'; // Closer to #3b3b3b // Subtle gray that matches the inspiration
+
+  return (
+    <div className={`flex items-center justify-between py-3 hover:bg-neutral-700/30 px-4 rounded-lg transition-colors ${!isLastInGroup ? 'border-b border-gray-700/30' : ''}`}>
+      <div className="flex items-center">
+        <div className={`${iconBgColor} w-10 h-10 rounded-full flex items-center justify-center mr-3`}>
+          <Icon name={transaction.icon} className="w-5 h-5 text-white" />
+        </div>
+        <div>
+          <div className="font-medium tracking-tight text-white">{transaction.merchant}</div>
+          <div className="text-gray-400 text-sm">
+            {transaction.location || transaction.message}
+          </div>
+        </div>
+      </div>
+      <div className="text-right">
+        <div className={`font-medium tracking-tight ${transaction.isIncoming ? 'text-green-500' : 'text-white'}`}>
+          {transaction.isIncoming ? '+' : ''}${transaction.amount.toFixed(2)}
+        </div>
+        <div className="text-gray-400 text-sm">{transaction.timestamp}</div>
+      </div>
+    </div>
+  );
+};
+
+export default TransactionItem;
+
+  
+
+
+
+==== File: components\ui\transactions\TransactionList.tsx ====
+// components/ui/transactions/TransactionList.tsx
+import React, { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import TransactionItem from './TransactionItem';
+import { TransactionDateGroup } from '@/lib/types';
+import { getTransactionsByPeriod } from '@/lib/data/transactions';
+
+interface TransactionListProps {
+  transactionGroups: TransactionDateGroup[];
+  selectedPeriod: string;
+}
+
+const TransactionList: React.FC<TransactionListProps> = ({ 
+  transactionGroups: initialGroups,
+  selectedPeriod
+}) => {
+  const [transactionGroups, setTransactionGroups] = useState<TransactionDateGroup[]>(initialGroups);
+
+  // Update transactions when period changes
+  useEffect(() => {
+    const updatedTransactions = getTransactionsByPeriod(selectedPeriod);
+    setTransactionGroups(updatedTransactions);
+  }, [selectedPeriod]);
+
+  // Define smoother animations
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: { 
+      opacity: 1,
+      transition: { 
+        staggerChildren: 0.1,
+        delayChildren: 0.05
+      }
+    },
+    exit: { 
+      opacity: 0,
+      transition: { 
+        duration: 0.2
+      }
+    }
+  };
+
+  const groupVariants = {
+    hidden: { opacity: 0 },
+    visible: { 
+      opacity: 1,
+      transition: { duration: 0.3 }
+    },
+    exit: { 
+      opacity: 0,
+      transition: { duration: 0.2 }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { opacity: 0, x: -5 },
+    visible: { 
+      opacity: 1, 
+      x: 0,
+      transition: { duration: 0.2 }
+    }
+  };
+
+  return (
+    <div className="pb-32">
+      {/* Use a key based on the period to force a clean transition */}
+      <AnimatePresence mode="sync">
+        <motion.div
+          key={selectedPeriod}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          variants={containerVariants}
+        >
+          {transactionGroups.map((group, groupIndex) => (
+            <motion.div 
+              key={group.date}
+              variants={groupVariants}
+              className="mb-4"
+            >
+              <div className="sticky top-0 bg-[#1a1a1a] px-6 py-3 text-gray-400 text-xs uppercase font-semibold z-10 border-t border-gray-800">
+                {group.date}
+              </div>
+              <div>
+                {group.transactions.map((transaction, transactionIndex) => (
+                  <motion.div
+                    key={transaction.id}
+                    variants={itemVariants}
+                  >
+                    <TransactionItem 
+                      transaction={transaction} 
+                      isLastInGroup={transactionIndex === group.transactions.length - 1}
+                    />
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+          ))}
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  );
+};
+
+export default TransactionList;
+
+
+
+==== File: lib\context\ThemeContext.tsx ====
+'use client';
+
+import React, { createContext, useContext, useState, useEffect } from 'react';
+
+type Theme = 'light' | 'dark';
+
+interface ThemeContextType {
+  theme: Theme;
+  toggleTheme: () => void;
+}
+
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
+
+export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [theme, setTheme] = useState<Theme>('dark');
+
+  const toggleTheme = () => {
+    setTheme(prevTheme => {
+      const newTheme = prevTheme === 'light' ? 'dark' : 'light';
+      localStorage.setItem('app-theme', newTheme);
+      return newTheme;
+    });
+  };
+
+  // Initialize theme from localStorage or system preference
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('app-theme') as Theme | null;
+    
+    if (savedTheme) {
+      setTheme(savedTheme);
+    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      setTheme('dark');
+    }
+    
+    // Apply theme class to body
+    document.body.className = theme === 'dark' ? 'bg-black text-white' : 'bg-white text-black';
+  }, [theme]);
+
+  return (
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      {children}
+    </ThemeContext.Provider>
+  );
+};
+
+export const useTheme = (): ThemeContextType => {
+  const context = useContext(ThemeContext);
+  if (context === undefined) {
+    throw new Error('useTheme must be used within a ThemeProvider');
+  }
+  return context;
+};
+
+
+
+
+
+==== File: lib\data\cards.ts ====
+import { CardType } from '../types';
+
+export const cards: CardType[] = [
+  {
+    id: '1',
+    type: 'VISA',
+    number: '•••• 9891',
+    expiry: '••/••',
+    cvv: '•••',
+    color: '#E53E3E', // Updated red color that better matches the inspiration
+  },
+  // You can add more cards here
+];
+
+export const getCard = (id: string): CardType | undefined => {
+  return cards.find(card => card.id === id);
+};
+
+export const getDefaultCard = (): CardType => {
+  return cards[0];
+};
+
+
+
+
+==== File: lib\data\transactions.ts ====
+// lib/data/transactions.ts
+import { TransactionType, TransactionDateGroup } from '../types';
+
+// Helper to generate transaction IDs
+const generateId = () => Math.random().toString(36).substring(2, 11);
+
+// Today's date for reference
+const currentDate = new Date();
+
+// Helper to create a date string from days ago
+const daysAgo = (days: number) => {
+  const date = new Date(currentDate);
+  date.setDate(date.getDate() - days);
+  
+  // For today and yesterday
+  if (days === 0) return 'TODAY';
+  if (days === 1) return 'YESTERDAY';
+  
+  // For other days - format as "MMM DD, YYYY"
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  }).toUpperCase();
+};
+
+// DAILY TRANSACTIONS - For "Day" filter view
+export const dailyTransactions: TransactionDateGroup[] = [
+  {
+    date: 'TODAY',
+    transactions: [
+      {
+        id: generateId(),
+        merchant: 'Zara',
+        location: 'Harrisburg Mall',
+        amount: 432.29,
+        isIncoming: false,
+        timestamp: '1:22PM',
+        icon: 'shopping',
+        category: 'clothes',
+      },
+      {
+        id: generateId(),
+        merchant: 'Mark Coleman',
+        message: 'Thanks for the dinner!',
+        amount: 128.00,
+        isIncoming: true,
+        timestamp: '12:32PM',
+        icon: 'transfer',
+      },
+      {
+        id: generateId(),
+        merchant: 'Starbucks',
+        location: 'Business Bay',
+        amount: 18.50,
+        isIncoming: false,
+        timestamp: '10:15AM',
+        icon: 'coffee',
+        category: 'dining',
+      },
+    ],
+  }
+];
+
+// WEEKLY TRANSACTIONS - For "Week" filter view
+export const weeklyTransactions: TransactionDateGroup[] = [
+  {
+    date: 'TODAY',
+    transactions: [
+      {
+        id: generateId(),
+        merchant: 'Zara',
+        location: 'Harrisburg Mall',
+        amount: 432.29,
+        isIncoming: false,
+        timestamp: '1:22PM',
+        icon: 'shopping',
+        category: 'clothes',
+      },
+      {
+        id: generateId(),
+        merchant: 'Mark Coleman',
+        message: 'Thanks for the dinner!',
+        amount: 128.00,
+        isIncoming: true,
+        timestamp: '12:32PM',
+        icon: 'transfer',
+      }
+    ],
+  },
+  {
+    date: 'YESTERDAY',
+    transactions: [
+      {
+        id: generateId(),
+        merchant: 'Netflix',
+        message: 'Subscription',
+        amount: 18.00,
+        isIncoming: false,
+        timestamp: '12:45PM',
+        icon: 'subscription',
+        category: 'entertainment',
+      },
+      {
+        id: generateId(),
+        merchant: 'Damien Light',
+        message: 'You won!',
+        amount: 20.00,
+        isIncoming: true,
+        timestamp: '10:22AM',
+        icon: 'entertainment',
+      }
+    ],
+  },
+  {
+    date: daysAgo(2),
+    transactions: [
+      {
+        id: generateId(),
+        merchant: 'Uber',
+        location: 'Downtown Harrisburg',
+        amount: 35.50,
+        isIncoming: false,
+        timestamp: '9:10AM',
+        icon: 'car',
+        category: 'transport',
+      },
+      {
+        id: generateId(),
+        merchant: 'Starbucks',
+        location: 'Business Bay',
+        amount: 12.75,
+        isIncoming: false,
+        timestamp: '8:30AM',
+        icon: 'coffee',
+        category: 'dining',
+      }
+    ],
+  },
+  {
+    date: daysAgo(5),
+    transactions: [
+      {
+        id: generateId(),
+        merchant: 'Amazon',
+        message: 'Prime Monthly',
+        amount: 14.99,
+        isIncoming: false,
+        timestamp: '3:14PM',
+        icon: 'subscription',
+        category: 'subscription',
+      },
+      {
+        id: generateId(),
+        merchant: 'Chipotle',
+        location: 'Market Street',
+        amount: 22.45,
+        isIncoming: false,
+        timestamp: '1:20PM',
+        icon: 'food',
+        category: 'dining',
+      }
+    ],
+  }
+];
+
+// MONTHLY TRANSACTIONS - For "Month" filter view
+export const monthlyTransactions: TransactionDateGroup[] = [
+  {
+    date: 'TODAY',
+    transactions: [
+      {
+        id: generateId(),
+        merchant: 'Zara',
+        location: 'Harrisburg Mall',
+        amount: 432.29,
+        isIncoming: false,
+        timestamp: '1:22PM',
+        icon: 'shopping',
+        category: 'clothes',
+      },
+      {
+        id: generateId(),
+        merchant: 'Mark Coleman',
+        message: 'Thanks for the dinner!',
+        amount: 128.00,
+        isIncoming: true,
+        timestamp: '12:32PM',
+        icon: 'transfer',
+      },
+      {
+        id: generateId(),
+        merchant: 'Starbucks',
+        location: 'Business Bay',
+        amount: 18.50,
+        isIncoming: false,
+        timestamp: '10:15AM',
+        icon: 'coffee',
+        category: 'dining',
+      },
+    ],
+  },
+  {
+    date: 'YESTERDAY',
+    transactions: [
+      {
+        id: generateId(),
+        merchant: 'Netflix',
+        message: 'Subscription',
+        amount: 18.00,
+        isIncoming: false,
+        timestamp: '12:45PM',
+        icon: 'subscription',
+        category: 'entertainment',
+      },
+      {
+        id: generateId(),
+        merchant: 'Damien Light',
+        message: 'You won!',
+        amount: 20.00,
+        isIncoming: true,
+        timestamp: '10:22AM',
+        icon: 'entertainment',
+      },
+      {
+        id: generateId(),
+        merchant: 'Uber',
+        location: 'Downtown Harrisburg',
+        amount: 35.50,
+        isIncoming: false,
+        timestamp: '9:10AM',
+        icon: 'car',
+        category: 'transport',
+      },
+    ],
+  },
+  {
+    date: 'APR 23, 2025',
+    transactions: [
+      {
+        id: generateId(),
+        merchant: 'Spotify',
+        message: 'Premium Subscription',
+        amount: 9.99,
+        isIncoming: false,
+        timestamp: '3:20PM',
+        icon: 'subscription',
+        category: 'entertainment',
+      },
+      {
+        id: generateId(),
+        merchant: 'Amazon',
+        message: 'Online order',
+        amount: 125.45,
+        isIncoming: false,
+        timestamp: '11:30AM',
+        icon: 'shopping',
+        category: 'shopping',
+      },
+      {
+        id: generateId(),
+        merchant: 'Payroll',
+        message: 'Monthly salary',
+        amount: 5280.00,
+        isIncoming: true,
+        timestamp: '9:00AM',
+        icon: 'transfer',
+        category: 'income',
+      },
+    ],
+  },
+  {
+    date: 'APR 15, 2025',
+    transactions: [
+      {
+        id: generateId(),
+        merchant: 'Target',
+        location: 'Downtown',
+        amount: 87.32,
+        isIncoming: false,
+        timestamp: '4:10PM',
+        icon: 'shopping',
+        category: 'shopping',
+      },
+      {
+        id: generateId(),
+        merchant: 'Home Depot',
+        location: 'West Side',
+        amount: 321.56,
+        isIncoming: false,
+        timestamp: '11:05AM',
+        icon: 'shopping',
+        category: 'home',
+      }
+    ],
+  },
+  {
+    date: 'APR 8, 2025',
+    transactions: [
+      {
+        id: generateId(),
+        merchant: 'Health Insurance',
+        message: 'Monthly premium',
+        amount: 320.00,
+        isIncoming: false,
+        timestamp: '9:00AM',
+        icon: 'health',
+        category: 'health',
+      },
+      {
+        id: generateId(),
+        merchant: 'Electricity Bill',
+        message: 'Monthly utility',
+        amount: 142.78,
+        isIncoming: false,
+        timestamp: '8:45AM',
+        icon: 'utilities',
+        category: 'utilities',
+      }
+    ],
+  }
+];
+
+// YEARLY TRANSACTIONS - For "Year" filter view (summarized by month)
+export const yearlyTransactions: TransactionDateGroup[] = [
+  {
+    date: 'APRIL 2025',
+    transactions: [
+      {
+        id: generateId(),
+        merchant: 'Monthly Summary',
+        message: '47 transactions',
+        amount: 7856.32,
+        isIncoming: false,
+        timestamp: '',
+        icon: 'insights',
+        category: 'summary',
+      }
+    ],
+  },
+  {
+    date: 'MARCH 2025',
+    transactions: [
+      {
+        id: generateId(),
+        merchant: 'Monthly Summary',
+        message: '52 transactions',
+        amount: 8123.45,
+        isIncoming: false,
+        timestamp: '',
+        icon: 'insights',
+        category: 'summary',
+      }
+    ],
+  },
+  {
+    date: 'FEBRUARY 2025',
+    transactions: [
+      {
+        id: generateId(),
+        merchant: 'Monthly Summary',
+        message: '39 transactions',
+        amount: 6387.21,
+        isIncoming: false,
+        timestamp: '',
+        icon: 'insights',
+        category: 'summary',
+      }
+    ],
+  },
+  {
+    date: 'JANUARY 2025',
+    transactions: [
+      {
+        id: generateId(),
+        merchant: 'Monthly Summary',
+        message: '43 transactions',
+        amount: 7123.90,
+        isIncoming: false,
+        timestamp: '',
+        icon: 'insights',
+        category: 'summary',
+      }
+    ],
+  },
+  {
+    date: 'DECEMBER 2024',
+    transactions: [
+      {
+        id: generateId(),
+        merchant: 'Monthly Summary',
+        message: '58 transactions',
+        amount: 9842.76,
+        isIncoming: false,
+        timestamp: '',
+        icon: 'insights',
+        category: 'summary',
+      }
+    ],
+  },
+  {
+    date: 'NOVEMBER 2024',
+    transactions: [
+      {
+        id: generateId(),
+        merchant: 'Monthly Summary',
+        message: '45 transactions',
+        amount: 7432.18,
+        isIncoming: false,
+        timestamp: '',
+        icon: 'insights',
+        category: 'summary',
+      }
+    ],
+  }
+];
+
+// Default transactions (monthly view)
+export const transactions = monthlyTransactions;
+
+// Function to get transactions based on period
+export const getTransactionsByPeriod = (period: string): TransactionDateGroup[] => {
+  switch (period) {
+    case 'day':
+      return dailyTransactions;
+    case 'week':
+      return weeklyTransactions;
+    case 'year':
+      return yearlyTransactions;
+    case 'month':
+    default:
+      return monthlyTransactions;
+  }
+};
+
+// Default getter function - returns monthly data
+export const getTransactions = (): TransactionDateGroup[] => {
+  return monthlyTransactions;
+};
+
+
+
+==== File: lib\hooks\useContainerPosition.tsx ====
+// lib/hooks/useContainerPosition.tsx
+'use client';
+
+import { useState, useEffect, useRef, RefObject } from 'react';
+
+interface ContainerPositionOptions {
+  referenceRef: RefObject<HTMLElement>; // The element we position relative to
+  containerRef: RefObject<HTMLElement>; // The container to position
+  bottomOffset?: number; // Space for bottom navigation or other elements
+  collapsedRatio?: number; // Ratio of available space for collapsed state
+  expandedRatio?: number; // Ratio of available space for expanded state
+}
+
+interface ContainerPositionResult {
+  collapsedHeight: number;
+  expandedHeight: number;
+  isCalculated: boolean;
+  updatePosition: () => void;
+}
+
+export function useContainerPosition({
+  referenceRef,
+  containerRef,
+  bottomOffset = 80,
+  collapsedRatio = 0.7,
+  expandedRatio = 0.9,
+}: ContainerPositionOptions): ContainerPositionResult {
+  const [collapsedHeight, setCollapsedHeight] = useState(0);
+  const [expandedHeight, setExpandedHeight] = useState(0);
+  const [isCalculated, setIsCalculated] = useState(false);
+
+  // Function to calculate positioning
+  const calculatePositioning = () => {
+    if (!containerRef.current || !referenceRef.current) return;
+    
+    // Get the bottom position of the reference element (pay buttons)
+    const referenceRect = referenceRef.current.getBoundingClientRect();
+    const referenceBottom = referenceRect.bottom;
+    
+    // Set the top of the container to the bottom of the reference element
+    if (containerRef.current) {
+      containerRef.current.style.top = `${referenceBottom}px`;
+    }
+    
+    // Update the height of the container
+    const viewportHeight = window.innerHeight;
+    
+    const availableHeight = viewportHeight - referenceBottom - bottomOffset;
+    const newCollapsedHeight = Math.min(availableHeight * collapsedRatio, availableHeight);
+    const newExpandedHeight = Math.min(availableHeight * expandedRatio, availableHeight);
+    
+    // Update state
+    setCollapsedHeight(newCollapsedHeight);
+    setExpandedHeight(newExpandedHeight);
+    setIsCalculated(true);
+  };
+
+  useEffect(() => {
+    // Calculate on mount and when window is resized
+    calculatePositioning();
+    window.addEventListener('resize', calculatePositioning);
+    
+    // Also observe the reference element for any changes in height/position
+    if (referenceRef.current) {
+      const observer = new ResizeObserver(calculatePositioning);
+      observer.observe(referenceRef.current);
+      
+      return () => {
+        observer.disconnect();
+        window.removeEventListener('resize', calculatePositioning);
+      };
+    }
+    
+    return () => window.removeEventListener('resize', calculatePositioning);
+  }, [referenceRef, containerRef]);
+
+  return {
+    collapsedHeight,
+    expandedHeight,
+    isCalculated,
+    updatePosition: calculatePositioning
+  };
+}
+
+export default useContainerPosition;
+
+
+
+==== File: lib\hooks\useSwipeableContainer.ts ====
+'use client';
+
+import { useState, useRef, useEffect } from 'react';
+
+interface UseSwipeableContainerOptions {
+  initialHeight: number;
+  maxHeight: number;
+  minHeight: number;
+  snapPoints?: number[];
+}
+
+export const useSwipeableContainer = ({
+  initialHeight,
+  maxHeight,
+  minHeight,
+  snapPoints = [],
+}: UseSwipeableContainerOptions) => {
+  const [height, setHeight] = useState(initialHeight);
+  const [isDragging, setIsDragging] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const startYRef = useRef<number | null>(null);
+  const startHeightRef = useRef<number>(initialHeight);
+
+  const handleDragStart = (clientY: number) => {
+    startYRef.current = clientY;
+    startHeightRef.current = height;
+    setIsDragging(true);
+    
+    // Add a class to the body to prevent scrolling while dragging
+    document.body.classList.add('overflow-hidden');
+  };
+
+  const handleDrag = (clientY: number) => {
+    if (!isDragging || startYRef.current === null) {
+      return;
+    }
+
+    const deltaY = startYRef.current - clientY;
+    const newHeight = Math.min(maxHeight, Math.max(minHeight, startHeightRef.current + deltaY));
+    setHeight(newHeight);
+  };
+
+  const handleDragEnd = () => {
+    setIsDragging(false);
+    startYRef.current = null;
+    
+    // Remove the class from the body
+    document.body.classList.remove('overflow-hidden');
+
+    // Find the closest snap point, including min and max
+    const allSnapPoints = [...snapPoints, minHeight, maxHeight];
+    
+    if (allSnapPoints.length > 0) {
+      const closestSnapPoint = allSnapPoints.reduce((prev, curr) => {
+        return Math.abs(curr - height) < Math.abs(prev - height) ? curr : prev;
+      });
+      
+      // Animate to the snap point
+      setHeight(closestSnapPoint);
+    }
+  };
+
+  // Add a function to programmatically set the container height to a specific snap point
+  const snapTo = (snapPoint: number) => {
+    const validSnapPoint = Math.min(maxHeight, Math.max(minHeight, snapPoint));
+    setHeight(validSnapPoint);
+  };
+
+  useEffect(() => {
+    const handleTouchStart = (e: TouchEvent) => {
+      const handle = containerRef.current?.querySelector('.drag-handle');
+      if (handle && e.target instanceof Node && handle.contains(e.target)) {
+        e.preventDefault(); // Prevent default to avoid scroll interference
+        handleDragStart(e.touches[0].clientY);
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (isDragging) {
+        e.preventDefault(); // Prevent scrolling while dragging
+        handleDrag(e.touches[0].clientY);
+      }
+    };
+
+    const handleTouchEnd = () => {
+      if (isDragging) {
+        handleDragEnd();
+      }
+    };
+
+    // Mouse events for desktop support
+    const handleMouseDown = (e: MouseEvent) => {
+      const handle = containerRef.current?.querySelector('.drag-handle');
+      if (handle && e.target instanceof Node && handle.contains(e.target)) {
+        handleDragStart(e.clientY);
+      }
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (isDragging) {
+        handleDrag(e.clientY);
+      }
+    };
+
+    const handleMouseUp = () => {
+      if (isDragging) {
+        handleDragEnd();
+      }
+    };
+
+    // Touch events
+    document.addEventListener('touchstart', handleTouchStart, { passive: false });
+    document.addEventListener('touchmove', handleTouchMove, { passive: false });
+    document.addEventListener('touchend', handleTouchEnd);
+
+    // Mouse events
+    document.addEventListener('mousedown', handleMouseDown);
+    document.addEventListener('mousemove', handleMouseMove);
+    document.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      // Clean up touch events
+      document.removeEventListener('touchstart', handleTouchStart);
+      document.removeEventListener('touchmove', handleTouchMove);
+      document.removeEventListener('touchend', handleTouchEnd);
+
+      // Clean up mouse events
+      document.removeEventListener('mousedown', handleMouseDown);
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isDragging, height, minHeight, maxHeight]);
+
+  return { containerRef, height, isDragging, snapTo };
+};
+
+
+
+
+==== File: lib\types\index.ts ====
+export type CardType = {
+  id: string;
+  type: 'VISA' | 'MASTERCARD' | 'AMEX';
+  number: string;
+  expiry: string;
+  cvv: string;
+  color: string;
+};
+
+export type TransactionType = {
+  id: string;
+  merchant: string;
+  location?: string;
+  amount: number;
+  isIncoming: boolean;
+  timestamp: string;
+  message?: string;
+  icon: string; // Updated to allow any icon name
+  category?: string; // Optional category for fallback icons
+};
+
+export type TransactionDateGroup = {
+  date: 'TODAY' | 'YESTERDAY' | string;
+  transactions: TransactionType[];
+};
+
+export type NavItemType = {
+  name: string;
+  icon: string;
+  href: string;
+};
+
+
+
+
+==== File: lib\utils\formatters.ts ====
+/**
+ * Format currency amount with proper symbol and decimal places
+ */
+export const formatCurrency = (amount: number, currency = 'USD', locale = 'en-US'): string => {
+  return new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency,
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(amount);
+};
+
+/**
+ * Format date in desired format
+ */
+export const formatDate = (date: Date | string, format = 'short'): string => {
+  if (typeof date === 'string') {
+    date = new Date(date);
+  }
+  
+  if (format === 'time') {
+    return date.toLocaleTimeString('en-US', { 
+      hour: 'numeric', 
+      minute: '2-digit',
+      hour12: true 
+    });
+  }
+  
+  if (format === 'short') {
+    return date.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric'
+    });
+  }
+  
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
+};
+
+/**
+ * Group transactions by date
+ */
+export const groupTransactionsByDate = (transactions: any[]): { [key: string]: any[] } => {
+  const grouped = transactions.reduce((acc, transaction) => {
+    const date = transaction.date;
+    if (!acc[date]) {
+      acc[date] = [];
+    }
+    acc[date].push(transaction);
+    return acc;
+  }, {});
+  
+  return grouped;
+};
+
+
+
+
+==== File: lib\utils\iosFullscreen.ts ====
+// Add this to a new file: lib/utils/iosFullscreen.ts
+
+export const setupIOSFullscreen = () => {
+    // Only run on iOS devices
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+    
+    if (!isIOS) return;
+    
+    // Function to handle fullscreen
+    const goFullScreen = () => {
+      // For iOS, we need to scroll slightly to hide the address bar
+      window.scrollTo(0, 1);
+    };
+    
+    // Add scroll event listener to hide address bar when scrolling
+    window.addEventListener('scroll', () => {
+      if (window.scrollY > 0) {
+        document.body.classList.add('ios-scrolled');
+      } else {
+        document.body.classList.remove('ios-scrolled');
+      }
+    });
+    
+    // Try to hide address bar when page loads and after orientation changes
+    window.addEventListener('load', goFullScreen);
+    window.addEventListener('orientationchange', goFullScreen);
+    window.addEventListener('resize', goFullScreen);
+    
+    // Try immediately and after a short delay
+    goFullScreen();
+    setTimeout(goFullScreen, 100);
+    setTimeout(goFullScreen, 500); // iOS sometimes needs a longer delay
+  };
+
+
+
+==== File: pages\_document.tsx ====
+import { Html, Head, Main, NextScript } from 'next/document';
+
+export default function Document() {
+  return (
+    <Html lang="en">
+      <Head>
+        {/* PWA meta tags */}
+        <meta name="application-name" content="Banking App" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Banking App" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="msapplication-TileColor" content="#121212" />
+        <meta name="msapplication-tap-highlight" content="no" />
+        <meta name="theme-color" content="#121212" />
+        
+        {/* iOS splash screens */}
+        <link rel="apple-touch-startup-image" href="/icons/apple-splash-2048-2732.jpg" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+        <link rel="apple-touch-startup-image" href="/icons/apple-splash-1668-2388.jpg" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+        <link rel="apple-touch-startup-image" href="/icons/apple-splash-1536-2048.jpg" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+        <link rel="apple-touch-startup-image" href="/icons/apple-splash-1668-2224.jpg" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+        <link rel="apple-touch-startup-image" href="/icons/apple-splash-1620-2160.jpg" media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+        <link rel="apple-touch-startup-image" href="/icons/apple-splash-1284-2778.jpg" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+        <link rel="apple-touch-startup-image" href="/icons/apple-splash-1170-2532.jpg" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+        <link rel="apple-touch-startup-image" href="/icons/apple-splash-1125-2436.jpg" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+        <link rel="apple-touch-startup-image" href="/icons/apple-splash-1242-2688.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+        <link rel="apple-touch-startup-image" href="/icons/apple-splash-828-1792.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+        <link rel="apple-touch-startup-image" href="/icons/apple-splash-1242-2208.jpg" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+        <link rel="apple-touch-startup-image" href="/icons/apple-splash-750-1334.jpg" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+        <link rel="apple-touch-startup-image" href="/icons/apple-splash-640-1136.jpg" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+      </Head>
+      <body>
+        <Main />
+        <NextScript />
+      </body>
+    </Html>
+  );
+}
+
+
+
