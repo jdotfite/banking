@@ -71,22 +71,39 @@ const Onboarding: React.FC = () => {
   const [initialLoad, setInitialLoad] = useState(true);
   const [autoAdvance, setAutoAdvance] = useState(true);
   const touchStartX = useRef(0);
+  const touchStartY = useRef(0); // Add Y-axis tracking
   const autoAdvanceTimerRef = useRef<NodeJS.Timeout | null>(null);
   const router = useRouter();
   
-  // Handle initial load
+  // Handle initial load with a layout effect to prevent flashing
   useEffect(() => {
+    // Ensure proper height calculation on mobile browsers
+    const setViewportHeight = () => {
+      // Set a CSS variable for the actual viewport height
+      document.documentElement.style.setProperty(
+        '--vh', 
+        `${window.innerHeight * 0.01}px`
+      );
+    };
+
+    // Initial calculation
+    setViewportHeight();
+    
+    // Recalculate on resize
+    window.addEventListener('resize', setViewportHeight);
+    
     // Set initialLoad to false after component mounts
     setInitialLoad(false);
     
     // Start auto-advance timer
     startAutoAdvanceTimer();
     
-    // Cleanup timer on unmount
+    // Cleanup on unmount
     return () => {
       if (autoAdvanceTimerRef.current) {
         clearTimeout(autoAdvanceTimerRef.current);
       }
+      window.removeEventListener('resize', setViewportHeight);
     };
   }, []);
   
@@ -146,30 +163,52 @@ const Onboarding: React.FC = () => {
     startAutoAdvanceTimer();
   };
 
-  // Handle touch events for swiping
+  // Enhanced touch handling to prevent unwanted scrolling
   const handleTouchStart = (e: React.TouchEvent) => {
     touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY; // Track Y position
+    
     // Pause auto-advance during touch interaction
     if (autoAdvanceTimerRef.current) {
       clearTimeout(autoAdvanceTimerRef.current);
     }
   };
 
+  const handleTouchMove = (e: React.TouchEvent) => {
+    // Prevent default only for horizontal swipes to allow vertical scrolling
+    const touchMoveX = e.touches[0].clientX;
+    const touchMoveY = e.touches[0].clientY;
+    
+    const xDiff = touchStartX.current - touchMoveX;
+    const yDiff = touchStartY.current - touchMoveY;
+    
+    // If horizontal movement is greater than vertical, prevent default
+    if (Math.abs(xDiff) > Math.abs(yDiff)) {
+      e.preventDefault();
+    }
+  };
+
   const handleTouchEnd = (e: React.TouchEvent) => {
     const touchEndX = e.changedTouches[0].clientX;
-    const diff = touchStartX.current - touchEndX;
-
-    // Swipe right to left (next)
-    if (diff > 50) {
-      nextSlide();
+    const touchEndY = e.changedTouches[0].clientY;
+    
+    const xDiff = touchStartX.current - touchEndX;
+    const yDiff = touchStartY.current - touchEndY;
+    
+    // Only process horizontal swipes if they're the dominant motion
+    if (Math.abs(xDiff) > Math.abs(yDiff)) {
+      // Swipe right to left (next)
+      if (xDiff > 50) {
+        nextSlide();
+      }
+      // Swipe left to right (previous)
+      else if (xDiff < -50) {
+        prevSlide();
+      }
     }
-    // Swipe left to right (previous)
-    else if (diff < -50) {
-      prevSlide();
-    } else {
-      // If no significant swipe, restart the timer
-      startAutoAdvanceTimer();
-    }
+    
+    // Restart the timer regardless
+    startAutoAdvanceTimer();
   };
 
   // Handle sign up button click
@@ -208,11 +247,12 @@ const Onboarding: React.FC = () => {
 
   return (
     <div 
-      className="flex flex-col min-h-[100dvh] w-full overflow-hidden"
+      className="flex flex-col w-full overflow-hidden"
       style={{ 
         backgroundColor: slides[currentSlide].bgColor,
         color: slides[currentSlide].textColor,
-        transition: 'background-color 0.5s ease-in-out'
+        transition: 'background-color 0.5s ease-in-out',
+        height: 'calc(var(--vh, 1vh) * 100)' // Use CSS variable for accurate height
       }}
     >
       {/* Logo */}
@@ -226,8 +266,9 @@ const Onboarding: React.FC = () => {
 
       {/* Main content area - Image only */}
       <div 
-        className="relative flex-1"
+        className="relative flex-1 overflow-hidden"
         onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
       >
         <animated.div 
@@ -246,14 +287,18 @@ const Onboarding: React.FC = () => {
       </div>
 
       {/* Dark gray bottom section - with text content moved here */}
-      <div className="w-full bg-neutral-900 text-white flex flex-col" style={{ minHeight: '40%' }}>
+      <div 
+        className="w-full bg-neutral-900 text-white flex flex-col" 
+        style={{ height: '40%' }} // Use fixed height instead of minHeight
+      >
         {/* Text content */}
-        <div className="w-full px-6 pt-8 pb-4 text-center flex-1">
+        <div className="w-full px-6 pt-8 pb-4 text-center flex-1 overflow-y-hidden">
           <h1 className="text-3xl font-bold mb-4">{slides[currentSlide].title}</h1>
           <p className="text-md opacity-90 line-clamp-3">{slides[currentSlide].subtitle}</p>
         </div>
+        
         {/* Pagination dots */}
-        <div className="flex justify-center space-x-2 py-8">
+        <div className="flex justify-center space-x-2 py-4">
           {slides.map((_, index) => (
             <button
               key={index}
@@ -271,7 +316,7 @@ const Onboarding: React.FC = () => {
         {/* Action buttons */}
         <animated.div 
           style={buttonAnimation}
-          className="px-6 pb-4 space-y-4"
+          className="px-6 pb-8 space-y-4"
         >
           <button
             onClick={handleSignUp}
