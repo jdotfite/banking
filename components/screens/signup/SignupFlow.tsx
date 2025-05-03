@@ -51,7 +51,7 @@ const SignupFlow: React.FC = () => {
   });
 
   // Handle form data changes
-  const handleChange = (field: keyof SignupFormData, value: string) => {
+  const handleChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
