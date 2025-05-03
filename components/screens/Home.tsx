@@ -120,9 +120,7 @@ const Home: React.FC = () => {
   // Show loading spinner if loading
   if (isLoading || isBankingDataLoading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-app-black">
-        <LoadingSpinner size="large" />
-      </div>
+      <LoadingSpinner size="large" fullScreen={true} />
     );
   }
 
