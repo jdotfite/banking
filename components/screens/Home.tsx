@@ -150,10 +150,10 @@ const Home: React.FC = () => {
             <h3 className="text-sm font-medium mb-1">Transactions</h3>
             <p className="text-xs text-gray-400 mb-2">Spent in April</p>
             <div className="flex space-x-1 mb-1">
-              <div className="h-1 w-1/4 rounded-full bg-purple-500"></div>
-              <div className="h-1 w-1/4 rounded-full bg-red-500"></div>
-              <div className="h-1 w-1/4 rounded-full bg-blue-500"></div>
-              <div className="h-1 w-1/4 rounded-full bg-yellow-500"></div>
+              <div className="h-4 w-1/4 rounded-full bg-purple-500"></div>
+              <div className="h-4 w-1/4 rounded-full bg-red-500"></div>
+              <div className="h-4 w-1/4 rounded-full bg-blue-500"></div>
+              <div className="h-4 w-1/4 rounded-full bg-yellow-500"></div>
             </div>
           </div>
           
