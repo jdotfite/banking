@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { Outfit } from 'next/font/google';
 import './globals.css';
 import RegisterServiceWorker from '@/components/RegisterServiceWorker';
+import PWAInstallPrompt from '@/components/ui/common/PWAInstallPrompt';
 
 const outfit = Outfit({
   subsets: ['latin'],
@@ -35,6 +36,7 @@ export default function RootLayout({
       </head>
       <body className={`${outfit.className} bg-gray-900 min-h-screen font-outfit`}>
         <RegisterServiceWorker />
+        <PWAInstallPrompt />
         {children}
         {/* Keep the script for backward compatibility */}
         <script src="/sw-register.js" defer></script>
