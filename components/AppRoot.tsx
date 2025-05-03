@@ -52,7 +52,7 @@ const AppContent: React.FC = () => {
       if (typeof window !== 'undefined') {
         console.log('Redirecting to onboarding flow...');
         window.location.href = '/onboarding';
-        return <LoadingSpinner size="large" />;
+        return <LoadingSpinner size="large" fullScreen={true} />;
       }
     }
     return <Home />;
