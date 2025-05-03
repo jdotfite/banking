@@ -50,6 +50,15 @@ async function fixServiceWorker() {
   }
   
   console.log('✅ Service worker fix completed!');
+  console.log('🔄 Forcing service worker update...');
+  
+  // Force a fresh service worker registration
+  if ('serviceWorker' in navigator) {
+    const registration = await navigator.serviceWorker.register('/sw.js');
+    await registration.update();
+    console.log('Service worker forcefully updated');
+  }
+  
   console.log('🔄 Please manually refresh the page to complete the update');
 }
 

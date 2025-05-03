@@ -28,7 +28,7 @@ export const preloaderConfig = {
   
   // Loading screen appearance
   loadingScreen: {
-    logo: '/images/icons/logo.png',
+    logo: '/icons/icon-transparent.png',
     minDisplayTime: 1000, // Minimum time to show loading screen in milliseconds
     transitionDuration: 500 // Transition duration in milliseconds
   }
