@@ -1,7 +1,8 @@
 // components/screens/AdminProfileSelector.tsx
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { bankingData } from '@/lib/data/fakeBankingData';
 import { animated, useSpring } from 'react-spring';
@@ -19,69 +20,52 @@ const AdminProfileSelector: React.FC<AdminProfileSelectorProps> = ({ onSelectUse
   // Setup viewport height for mobile browsers
   useEffect(() => {
     const setViewportHeight = () => {
-      // Set a CSS variable for the actual viewport height
       document.documentElement.style.setProperty(
         '--vh', 
         `${window.innerHeight * 0.01}px`
       );
     };
 
-    // Initial calculation
     setViewportHeight();
-    
-    // Recalculate on resize
     window.addEventListener('resize', setViewportHeight);
-    
-    return () => {
-      window.removeEventListener('resize', setViewportHeight);
-    };
+    return () => window.removeEventListener('resize', setViewportHeight);
   }, []);
 
-  // Animation for the container - staggered animation like in Home.tsx
-  const containerSpring = useSpring({
-    opacity: isLoading ? 0 : 1,
-    transform: isLoading ? 'translateY(20px)' : 'translateY(0px)',
-    config: { tension: 280, friction: 25 },
-    delay: 300,
-  });
+  // Generate only card animations (New User + 2 existing users)
+  const cardSprings = [
+    useSpring({
+      opacity: isLoading ? 0 : 1,
+      transform: isLoading ? 'translateY(20px)' : 'translateY(0px)',
+      config: { tension: 280, friction: 25 },
+      delay: 300,
+    }),
+    useSpring({
+      opacity: isLoading ? 0 : 1,
+      transform: isLoading ? 'translateY(20px)' : 'translateY(0px)',
+      config: { tension: 280, friction: 25 },
+      delay: 350,
+    }),
+    useSpring({
+      opacity: isLoading ? 0 : 1,
+      transform: isLoading ? 'translateY(20px)' : 'translateY(0px)',
+      config: { tension: 280, friction: 25 },
+      delay: 400,
+    })
+  ];
 
-  // Animation for the title
-  const titleSpring = useSpring({
-    opacity: isLoading ? 0 : 1,
-    transform: isLoading ? 'translateY(20px)' : 'translateY(0px)',
-    config: { tension: 280, friction: 25 },
-    delay: 400,
-  });
-
-  // Function to generate card springs with staggered delays
-  const getCardSpring = (index: number) => useSpring({
-    opacity: isLoading ? 0 : 1,
-    transform: isLoading ? 'translateY(20px)' : 'translateY(0px)',
-    config: { tension: 280, friction: 25 },
-    delay: 500 + (index * 50), // Staggered delay like in Home.tsx
-  });
-
-  // Simulate loading
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 800);
+    const timer = setTimeout(() => setIsLoading(false), 800);
     return () => clearTimeout(timer);
   }, []);
 
-  // Handle user selection
   const handleSelectUser = (userId: string | null) => {
-    // Store the selected user ID in localStorage
     if (userId === 'new') {
-      // For new user flow
       localStorage.setItem('selectedUserId', 'new');
       onSelectUser('new');
     } else if (userId) {
-      // For existing users
       localStorage.setItem('selectedUserId', userId);
       onSelectUser(userId);
     } else {
-      // Fallback (should not happen)
       localStorage.removeItem('selectedUserId');
       onSelectUser(null);
     }
@@ -113,15 +97,15 @@ const AdminProfileSelector: React.FC<AdminProfileSelectorProps> = ({ onSelectUse
     >
       <div className="h-full overflow-y-auto">
         <div className="p-5">
-          <animated.div style={titleSpring} className="text-center mb-8 pt-6">
+          <div className="text-center mb-8 pt-6">
             <h1 className="text-2xl font-bold mb-2">Banking App Admin</h1>
             <p className="text-neutral-400">Select a profile to continue</p>
-          </animated.div>
+          </div>
 
-          <animated.div style={containerSpring} className="max-w-md mx-auto">
+          <div className="max-w-md mx-auto">
             {/* New User Option */}
             <animated.div 
-              style={getCardSpring(0)} 
+              style={cardSprings[0]} 
               className="bg-[#212121] rounded-xl p-5 mb-5 cursor-pointer hover:shadow-lg transition-shadow"
               onClick={() => handleSelectUser('new')}
             >
@@ -140,17 +124,14 @@ const AdminProfileSelector: React.FC<AdminProfileSelectorProps> = ({ onSelectUse
 
             <h3 className="text-lg font-medium mb-3 text-neutral-300">Existing Profiles</h3>
             
-            {/* Existing Users */}
             {users.map((user, index) => {
-              // Find user's account
               const userAccount = bankingData.accounts.find(account => account.userId === user.id);
-              // Find user's credit card
               const userCard = bankingData.creditCards.find(card => card.userId === user.id);
               
               return (
                 <animated.div 
                   key={user.id}
-                  style={getCardSpring(index + 1)} 
+                  style={cardSprings[index + 1]} 
                   className="bg-[#212121] rounded-xl p-5 mb-4 cursor-pointer hover:bg-neutral-700 transition-colors"
                   onClick={() => handleSelectUser(user.id)}
                 >
@@ -170,7 +151,6 @@ const AdminProfileSelector: React.FC<AdminProfileSelectorProps> = ({ onSelectUse
                           className="text-neutral-400 hover:text-white transition-colors"
                           onClick={(e) => {
                             e.stopPropagation();
-                            // TODO: Implement account modification
                             console.log('Edit account:', user.id);
                           }}
                         >
@@ -201,7 +181,7 @@ const AdminProfileSelector: React.FC<AdminProfileSelectorProps> = ({ onSelectUse
               <p>This screen is only visible in development mode</p>
               <p className="mt-1">Banking App Admin v1.0</p>
             </div>
-          </animated.div>
+          </div>
         </div>
       </div>
     </div>
