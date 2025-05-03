@@ -123,9 +123,9 @@ const BasicInfoScreen: React.FC<BasicInfoScreenProps> = ({ formData, onChange, o
         {/* Next button */}
         <button
           type="submit"
-          className="w-full p-4 bg-green-100 text-gray-500 font-medium rounded-lg mt-6 hover:bg-green-200 transition-colors"
+          className="w-full p-4 bg-transparent border-2 border-black text-black uppercase font-medium rounded-lg mt-6 hover:bg-transparent transition-colors"
         >
-          Next
+          NEXT
         </button>
 
         {/* Legal disclosures */}

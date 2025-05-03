@@ -3,7 +3,7 @@ const withPWA = require('next-pwa')({
   dest: 'public',            // where sw.js and other assets go
   register: true,            // automatically register service worker
   skipWaiting: true,         // activate new service worker immediately
-  disable: process.env.NODE_ENV === 'development', // don't run PWA in dev
+  disable: false, // enable PWA in all environments
   buildExcludes: [/app-build-manifest.json$/], // Add this line to fix the precaching error
 });
 
