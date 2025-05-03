@@ -96,7 +96,7 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
               placeholder="Street address (no P.O. boxes)"
               value={formData.streetAddress}
               onChange={(e) => onChange('streetAddress', e.target.value)}
-              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700"
             />
             {errors.streetAddress && <p className="text-red-500 text-sm mt-1">{errors.streetAddress}</p>}
           </div>
@@ -108,7 +108,7 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
               placeholder="Apt / Suite number (optional)"
               value={formData.aptSuite}
               onChange={(e) => onChange('aptSuite', e.target.value)}
-              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700"
             />
           </div>
 
@@ -119,7 +119,7 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
               placeholder="ZIP Code"
               value={formData.zipCode}
               onChange={(e) => onChange('zipCode', e.target.value.replace(/\D/g, '').substring(0, 5))}
-              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700"
             />
             {errors.zipCode && <p className="text-red-500 text-sm mt-1">{errors.zipCode}</p>}
           </div>
@@ -132,7 +132,7 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
                 placeholder="City"
                 value={formData.city}
                 onChange={(e) => onChange('city', e.target.value)}
-                className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700"
               />
               {errors.city && <p className="text-red-500 text-sm mt-1">{errors.city}</p>}
             </div>
@@ -140,7 +140,7 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
               <select
                 value={formData.state}
                 onChange={(e) => onChange('state', e.target.value)}
-                className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 appearance-none"
+                className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700 appearance-none"
               >
                 <option value="">State</option>
                 {states.map(state => (
@@ -155,7 +155,7 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
         {/* Next button */}
         <button
           type="submit"
-          className="w-full p-4 bg-transparent border-2 border-black text-black uppercase font-medium rounded-lg mt-6 hover:bg-transparent transition-colors"
+          className="w-full p-4 bg-transparent border-2 border-black text-black uppercase font-medium rounded-lg mt-6 hover:bg-gray-50 transition-colors"
         >
           NEXT
         </button>

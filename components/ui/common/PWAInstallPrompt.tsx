@@ -79,7 +79,7 @@ const PWAInstallPrompt: React.FC = () => {
       <div className="max-w-6xl mx-auto flex items-center justify-between">
         <div className="flex items-center">
           <img 
-            src="/icons/icon.svg" 
+            src="/images/icons/icon.png" 
             alt="App Logo"
             className="w-8 h-8 mr-3"
           />
@@ -94,7 +94,7 @@ const PWAInstallPrompt: React.FC = () => {
           {!isIOS && (
             <button
               onClick={handleInstall}
-              className="bg-blue-600 text-white px-3 py-1 rounded text-sm font-medium hover:bg-blue-700 transition-colors"
+              className="bg-neutral-800 text-white px-3 py-1 rounded text-sm font-medium hover:bg-blue-700 transition-colors"
             >
               Install
             </button>

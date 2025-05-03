@@ -81,30 +81,30 @@ const AdminProfileSelector: React.FC<AdminProfileSelectorProps> = ({ onSelectUse
     <div className="min-h-screen bg-app-black text-white p-5">
       <animated.div style={titleSpring} className="text-center mb-8 pt-6">
         <h1 className="text-2xl font-bold mb-2">Banking App Admin</h1>
-        <p className="text-gray-400">Select a profile to continue</p>
+        <p className="text-neutral-400">Select a profile to continue</p>
       </animated.div>
 
       <animated.div style={containerSpring} className="max-w-md mx-auto">
         {/* New User Option */}
         <animated.div 
           style={cardSpring} 
-          className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl p-5 mb-5 cursor-pointer hover:shadow-lg transition-shadow"
+          className="bg-[#212121] rounded-xl p-5 mb-5 cursor-pointer hover:shadow-lg transition-shadow"
           onClick={() => handleSelectUser('new')}
         >
           <div className="flex items-center">
             <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mr-4">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-neutral-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
             </div>
             <div>
               <h2 className="text-xl font-bold">New User</h2>
-              <p className="text-blue-200">Start with a fresh account</p>
+              <p className="text-neutral-400">Start with a fresh account</p>
             </div>
           </div>
         </animated.div>
 
-        <h3 className="text-lg font-medium mb-3 text-gray-300">Existing Profiles</h3>
+        <h3 className="text-lg font-medium mb-3 text-neutral-300">Existing Profiles</h3>
         
         {/* Existing Users */}
         {users.map((user, index) => {
@@ -130,10 +130,10 @@ const AdminProfileSelector: React.FC<AdminProfileSelectorProps> = ({ onSelectUse
                   <div className="flex justify-between items-start">
                     <div>
                       <h2 className="text-xl font-bold">{user.name}</h2>
-                      <p className="text-gray-400">{user.occupation}</p>
+                      <p className="text-neutral-400">{user.occupation}</p>
                     </div>
                     <button 
-                      className="text-gray-400 hover:text-white transition-colors"
+                      className="text-neutral-400 hover:text-white transition-colors"
                       onClick={(e) => {
                         e.stopPropagation();
                         // TODO: Implement account modification
@@ -151,11 +151,11 @@ const AdminProfileSelector: React.FC<AdminProfileSelectorProps> = ({ onSelectUse
               
               <div className="grid grid-cols-2 gap-3 text-sm">
                 <div className="bg-neutral-700 p-3 rounded-lg">
-                  <p className="text-gray-400 mb-1">Checking Balance</p>
+                  <p className="text-neutral-400 mb-1">Checking Balance</p>
                   <p className="text-white font-medium">${userAccount?.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                 </div>
                 <div className="bg-neutral-900 p-3 rounded-lg">
-                  <p className="text-gray-400 mb-1">Credit Card</p>
+                  <p className="text-neutral-400 mb-1">Credit Card</p>
                   <p className="text-white font-medium">{userCard?.name || 'None'}</p>
                 </div>
               </div>
@@ -163,7 +163,7 @@ const AdminProfileSelector: React.FC<AdminProfileSelectorProps> = ({ onSelectUse
           );
         })}
 
-        <div className="mt-8 text-center text-xs text-gray-500">
+        <div className="mt-8 text-center text-xs text-neutral-500">
           <p>This screen is only visible in development mode</p>
           <p className="mt-1">Banking App Admin v1.0</p>
         </div>

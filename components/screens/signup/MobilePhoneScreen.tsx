@@ -73,7 +73,7 @@ const MobilePhoneScreen: React.FC<MobilePhoneScreenProps> = ({ formData, onChang
               placeholder="Mobile phone number (no VOIP)"
               value={formData.mobilePhone}
               onChange={handlePhoneChange}
-              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700"
             />
             {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
           </div>
@@ -87,7 +87,7 @@ const MobilePhoneScreen: React.FC<MobilePhoneScreenProps> = ({ formData, onChang
         {/* Next button */}
         <button
           type="submit"
-          className="w-full p-4 bg-transparent border-2 border-black text-black uppercase font-medium rounded-lg mt-6 hover:bg-transparent transition-colors"
+          className="w-full p-4 bg-transparent border-2 border-black text-black uppercase font-medium rounded-lg mt-6 hover:bg-gray-50 transition-colors"
         >
           NEXT
         </button>
@@ -100,7 +100,7 @@ const MobilePhoneScreen: React.FC<MobilePhoneScreenProps> = ({ formData, onChang
               onNext();
             }
           }}
-          className="w-full p-4 bg-transparent border-2 border-black text-black uppercase font-medium rounded-lg mt-4 hover:bg-transparent transition-colors"
+          className="w-full p-4 bg-transparent border-2 border-black text-black uppercase font-medium rounded-lg mt-4 hover:bg-gray-50 transition-colors"
         >
           GET TRANSACTIONAL MESSAGES ONLY
         </button>
