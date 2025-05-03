@@ -30,7 +30,7 @@ const slides = [
   {
     id: 'card',
     title: 'Personal Concierge',
-    subtitle: ': Chat one-on-one with a local Member Concierge directly in the app, no chatbots—just real people who know you, your goals, and your community.',
+    subtitle: 'Chat one-on-one with a local Member Concierge directly in the app, no chatbots—just real people who know you, your goals, and your community.',
     bgColor: '#5ea63a', // Green
     textColor: 'white',
     image: '/images/onboarding/woman-m1st.png',
