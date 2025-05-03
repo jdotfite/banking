@@ -1,14 +1,29 @@
 {
+  "id": "/",
   "name": "Members 1st Banking",
   "short_name": "Banking",
   "description": "Your personal banking app",
   "theme_color": "#7b2528",
-  "background_color": "#121212",
+  "background_color": "#ffffff",
   "display": "standalone",
   "orientation": "portrait",
   "scope": "/",
   "start_url": "/",
+  "categories": ["finance"],
+  "screenshots": [
+    {
+      "src": "/images/marketing/screenshot1.png",
+      "sizes": "1080x1920",
+      "type": "image/png"
+    }
+  ],
   "icons": [
+    {
+      "src": "/icons/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
     {
       "src": "/icons/icon-192x192.png",
       "sizes": "192x192",
@@ -20,6 +35,20 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "monochrome"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "View Transactions",
+      "short_name": "Transactions",
+      "description": "View your recent transactions",
+      "url": "/wallet"
     }
   ]
 }
