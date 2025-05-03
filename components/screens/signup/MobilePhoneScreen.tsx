@@ -12,6 +12,7 @@ interface MobilePhoneScreenProps {
 
 const MobilePhoneScreen: React.FC<MobilePhoneScreenProps> = ({ formData, onChange, onNext }) => {
   const [error, setError] = useState('');
+  const [marketingConsent, setMarketingConsent] = useState(true);
 
   // Validate phone number
   const validatePhoneNumber = () => {
@@ -21,8 +22,8 @@ const MobilePhoneScreen: React.FC<MobilePhoneScreenProps> = ({ formData, onChang
     }
 
     // Simple US phone number validation (10 digits)
-    const phoneRegex = /^\d{10}$/;
-    if (!phoneRegex.test(formData.mobilePhone.replace(/\D/g, ''))) {
+    const digitsOnly = formData.mobilePhone.replace(/\D/g, '');
+    if (digitsOnly.length !== 10) {
       setError('Please enter a valid 10-digit phone number');
       return false;
     }
@@ -38,7 +39,13 @@ const MobilePhoneScreen: React.FC<MobilePhoneScreenProps> = ({ formData, onChang
 
     // Format as (XXX) XXX-XXXX
     if (input.length > 0) {
-      formattedInput = input.substring(0, 10);
+      if (input.length <= 3) {
+        formattedInput = input;
+      } else if (input.length <= 6) {
+        formattedInput = `(${input.substring(0, 3)}) ${input.substring(3)}`;
+      } else {
+        formattedInput = `(${input.substring(0, 3)}) ${input.substring(3, 6)}-${input.substring(6, 10)}`;
+      }
     }
 
     onChange('mobilePhone', formattedInput);
@@ -48,6 +55,15 @@ const MobilePhoneScreen: React.FC<MobilePhoneScreenProps> = ({ formData, onChang
   const handleNext = (e: React.FormEvent) => {
     e.preventDefault();
     if (validatePhoneNumber()) {
+      // Here you could save the marketing consent preference
+      onNext();
+    }
+  };
+
+  // Handle transactional only button click
+  const handleTransactionalOnly = () => {
+    if (validatePhoneNumber()) {
+      setMarketingConsent(false);
       onNext();
     }
   };
@@ -68,14 +84,23 @@ const MobilePhoneScreen: React.FC<MobilePhoneScreenProps> = ({ formData, onChang
         <div className="space-y-4">
           {/* Phone number input */}
           <div>
+            <label htmlFor="phone-input" className="sr-only">
+              Mobile phone number
+            </label>
             <input
+              id="phone-input"
               type="tel"
               placeholder="Mobile phone number (no VOIP)"
               value={formData.mobilePhone}
               onChange={handlePhoneChange}
+              aria-describedby={error ? "phone-error" : undefined}
               className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700"
             />
-            {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+            {error && (
+              <p id="phone-error" className="text-red-500 text-sm mt-1" role="alert">
+                {error}
+              </p>
+            )}
           </div>
 
           {/* Marketing consent text */}
@@ -91,42 +116,7 @@ const MobilePhoneScreen: React.FC<MobilePhoneScreenProps> = ({ formData, onChang
         >
           NEXT
         </button>
-
-        {/* Transactional messages only option */}
-        <button
-          type="button"
-          onClick={() => {
-            if (validatePhoneNumber()) {
-              onNext();
-            }
-          }}
-          className="w-full p-4 bg-transparent border-2 border-black text-black uppercase font-medium rounded-lg mt-4 hover:bg-gray-50 transition-colors"
-        >
-          GET TRANSACTIONAL MESSAGES ONLY
-        </button>
       </form>
-
-      {/* Number pad (for display only - not functional) */}
-      <div className="mt-8 bg-gray-900 rounded-t-lg p-4">
-        <div className="grid grid-cols-3 gap-2">
-          {[1, 2, 3, 4, 5, 6, 7, 8, 9, '*', 0, '#'].map((num, index) => (
-            <div 
-              key={index} 
-              className="bg-gray-800 rounded-full p-4 text-center text-white text-xl font-medium"
-            >
-              {num}
-              {num === 2 && <div className="text-xs text-gray-400">ABC</div>}
-              {num === 3 && <div className="text-xs text-gray-400">DEF</div>}
-              {num === 4 && <div className="text-xs text-gray-400">GHI</div>}
-              {num === 5 && <div className="text-xs text-gray-400">JKL</div>}
-              {num === 6 && <div className="text-xs text-gray-400">MNO</div>}
-              {num === 7 && <div className="text-xs text-gray-400">PQRS</div>}
-              {num === 8 && <div className="text-xs text-gray-400">TUV</div>}
-              {num === 9 && <div className="text-xs text-gray-400">WXYZ</div>}
-            </div>
-          ))}
-        </div>
-      </div>
     </div>
   );
 };

@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { X } from 'lucide-react';
+import { X, ArrowLeft } from 'lucide-react';
 import BasicInfoScreen from './BasicInfoScreen';
 import DateOfBirthScreen from './DateOfBirthScreen';
 import MobilePhoneScreen from './MobilePhoneScreen';
@@ -36,6 +36,8 @@ interface SignupFormData {
 const SignupFlow: React.FC = () => {
   const router = useRouter();
   const [currentStep, setCurrentStep] = useState<SignupStep>(SignupStep.BASIC_INFO);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState<SignupFormData>({
     firstName: '',
     lastName: '',
@@ -50,18 +52,25 @@ const SignupFlow: React.FC = () => {
     password: ''
   });
 
+  const totalSteps = Object.keys(SignupStep).length / 2; // Divide by 2 because enum creates both numeric and string keys
+
   // Handle form data changes
   const handleChange = (field: string, value: string) => {
     setFormData(prev => ({
       ...prev,
       [field]: value
     }));
+    
+    // Clear any previous error when user makes changes
+    if (error) setError(null);
   };
 
   // Handle next step
   const handleNext = () => {
     if (currentStep < SignupStep.CREATE_PASSWORD) {
       setCurrentStep(prev => prev + 1);
+      // Focus management for accessibility
+      window.scrollTo(0, 0);
     } else {
       // Final step - complete signup
       completeSignup();
@@ -72,6 +81,8 @@ const SignupFlow: React.FC = () => {
   const handleBack = () => {
     if (currentStep > SignupStep.BASIC_INFO) {
       setCurrentStep(prev => prev - 1);
+      // Focus management for accessibility
+      window.scrollTo(0, 0);
     } else {
       // First step - go back to onboarding
       router.push('/onboarding');
@@ -80,17 +91,63 @@ const SignupFlow: React.FC = () => {
 
   // Handle close button
   const handleClose = () => {
-    router.push('/');
+    if (window.confirm('Are you sure you want to exit? Your progress will be lost.')) {
+      router.push('/');
+    }
+  };
+
+  // Validate all form data before submission
+  const validateFormData = (): boolean => {
+    // Basic validation - check if required fields are filled
+    const requiredFields: (keyof SignupFormData)[] = [
+      'firstName', 'lastName', 'email', 'dateOfBirth', 
+      'mobilePhone', 'streetAddress', 'zipCode', 'city', 
+      'state', 'password'
+    ];
+    
+    for (const field of requiredFields) {
+      if (!formData[field]) {
+        setError(`Please complete all required fields before submitting.`);
+        return false;
+      }
+    }
+    
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError('Please enter a valid email address.');
+      return false;
+    }
+    
+    return true;
   };
 
   // Complete signup and redirect to admin page
-  const completeSignup = () => {
-    console.log('Signup completed with data:', formData);
+  const completeSignup = async () => {
+    if (!validateFormData()) return;
     
-    // In a real app, this would call an API to create the account
-    // For now, we'll just redirect to the admin page
-    localStorage.removeItem('selectedUserId');
-    router.push('/');
+    setIsSubmitting(true);
+    setError(null);
+    
+    try {
+      console.log('Signup completed with data:', formData);
+      
+      // In a real app, this would call an API to create the account
+      // For example:
+      // await apiClient.createAccount(formData);
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      localStorage.removeItem('selectedUserId');
+      router.push('/');
+      
+    } catch (err) {
+      console.error('Signup failed:', err);
+      setError('Failed to create account. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Render the current step
@@ -134,6 +191,7 @@ const SignupFlow: React.FC = () => {
             formData={formData} 
             onChange={handleChange} 
             onNext={handleNext} 
+            isSubmitting={isSubmitting}
           />
         );
       default:
@@ -143,20 +201,42 @@ const SignupFlow: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Header with close button */}
-      <div className="h-16 bg-black flex items-center px-4">
-        <button 
-          onClick={handleClose}
-          className="p-2 text-white"
-          aria-label="Close"
-        >
-          <X size={24} />
-        </button>
+      {/* Header with navigation buttons */}
+      <div className="h-16 bg-black flex items-center justify-between px-4">
+        {currentStep > SignupStep.BASIC_INFO ? (
+          <button 
+            onClick={handleBack}
+            className="p-2 text-white"
+            aria-label="Go back"
+          >
+            <ArrowLeft size={24} />
+          </button>
+        ) : (
+          <button 
+            onClick={handleClose}
+            className="p-2 text-white"
+            aria-label="Close"
+          >
+            <X size={24} />
+          </button>
+        )}
+        
+        {/* Progress indicator */}
+        <div className="text-white text-sm">
+          Step {currentStep + 1} of {totalSteps}
+        </div>
       </div>
 
       {/* Current step content */}
-      <div className="px-4">
+      <div className="px-4 pb-8">
         {renderStep()}
+        
+        {/* Global error message */}
+        {error && (
+          <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded">
+            {error}
+          </div>
+        )}
       </div>
     </div>
   );
