@@ -12,8 +12,20 @@ import LoadingSpinner from '@/components/ui/common/LoadingSpinner';
 
 // Inner component that uses the context
 const AppContent: React.FC = () => {
-  const { selectedUserId, isAdminMode, setSelectedUserId } = useUser();
+  const { selectedUserId, isAdminMode, setSelectedUserId, resetUserSelection } = useUser();
   const [isLoading, setIsLoading] = useState(true);
+
+  // Reset to admin screen when app is closed
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      resetUserSelection();
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [resetUserSelection]);
 
   // Simulate initial loading
   useEffect(() => {
@@ -38,8 +50,15 @@ const AppContent: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-app-black">
-        <LoadingSpinner size="large" />
+      <div className="flex flex-col items-center justify-center h-screen bg-white space-y-4">
+        <div className="animate-pulse">
+          <img 
+            src="/icons/logo.png" 
+            alt="App Logo"
+            className="w-32 h-32"
+          />
+        </div>
+        <LoadingSpinner size="large" color="text-gray-600" />
       </div>
     );
   }
