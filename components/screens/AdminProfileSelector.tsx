@@ -6,7 +6,6 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { bankingData } from '@/lib/data/fakeBankingData';
 import { animated, useSpring } from 'react-spring';
-import PWAInstallPrompt from '@/components/ui/common/PWAInstallPrompt';
 
 interface AdminProfileSelectorProps {
   onSelectUser: (userId: string | null) => void;
@@ -31,27 +30,23 @@ const AdminProfileSelector: React.FC<AdminProfileSelectorProps> = ({ onSelectUse
     return () => window.removeEventListener('resize', setViewportHeight);
   }, []);
 
-  // Generate only card animations (New User + 2 existing users)
-  const cardSprings = [
+  // Generate card animations dynamically based on user count
+  const newUserSpring = useSpring({
+    opacity: isLoading ? 0 : 1,
+    transform: isLoading ? 'translateY(20px)' : 'translateY(0px)',
+    config: { tension: 280, friction: 25 },
+    delay: 300,
+  });
+  
+  // Generate springs for each user
+  const userSprings = users.map((_, index) => 
     useSpring({
       opacity: isLoading ? 0 : 1,
       transform: isLoading ? 'translateY(20px)' : 'translateY(0px)',
       config: { tension: 280, friction: 25 },
-      delay: 300,
-    }),
-    useSpring({
-      opacity: isLoading ? 0 : 1,
-      transform: isLoading ? 'translateY(20px)' : 'translateY(0px)',
-      config: { tension: 280, friction: 25 },
-      delay: 350,
-    }),
-    useSpring({
-      opacity: isLoading ? 0 : 1,
-      transform: isLoading ? 'translateY(20px)' : 'translateY(0px)',
-      config: { tension: 280, friction: 25 },
-      delay: 400,
+      delay: 350 + (index * 50), // Stagger the animations
     })
-  ];
+  );
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 800);
@@ -105,7 +100,7 @@ const AdminProfileSelector: React.FC<AdminProfileSelectorProps> = ({ onSelectUse
           <div className="max-w-md mx-auto">
             {/* New User Option */}
             <animated.div 
-              style={cardSprings[0]} 
+              style={newUserSpring} 
               className="bg-[#212121] rounded-xl p-5 mb-5 cursor-pointer hover:shadow-lg transition-shadow"
               onClick={() => handleSelectUser('new')}
             >
@@ -131,7 +126,7 @@ const AdminProfileSelector: React.FC<AdminProfileSelectorProps> = ({ onSelectUse
               return (
                 <animated.div 
                   key={user.id}
-                  style={cardSprings[index + 1]} 
+                  style={userSprings[index]} 
                   className="bg-[#212121] rounded-xl p-5 mb-4 cursor-pointer hover:bg-neutral-700 transition-colors"
                   onClick={() => handleSelectUser(user.id)}
                 >
@@ -166,7 +161,7 @@ const AdminProfileSelector: React.FC<AdminProfileSelectorProps> = ({ onSelectUse
                   <div className="grid grid-cols-2 gap-3 text-sm">
                     <div className="bg-neutral-700 p-3 rounded-lg">
                       <p className="text-neutral-400 mb-1">Checking Balance</p>
-                      <p className="text-white font-medium">${userAccount?.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                      <p className="text-white font-medium">${userAccount?.balance?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'}</p>
                     </div>
                     <div className="bg-neutral-900 p-3 rounded-lg">
                       <p className="text-neutral-400 mb-1">Credit Card</p>
