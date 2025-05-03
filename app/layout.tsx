@@ -1,11 +1,7 @@
-// ✅ This is a server component – DO NOT add "use client"
-
+// app/layout.tsx
 import type { Metadata } from 'next';
 import { Outfit } from 'next/font/google';
 import './globals.css';
-import IOSFullscreen from '@/components/IOSFullScreen';
-import { ThemeProvider } from '@/lib/context/ThemeContext';
-import AppContainer from '@/components/layout/AppContainer';
 
 const outfit = Outfit({
   subsets: ['latin'],
@@ -36,10 +32,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="Banking App" />
       </head>
       <body className={`${outfit.className} bg-gray-900 min-h-screen font-outfit`}>
-        <ThemeProvider>
-          <AppContainer>{children}</AppContainer>
-        </ThemeProvider>
-        <IOSFullscreen />
+        {children}
         <script src="/sw-register.js" defer></script>
       </body>
     </html>

@@ -3,6 +3,7 @@
 
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import { animated, useSpring } from 'react-spring';
 
 interface SpendingData {
   name: string;
@@ -71,8 +72,15 @@ const SpendingChart: React.FC<SpendingChartProps> = ({ selectedPeriod, periodOpt
     return option ? option.label : 'this month';
   };
 
+  // Add animation for chart
+  const chartAnimation = useSpring({
+    from: { opacity: 0, transform: 'scale(0.9)' },
+    to: { opacity: 1, transform: 'scale(1)' },
+    config: { tension: 280, friction: 25 },
+  });
+
   return (
-    <div className="w-full">
+    <animated.div className="w-full" style={chartAnimation}>
       {/* Chart container - reduced thickness to match inspiration better */}
       <div className="relative" style={{ height: '260px' }}>
         <ResponsiveContainer width="100%" height="100%">
@@ -108,7 +116,7 @@ const SpendingChart: React.FC<SpendingChartProps> = ({ selectedPeriod, periodOpt
           <p className="text-white font-semibold" style={{ fontSize: '36px' }}>{formatCurrency(totalSpent)}</p>
         </div>
       </div>
-    </div>
+    </animated.div>
   );
 };
 

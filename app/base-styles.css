@@ -1,0 +1,212 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+
+:root {
+  --font-outfit: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+html,
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+  background-color: black;
+  color: white;
+  font-family: "Outfit", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: #27272a;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #4b5563;
+  border-radius: 4px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Animation utilities */
+.animate-fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.5s ease-out;
+}
+
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Transition utilities */
+.transition-height {
+  transition-property: height;
+}
+
+/* Custom card styling */
+.credit-card {
+  transition: all 0.3s ease;
+  backface-visibility: hidden;
+}
+
+.credit-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
+}
+
+/* Custom handle styling */
+.drag-handle {
+  touch-action: none;
+  user-select: none;
+}
+
+/* Smoother transitions */
+.transition-all {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Transaction container overlay */
+.transaction-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 15;
+  pointer-events: none;
+}
+
+/* Improved drag handle */
+.drag-handle {
+  width: 40px;
+  height: 4px;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 2px;
+  margin: 8px auto;
+  cursor: grab;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+/* Stylized cutout handle for transaction container */
+.drag-handle-container {
+  position: relative;
+  width: 100%;
+  height: 20px;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  margin-top: -10px;
+}
+
+.drag-handle {
+  width: 40px;
+  height: 5px;
+  background-color: #212121; /* Transaction area color */
+  border-radius: 2.5px;
+  position: relative;
+  cursor: grab;
+  margin-top: 7px;
+}
+
+.drag-handle-container:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100px;
+  height: 20px;
+  background-color: #121212; /* App background color */
+  border-bottom-left-radius: 50px;
+  border-bottom-right-radius: 50px;
+}
+
+/* When dragging */
+.drag-handle:active {
+  cursor: grabbing;
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* iOS-specific PWA styles */
+@supports (-webkit-touch-callout: none) {
+  /* iOS devices only */
+  html {
+    /* Fill the screen properly even with the notch/home indicator */
+    padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    height: -webkit-fill-available;
+  }
+  
+  body {
+    /* Prevent elastic scrolling */
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    /* Prevent overscroll effects */
+    overflow: hidden;
+    min-height: -webkit-fill-available;
+  }
+  
+  /* Main app container should handle scrolling */
+  #app-container {
+    overflow-y: auto;
+    height: 100%;
+    /* Enable momentum scrolling on iOS */
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Style when iOS has scrolled (address bar is hidden) */
+  body.ios-scrolled {
+    /* Styles to apply when address bar is hidden */
+  }
+}
+
+/* Make sure anchor elements with PWA handle back properly */
+a {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}
+
+/* Prevent text selection in app */
+.app-no-select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}

@@ -1,10 +1,178 @@
+==== File: CACHE-GUIDE.md ====
+# Handling Cache Issues During Development
+
+This guide provides solutions for dealing with caching issues when developing the Banking App.
+
+## The Problem
+
+When developing web applications, browser caching can sometimes cause confusion when changes don't appear to take effect. This can happen for several reasons:
+
+1. Browser caching static assets and HTML
+2. Service Worker caching (for PWAs)
+3. Next.js build cache
+4. React component state persistence
+
+## Solutions Implemented
+
+We've implemented several solutions to help manage caching during development:
+
+### 1. Modified Next.js Configuration
+
+The `next.config.js` file has been updated to disable caching in development mode:
+
+```javascript
+// Cache-Control headers are set to no-cache in development
+async headers() {
+  return [
+    {
+      source: '/(.*)',
+      headers: [
+        {
+          key: 'Cache-Control',
+          value: process.env.NODE_ENV === 'development' 
+            ? 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0' 
+            : 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400',
+        },
+        // Other headers...
+      ],
+    },
+  ];
+}
+```
+
+### 2. Middleware Cache-Busting
+
+The `middleware.ts` file now adds cache-busting headers to all responses in development mode:
+
+```javascript
+// Add cache-busting headers in development mode
+if (process.env.NODE_ENV === 'development') {
+  response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+  response.headers.set('Pragma', 'no-cache');
+  response.headers.set('Expires', '0');
+  response.headers.set('Surrogate-Control', 'no-store');
+  
+  // Add a timestamp header for debugging
+  response.headers.set('X-Cache-Timestamp', new Date().toISOString());
+}
+```
+
+### 3. Cache-Clearing Scripts
+
+Two scripts have been added to help clear caches:
+
+- `scripts/clear-cache-and-restart.ps1` (Windows PowerShell)
+- `scripts/clear-cache-and-restart.sh` (Unix/Mac/Linux)
+
+These scripts:
+- Clear the Next.js `.next` cache directory
+- Provide instructions for clearing browser cache
+- Restart the development server
+
+### 4. NPM Scripts
+
+New NPM scripts have been added to package.json:
+
+```json
+"scripts": {
+  "dev:clean": "rimraf .next && next dev",
+  "build:clean": "rimraf .next && next build",
+  "clear-cache:win": "powershell -ExecutionPolicy Bypass -File ./scripts/clear-cache-and-restart.ps1",
+  "clear-cache:unix": "bash ./scripts/clear-cache-and-restart.sh",
+  "test-nav": "next dev && echo 'Navigate to http://localhost:3000/test-nav.html to test navigation'"
+}
+```
+
+### 5. Navigation Test Page
+
+A test page has been created at `public/test-nav.html` that helps you:
+- Test the bottom navigation in isolation
+- Clear browser caches
+- Add timestamp parameters to force refreshes
+- Check cache-related headers
+
+## How to Use These Tools
+
+### When Changes Aren't Showing Up
+
+1. **Hard Refresh**: Try a hard refresh first (Ctrl+F5 or Cmd+Shift+R)
+
+2. **Clear Next.js Cache and Restart**:
+   - Windows: `npm run clear-cache:win`
+   - Mac/Linux: `npm run clear-cache:unix`
+
+3. **Use the Test Navigation Page**:
+   - Start the dev server: `npm run dev`
+   - Navigate to: http://localhost:3000/test-nav.html
+   - Use the buttons to clear cache and reload
+
+4. **Use Browser Developer Tools**:
+   - Open DevTools (F12)
+   - Go to Network tab
+   - Check "Disable cache" while DevTools is open
+   - Reload the page
+
+5. **Use Incognito/Private Window**:
+   - Chrome: Ctrl+Shift+N
+   - Firefox: Ctrl+Shift+P
+   - Edge: Ctrl+Shift+N
+
+6. **Add Query Parameters**:
+   - Append a timestamp to force a fresh load:
+   - Example: `http://localhost:3000/?refresh=123456789`
+
+## Port Differences
+
+If you're seeing different behavior on different ports (e.g., 3000 vs 3001):
+
+- This is likely because each server instance has its own cache
+- When you restart the server, it might pick a different port if the original is in use
+- Always check which port you're using in the terminal output
+- Use the cache-clearing techniques above on the specific port you're testing
+
+## Service Worker Considerations
+
+The PWA functionality is disabled in development mode (see `next.config.js`), but if you've previously installed the app as a PWA, you might need to:
+
+1. Unregister service workers:
+   - In Chrome DevTools → Application → Service Workers → Unregister
+   
+2. Clear site data:
+   - In Chrome DevTools → Application → Storage → Clear site data
+
+## Bottom Navigation Specific Issues
+
+The bottom navigation component has been centralized in the AppContainer component to ensure it's loaded only once and consistently positioned across all pages. If you're still experiencing issues with the navigation:
+
+1. Check that you're not importing and using BottomNav in individual page components
+2. Verify that the transform styles in BottomNav.tsx are not being overridden
+3. Use the test-nav.html page to isolate and test the navigation component
+
+
+
+
 ==== File: middleware.ts ====
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  return NextResponse.next();
+  
+  // Create the response
+  const response = NextResponse.next();
+  
+  // Add cache-busting headers in development mode
+  if (process.env.NODE_ENV === 'development') {
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+    response.headers.set('Surrogate-Control', 'no-store');
+    
+    // Add a timestamp header for debugging
+    response.headers.set('X-Cache-Timestamp', new Date().toISOString());
+  }
+  
+  return response;
 }
 
 export const config = {
@@ -12,6 +180,7 @@ export const config = {
     '/((?!_next/static|_next/image|favicon.ico|images|api).*)',
   ],
 };
+
 
 
 
@@ -33,6 +202,7 @@ const withPWA = require('next-pwa')({
   register: true,            // automatically register service worker
   skipWaiting: true,         // activate new service worker immediately
   disable: process.env.NODE_ENV === 'development', // don't run PWA in dev
+  buildExcludes: [/app-build-manifest.json$/], // Add this line to fix the precaching error
 });
 
 /** @type {import('next').NextConfig} */
@@ -55,7 +225,9 @@ const nextConfig = {
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400',
+            value: process.env.NODE_ENV === 'development' 
+              ? 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0' 
+              : 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400',
           },
           {
             key: 'X-Content-Type-Options',
@@ -118,9 +290,10 @@ module.exports = {
           red: '#E53E3E', // Slightly adjusted red
           redLight: '#F56565', // For gradient
           redDark: '#C53030', // For gradient
+          dark: '#212121', // Custom card background color
         },
         app: {
-        customGray: '#1A1A1A', // Exact gray from example
+          customGray: '#1A1A1A', // Exact gray from example
           black: '#121212', // Pure black for background
           darkGray: '#151515', // For transaction container
           mediumGray: '#2D3748', // For inactive icons
@@ -135,11 +308,6 @@ module.exports = {
   },
   plugins: [],
 };
-
-
-
-
-
 
 
 
@@ -405,14 +573,11 @@ a {
 
 
 ==== File: app\layout.tsx ====
-// ✅ This is a server component – DO NOT add "use client"
-
+// app/layout.tsx
 import type { Metadata } from 'next';
 import { Outfit } from 'next/font/google';
 import './globals.css';
 import IOSFullscreen from '@/components/IOSFullScreen';
-import { ThemeProvider } from '@/lib/context/ThemeContext';
-import AppContainer from '@/components/layout/AppContainer';
 
 const outfit = Outfit({
   subsets: ['latin'],
@@ -443,10 +608,7 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="Banking App" />
       </head>
       <body className={`${outfit.className} bg-gray-900 min-h-screen font-outfit`}>
-        <ThemeProvider>
-          <AppContainer>{children}</AppContainer>
-        </ThemeProvider>
-        <IOSFullscreen />
+        {children}
         <script src="/sw-register.js" defer></script>
       </body>
     </html>
@@ -455,32 +617,19 @@ export default function RootLayout({
 
 
 
-
 ==== File: app\page.tsx ====
 'use client';
 
 import React from 'react';
-import Home from '@/components/screens/Home';
-import BottomNav from '@/components/ui/navigation/BottomNav';
-import { NavItemType } from '@/lib/types';
-
-const navItems: NavItemType[] = [
-  { name: 'Home', icon: 'home', href: '/' },
-  { name: 'Insights', icon: 'insights', href: '/insights' },
-  { name: 'Add', icon: 'add', href: '/new' },
-  { name: 'Wallet', icon: 'wallet', href: '/wallet' },
-  { name: 'More', icon: 'more', href: '/more' },
-];
+import AppRoot from '@/components/AppRoot';
 
 export default function Page() {
   return (
     <main className="relative min-h-screen">
-      <Home />
-      <BottomNav />
+      <AppRoot />
     </main>
   );
 }
-
 
 
 
@@ -489,7 +638,6 @@ export default function Page() {
 'use client';
 
 import React from 'react';
-import BottomNav from '@/components/ui/navigation/BottomNav';
 
 export default function DepositPage() {
   return (
@@ -497,7 +645,6 @@ export default function DepositPage() {
       <div className="flex items-center justify-center h-screen bg-black text-white">
         <h1 className="text-2xl font-bold">Mobile Deposit</h1>
       </div>
-      <BottomNav />
     </main>
   );
 }
@@ -510,26 +657,14 @@ export default function DepositPage() {
 
 import React from 'react';
 import Insights from '@/components/screens/Insights';
-import BottomNav from '@/components/ui/navigation/BottomNav';
-import { NavItemType } from '@/lib/types';
-
-const navItems: NavItemType[] = [
-  { name: 'Home', icon: 'home', href: '/' },
-  { name: 'Insights', icon: 'insights', href: '/insights' },
-  { name: 'Add', icon: 'add', href: '/new' },
-  { name: 'Wallet', icon: 'wallet', href: '/wallet' },
-  { name: 'More', icon: 'more', href: '/more' },
-];
 
 export default function InsightsPage() {
   return (
     <main className="relative min-h-screen">
       <Insights />
-      <BottomNav />
     </main>
   );
 }
-
 
 
 
@@ -539,26 +674,14 @@ export default function InsightsPage() {
 
 import React from 'react';
 import More from '@/components/screens/More';
-import BottomNav from '@/components/ui/navigation/BottomNav';
-import { NavItemType } from '@/lib/types';
-
-const navItems: NavItemType[] = [
-  { name: 'Home', icon: 'home', href: '/' },
-  { name: 'Insights', icon: 'insights', href: '/insights' },
-  { name: 'Add', icon: 'add', href: '/new' },
-  { name: 'Wallet', icon: 'wallet', href: '/wallet' },
-  { name: 'More', icon: 'more', href: '/more' },
-];
 
 export default function MorePage() {
   return (
     <main className="relative min-h-screen">
       <More />
-      <BottomNav />
     </main>
   );
 }
-
 
 
 
@@ -568,26 +691,14 @@ export default function MorePage() {
 
 import React from 'react';
 import NewOperation from '@/components/screens/NewOperation';
-import BottomNav from '@/components/ui/navigation/BottomNav';
-import { NavItemType } from '@/lib/types';
-
-const navItems: NavItemType[] = [
-  { name: 'Home', icon: 'home', href: '/' },
-  { name: 'Insights', icon: 'insights', href: '/insights' },
-  { name: 'Add', icon: 'add', href: '/new' },
-  { name: 'Wallet', icon: 'wallet', href: '/wallet' },
-  { name: 'More', icon: 'more', href: '/more' },
-];
 
 export default function NewPage() {
   return (
     <main className="relative min-h-screen">
       <NewOperation />
-      <BottomNav />
     </main>
   );
 }
-
 
 
 
@@ -596,7 +707,6 @@ export default function NewPage() {
 'use client';
 
 import React from 'react';
-import BottomNav from '@/components/ui/navigation/BottomNav';
 
 export default function TransferPage() {
   return (
@@ -604,35 +714,20 @@ export default function TransferPage() {
       <div className="flex items-center justify-center h-screen bg-black text-white">
         <h1 className="text-2xl font-bold">Transfer</h1>
       </div>
-      <BottomNav />
     </main>
   );
 }
-
-
-
 
 ==== File: app\wallet\page.tsx ====
 'use client';
 
 import React from 'react';
 import Wallet from '@/components/screens/Wallet';
-import BottomNav from '@/components/ui/navigation/BottomNav';
-import { NavItemType } from '@/lib/types';
-
-const navItems: NavItemType[] = [
-  { name: 'Home', icon: 'home', href: '/' },
-  { name: 'Insights', icon: 'insights', href: '/insights' },
-  { name: 'Add', icon: 'add', href: '/new' },
-  { name: 'Wallet', icon: 'wallet', href: '/wallet' },
-  { name: 'More', icon: 'more', href: '/more' },
-];
 
 export default function WalletPage() {
   return (
     <main className="relative min-h-screen">
       <Wallet />
-      <BottomNav />
     </main>
   );
 }
@@ -640,20 +735,118 @@ export default function WalletPage() {
 
 
 
-
-==== File: components\IOSFullScreen.tsx ====
+==== File: components\AppRoot.tsx ====
+// components/AppRoot.tsx
 'use client';
 
-import { useEffect } from 'react';
-import { setupIOSFullscreen } from '@/lib/utils/iosFullscreen';
+import React, { useState, useEffect } from 'react';
+import { UserProvider, useUser } from '@/components/context/UserContext';
+import { EnhancedBankingDataProvider } from '@/components/preloaders/EnhancedBankingDataProvider';
+import { BankingDataProvider } from '@/components/preloaders/BankingDataPreloader';
+import AppContainer from '@/components/layout/AppContainer';
+import AdminProfileSelector from '@/components/screens/AdminProfileSelector';
+import Home from '@/components/screens/Home';
+import LoadingSpinner from '@/components/ui/common/LoadingSpinner';
 
-export default function IOSFullscreen() {
+// Inner component that uses the context
+const AppContent: React.FC = () => {
+  const { selectedUserId, isAdminMode, setSelectedUserId } = useUser();
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Simulate initial loading
   useEffect(() => {
-    setupIOSFullscreen();
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+    return () => clearTimeout(timer);
   }, []);
 
+  // Handle user selection from admin screen
+  const handleSelectUser = (userId: string | null) => {
+    setSelectedUserId(userId);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-app-black">
+        <LoadingSpinner size="large" />
+      </div>
+    );
+  }
+
+  // Show admin screen if in admin mode
+  if (isAdminMode) {
+    return <AdminProfileSelector onSelectUser={handleSelectUser} />;
+  }
+
+  // Show main app if user is selected
+  if (selectedUserId) {
+    return <Home />;
+  }
+
+  // Fallback to admin screen if no user is selected
+  return <AdminProfileSelector onSelectUser={handleSelectUser} />;
+};
+
+// Root component that provides context
+const AppRoot: React.FC = () => {
+  return (
+    <AppContainer>
+      <AppContent />
+    </AppContainer>
+  );
+};
+
+export default AppRoot;
+
+
+
+
+==== File: components\IOSFullScreen.tsx ====
+// components/IOSFullScreen.tsx
+'use client';
+
+import React, { useEffect } from 'react';
+
+/**
+ * Component to handle iOS fullscreen behavior
+ * This helps with iOS PWA display and handling the safe areas
+ */
+const IOSFullScreen: React.FC = () => {
+  useEffect(() => {
+    // Function to handle iOS fullscreen
+    const handleIOSFullscreen = () => {
+      // Only run on iOS devices
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+      
+      if (isIOS) {
+        // Add iOS specific meta tags and classes if needed
+        document.documentElement.classList.add('ios-device');
+        
+        // Handle iOS status bar
+        if (window.navigator && (window.navigator as any).standalone) {
+          document.documentElement.classList.add('ios-standalone');
+        }
+      }
+    };
+
+    // Run on mount
+    handleIOSFullscreen();
+    
+    // Add event listener for orientation changes
+    window.addEventListener('orientationchange', handleIOSFullscreen);
+    
+    // Cleanup
+    return () => {
+      window.removeEventListener('orientationchange', handleIOSFullscreen);
+    };
+  }, []);
+
+  // This component doesn't render anything visible
   return null;
-}
+};
+
+export default IOSFullScreen;
 
 
 
@@ -685,83 +878,1051 @@ export default function RegisterServiceWorker() {
 
 
 
+==== File: components\context\UserContext.tsx ====
+// components/context/UserContext.tsx
+'use client';
+
+import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import { bankingData } from '@/lib/data/fakeBankingData';
+
+// Define the context types
+type UserContextType = {
+  selectedUserId: string | null;
+  isNewUser: boolean;
+  isAdminMode: boolean;
+  setSelectedUserId: (userId: string | null) => void;
+  toggleAdminMode: () => void;
+  resetUserSelection: () => void;
+};
+
+// Create the context with default values
+const UserContext = createContext<UserContextType>({
+  selectedUserId: null,
+  isNewUser: false,
+  isAdminMode: true,
+  setSelectedUserId: () => {},
+  toggleAdminMode: () => {},
+  resetUserSelection: () => {},
+});
+
+// Props for the provider component
+interface UserProviderProps {
+  children: ReactNode;
+  initialAdminMode?: boolean;
+}
+
+// Provider component
+export const UserProvider: React.FC<UserProviderProps> = ({ 
+  children, 
+  initialAdminMode = process.env.NODE_ENV === 'development' 
+}) => {
+  // State for selected user ID
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  // State for admin mode
+  const [isAdminMode, setIsAdminMode] = useState<boolean>(initialAdminMode);
+  // Derived state for new user
+  const isNewUser = selectedUserId === 'new';
+
+  // Load selected user from localStorage on mount
+  useEffect(() => {
+    const storedUserId = localStorage.getItem('selectedUserId');
+    if (storedUserId) {
+      setSelectedUserId(storedUserId === 'new' ? 'new' : storedUserId);
+      // If a user is already selected, exit admin mode
+      if (isAdminMode) {
+        setIsAdminMode(false);
+      }
+    }
+  }, [isAdminMode]);
+
+  // Handle user selection
+  const handleSetSelectedUserId = (userId: string | null) => {
+    if (userId === 'new') {
+      localStorage.setItem('selectedUserId', 'new');
+      setSelectedUserId('new');
+    } else if (userId) {
+      localStorage.setItem('selectedUserId', userId);
+      setSelectedUserId(userId);
+    } else {
+      localStorage.removeItem('selectedUserId');
+      setSelectedUserId(null);
+    }
+    
+    // Exit admin mode when a user is selected
+    if (isAdminMode) {
+      setIsAdminMode(false);
+    }
+  };
+
+  // Toggle admin mode
+  const toggleAdminMode = () => {
+    setIsAdminMode(prev => !prev);
+  };
+
+  // Reset user selection and go back to admin mode
+  const resetUserSelection = () => {
+    localStorage.removeItem('selectedUserId');
+    setSelectedUserId(null);
+    setIsAdminMode(true);
+  };
+
+  // Context value
+  const value = {
+    selectedUserId,
+    isNewUser,
+    isAdminMode,
+    setSelectedUserId: handleSetSelectedUserId,
+    toggleAdminMode,
+    resetUserSelection,
+  };
+
+  return (
+    <UserContext.Provider value={value}>
+      {children}
+    </UserContext.Provider>
+  );
+};
+
+// Custom hook to use the user context
+export const useUser = () => {
+  const context = useContext(UserContext);
+  if (!context) {
+    throw new Error('useUser must be used within a UserProvider');
+  }
+  return context;
+};
+
+
+
+
 ==== File: components\layout\AppContainer.tsx ====
 // components/layout/AppContainer.tsx
 'use client';
 
-import React, { useEffect } from 'react';
-import { useTheme } from '@/lib/context/ThemeContext';
-import dynamic from 'next/dynamic';
-
-// Dynamically import the PWA install prompt to avoid SSR issues
-const PWAInstallPrompt = dynamic(
-  () => import('../ui/common/PWAInstallPrompt'),
-  { ssr: false }
-);
+import React, { ReactNode } from 'react';
+import BottomNav from '@/components/ui/navigation/BottomNav';
+import { UserProvider } from '@/components/context/UserContext';
+import { EnhancedBankingDataProvider } from '@/components/preloaders/EnhancedBankingDataProvider';
+import { BankingDataProvider } from '@/components/preloaders/BankingDataPreloader';
 
 interface AppContainerProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
+/**
+ * AppContainer component
+ * Wraps the entire application and provides the bottom navigation
+ * This ensures the bottom navigation is only loaded once and is consistent across all pages
+ */
 const AppContainer: React.FC<AppContainerProps> = ({ children }) => {
-  const { theme } = useTheme();
-  
-  // Add class to body when in standalone mode (PWA)
-  useEffect(() => {
-    const isStandalone = 
-      window.matchMedia('(display-mode: standalone)').matches ||
-      (window.navigator as any).standalone ||
-      document.referrer.includes('android-app://');
-    
-    if (isStandalone) {
-      document.body.classList.add('pwa-mode');
-    }
-    
-    // Listen for display mode changes
-    const mediaQuery = window.matchMedia('(display-mode: standalone)');
-    const handleChange = (e: MediaQueryListEvent) => {
-      if (e.matches) {
-        document.body.classList.add('pwa-mode');
-      } else {
-        document.body.classList.remove('pwa-mode');
-      }
-    };
-    
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, []);
-  
   return (
-    <div className="min-h-screen flex justify-center bg-neutral-800">
-      {/* Main container with proper constraints - add id for iOS scrolling */}
-      <div 
-        id="app-container" 
-        className="w-full relative min-h-screen bg-app-black text-white overflow-hidden app-no-select
-          md:max-w-sm lg:max-w-md xl:max-w-md 
-          md:my-5 lg:my-10 xl:my-10
-          md:rounded-2xl lg:rounded-2xl xl:rounded-2xl
-          md:shadow-2xl lg:shadow-2xl xl:shadow-2xl
-          md:border md:border-gray-800 lg:border lg:border-gray-800 xl:border xl:border-gray-800
-          md:min-h-[650px] lg:min-h-[750px] xl:min-h-[750px]
-          md:max-h-[90vh] lg:max-h-[90vh] xl:max-h-[90vh]
-          transition-all duration-300"
-      >
-        {/* Phone frame styling for desktop view */}
-        <div className="hidden md:block absolute top-3 w-28 h-6 bg-black rounded-b-2xl left-1/2 transform -translate-x-1/2"></div>
-        
-        {/* Content with proper padding for bottom elements */}
-        <div className="md:mt-6 pb-16 md:pb-0 h-full flex flex-col">
-          {children}
-        </div>
-        
-        {/* PWA Install Prompt - only shown in client */}
-        <PWAInstallPrompt />
-      </div>
-    </div>
+    <UserProvider>
+      <BankingDataProvider>
+        <EnhancedBankingDataProvider>
+          <div className="min-h-screen bg-neutral-800 text-white relative pb-16">
+            {/* Main content */}
+            <div className="mx-auto max-w-md">
+              <main className="relative">
+                {children}
+              </main>
+            </div>
+            
+            {/* Bottom navigation - fixed at the bottom */}
+            <div className="fixed bottom-0 left-0 right-0 z-50">
+              <BottomNav />
+            </div>
+          </div>
+        </EnhancedBankingDataProvider>
+      </BankingDataProvider>
+    </UserProvider>
   );
 };
 
 export default AppContainer;
+
+
+
+
+==== File: components\preloaders\BankingDataPreloader.js ====
+// BankingDataPreloader.js
+// Specialized component for preloading and processing banking data
+
+import React, { useState, useEffect, useContext, createContext } from 'react';
+import { bankingData } from '@/lib/data/fakeBankingData';
+
+// Create context for banking data
+const BankingDataContext = createContext(null);
+
+/**
+ * Banking Data Provider
+ * Provides access to preloaded banking data throughout the app
+ */
+export const BankingDataProvider = ({ children }) => {
+  const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Load data on mount
+  useEffect(() => {
+    // In a real app, this would be an API call
+    // We're using the fake data for demo purposes
+    const loadData = async () => {
+      try {
+        // Get cached data if available
+        const cachedData = localStorage.getItem('members1stBankingData');
+        
+        if (cachedData) {
+          setData(JSON.parse(cachedData));
+        } else {
+          // Process and cache the data
+          localStorage.setItem('members1stBankingData', JSON.stringify(bankingData));
+          setData(bankingData);
+        }
+      } catch (err) {
+        console.error('Error loading banking data:', err);
+        setError(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  // Context value
+  const value = {
+    data,
+    isLoading,
+    error,
+    refreshData: () => {
+      setIsLoading(true);
+      localStorage.removeItem('members1stBankingData');
+      localStorage.setItem('members1stBankingData', JSON.stringify(bankingData));
+      setData(bankingData);
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <BankingDataContext.Provider value={value}>
+      {children}
+    </BankingDataContext.Provider>
+  );
+};
+
+// Custom hook to access banking data
+export const useBankingData = () => {
+  const context = useContext(BankingDataContext);
+  if (!context) {
+    throw new Error('useBankingData must be used within a BankingDataProvider');
+  }
+  return context;
+};
+
+/**
+ * Banking Data Preloader
+ * 
+ * Preloads and processes all necessary banking data before showing the app
+ * 
+ * @param {Function} onComplete - Callback when data is loaded
+ * @param {Function} onProgress - Progress callback (0-100)
+ * @param {Object} options - Configuration options
+ */
+const BankingDataPreloader = ({ onComplete, onProgress, options = {} }) => {
+  // Default options
+  const config = {
+    simulateApiDelay: options.simulateApiDelay || 800,
+    mockNetworkConditions: options.mockNetworkConditions || false,
+    preProcessData: options.preProcessData || false,
+    ...options
+  };
+
+  // Preload stages
+  const stages = [
+    { name: 'Authenticating', weight: 15 },
+    { name: 'Loading account data', weight: 25 },
+    { name: 'Processing transactions', weight: 30 },
+    { name: 'Preparing interface', weight: 30 }
+  ];
+
+  // Load data in stages to simulate real banking app experience
+  useEffect(() => {
+    let active = true;
+    let currentProgress = 0;
+    let stageIndex = 0;
+
+    const processStage = async (stage) => {
+      if (!active) return;
+
+      // Start this stage
+      console.log(`Processing stage: ${stage.name}`);
+      
+      // Calculate progress range for this stage
+      const startProgress = currentProgress;
+      const endProgress = currentProgress + stage.weight;
+      
+      // Simulate processing with progress updates
+      const steps = 10;
+      for (let i = 0; i < steps; i++) {
+        if (!active) return;
+        
+        await new Promise(resolve => 
+          setTimeout(resolve, config.simulateApiDelay / steps)
+        );
+        
+        // Calculate and report progress
+        const stageProgress = startProgress + (stage.weight * (i + 1) / steps);
+        currentProgress = Math.min(stageProgress, 100);
+        onProgress && onProgress(Math.round(currentProgress));
+      }
+      
+      // Optional network condition simulation
+      if (config.mockNetworkConditions && Math.random() < 0.1) {
+        // 10% chance of slight delay
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+    };
+
+    const loadData = async () => {
+      try {
+        // Process each stage
+        for (const stage of stages) {
+          await processStage(stage);
+          stageIndex++;
+        }
+        
+        // Process banking data based on config
+        if (config.preProcessData) {
+          // In a real app, we might pre-calculate balances, categorize transactions, etc.
+          console.log('Pre-processing banking data...');
+          
+          // Create a copy of the data to avoid mutations
+          const processedData = JSON.parse(JSON.stringify(bankingData));
+          
+          // Example: Add transaction totals by category
+          processedData.users.forEach(user => {
+            const userTransactions = [];
+            
+            // Collect all user transactions
+            Object.values(processedData.transactions[user.id] || {}).forEach(accountTxs => {
+              userTransactions.push(...accountTxs);
+            });
+            
+            // Calculate category totals
+            const categoryTotals = userTransactions.reduce((totals, tx) => {
+              if (!tx.isIncoming) {
+                const category = tx.category || 'other';
+                totals[category] = (totals[category] || 0) + tx.amount;
+              }
+              return totals;
+            }, {});
+            
+            // Add to user data
+            processedData.categoryTotals = processedData.categoryTotals || {};
+            processedData.categoryTotals[user.id] = categoryTotals;
+          });
+          
+          // Store processed data
+          localStorage.setItem('members1stBankingData', JSON.stringify(processedData));
+        } else {
+          // Just store the original data
+          localStorage.setItem('members1stBankingData', JSON.stringify(bankingData));
+        }
+        
+        // Complete
+        onComplete && onComplete();
+      } catch (error) {
+        console.error('Error in data preloading:', error);
+        
+        // Store fallback data to allow app to run
+        localStorage.setItem('members1stBankingData', JSON.stringify(bankingData));
+        
+        // Still call onComplete to let app load
+        onComplete && onComplete();
+      }
+    };
+
+    loadData();
+
+    return () => {
+      active = false;
+    };
+  }, [config, onComplete, onProgress]);
+
+  // This component doesn't render anything visual
+  return null;
+};
+
+export default BankingDataPreloader;
+
+
+
+
+==== File: components\preloaders\CompleteBankingPreloader.js ====
+// components/preloaders/CompleteBankingPreloader.js
+import React, { useState, useEffect } from 'react';
+import ImagePreloader from './ImagePreloader';
+import BankingDataPreloader from './BankingDataPreloader';
+import { preloaderConfig } from '@/lib/config/preloaderConfig';
+
+/**
+ * Comprehensive Banking App Preloader
+ * Handles preloading of all required assets and data
+ */
+const CompleteBankingPreloader = ({ children, onComplete }) => {
+  // Preloading states
+  const [dataLoadingComplete, setDataLoadingComplete] = useState(false);
+  const [imageLoadingComplete, setImageLoadingComplete] = useState(false);
+  const [dataProgress, setDataProgress] = useState(0);
+  const [imageProgress, setImageProgress] = useState(0);
+  
+  // Get configuration
+  const config = preloaderConfig;
+  
+  // Calculate overall progress (50% data, 50% images)
+  const totalProgress = Math.round((dataProgress * 0.5) + (imageProgress * 0.5));
+  
+  // Check if everything is loaded
+  const isAppReady = dataLoadingComplete && imageLoadingComplete;
+  
+  // Add a small delay after loading completes for a smoother transition
+  const [showApp, setShowApp] = useState(false);
+  
+  useEffect(() => {
+    if (isAppReady) {
+      const timer = setTimeout(() => {
+        setShowApp(true);
+        if (onComplete) onComplete();
+      }, config.loadingScreen.transitionDuration);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isAppReady, config.loadingScreen.transitionDuration, onComplete]);
+  
+  // Loading screen component
+  const LoadingScreen = () => (
+    <div className="fixed inset-0 bg-app-black flex flex-col items-center justify-center z-50">
+      <div className="w-24 h-24 mb-8">
+        <img 
+          src={config.loadingScreen.logo} 
+          alt="Members 1st" 
+          className="w-full h-full object-contain animate-pulse"
+        />
+      </div>
+      
+      <h1 className="text-2xl font-medium text-white mb-8">
+        {config.loadingScreen.title}
+      </h1>
+      
+      {/* Progress bar */}
+      {config.loadingScreen.showProgressBar && (
+        <div className="w-64 h-2 bg-gray-800 rounded-full overflow-hidden mb-4">
+          <div 
+            className="h-full bg-red-600 rounded-full transition-all duration-300 ease-out"
+            style={{ width: `${totalProgress}%` }}
+          ></div>
+        </div>
+      )}
+      
+      {config.loadingScreen.showPercentage && (
+        <p className="text-gray-400 text-sm">
+          {totalProgress < 100 ? `Loading your account... ${totalProgress}%` : 'Almost ready...'}
+        </p>
+      )}
+    </div>
+  );
+  
+  return (
+    <>
+      {/* Preloader components */}
+      <BankingDataPreloader 
+        onProgress={setDataProgress}
+        onComplete={() => setDataLoadingComplete(true)}
+        options={{
+          preProcessData: config.bankingData.preProcessData,
+          simulateApiDelay: config.bankingData.simulateApiDelay
+        }}
+      />
+      
+      <ImagePreloader 
+        onProgress={setImageProgress}
+        onComplete={() => setImageLoadingComplete(true)}
+        options={{
+          timeout: config.images.timeout,
+          retries: config.images.retries,
+          parallel: config.images.parallel,
+          priorityImages: config.images.priorityImages
+        }}
+      />
+      
+      {/* Show app or loading screen */}
+      {showApp ? children : <LoadingScreen />}
+    </>
+  );
+};
+
+export default CompleteBankingPreloader;
+
+
+
+
+==== File: components\preloaders\EnhancedBankingDataProvider.tsx ====
+// components/preloaders/EnhancedBankingDataProvider.tsx
+'use client';
+
+// Disable TypeScript checking for this file
+// @ts-nocheck
+
+import React, { useState, useEffect, createContext, useContext, ReactNode } from 'react';
+import { bankingData } from '@/lib/data/fakeBankingData';
+import { useUser } from '@/components/context/UserContext';
+
+// Define the context types
+type EnhancedBankingDataContextType = {
+  data: any;
+  userData: any;
+  isLoading: boolean;
+  error: Error | null;
+  refreshData: () => void;
+};
+
+// Create the context
+const EnhancedBankingDataContext = createContext<EnhancedBankingDataContextType | null>(null);
+
+// Props for the provider component
+interface EnhancedBankingDataProviderProps {
+  children: ReactNode;
+}
+
+/**
+ * Enhanced Banking Data Provider
+ * Provides access to preloaded banking data throughout the app
+ * Filters data based on selected user from UserContext
+ */
+export const EnhancedBankingDataProvider: React.FC<EnhancedBankingDataProviderProps> = ({ children }) => {
+  const [data, setData] = useState<any>(null);
+  const [userData, setUserData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  
+  // Get user context
+  const { selectedUserId, isNewUser } = useUser();
+
+  // Load data on mount and when selectedUserId changes
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        setIsLoading(true);
+        
+        // Get cached data if available
+        const cachedData = localStorage.getItem('members1stBankingData');
+        let bankingDataObj;
+        
+        if (cachedData) {
+          bankingDataObj = JSON.parse(cachedData);
+        } else {
+          // Process and cache the data
+          localStorage.setItem('members1stBankingData', JSON.stringify(bankingData));
+          bankingDataObj = bankingData;
+        }
+        
+        setData(bankingDataObj);
+        
+        // Filter data for selected user
+        if (selectedUserId && selectedUserId !== 'new') {
+          const user = bankingDataObj.users.find((u: any) => u.id === selectedUserId);
+          const accounts = bankingDataObj.accounts.filter((a: any) => a.userId === selectedUserId);
+          const creditCards = bankingDataObj.creditCards.filter((c: any) => c.userId === selectedUserId);
+          const loans = bankingDataObj.loans.filter((l: any) => l.userId === selectedUserId);
+          const transactions = bankingDataObj.transactions[selectedUserId as keyof typeof bankingDataObj.transactions] || {};
+          const groupedTransactions = bankingDataObj.groupedTransactions[selectedUserId as keyof typeof bankingDataObj.groupedTransactions] || [];
+          
+          setUserData({
+            user,
+            accounts,
+            creditCards,
+            loans,
+            transactions,
+            groupedTransactions
+          });
+        } else if (isNewUser) {
+          // For new user flow, provide empty data structure
+          setUserData({
+            user: null,
+            accounts: [],
+            creditCards: [],
+            loans: [],
+            transactions: {},
+            groupedTransactions: []
+          });
+        } else {
+          // No user selected, provide full data
+          setUserData({
+            user: null,
+            accounts: bankingDataObj.accounts,
+            creditCards: bankingDataObj.creditCards,
+            loans: bankingDataObj.loans,
+            transactions: bankingDataObj.transactions,
+            groupedTransactions: []
+          });
+        }
+      } catch (err) {
+        console.error('Error loading banking data:', err);
+        setError(err instanceof Error ? err : new Error('Unknown error loading banking data'));
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, [selectedUserId, isNewUser]);
+
+  // Context value
+  const value = {
+    data,
+    userData,
+    isLoading,
+    error,
+    refreshData: () => {
+      setIsLoading(true);
+      localStorage.removeItem('members1stBankingData');
+      localStorage.setItem('members1stBankingData', JSON.stringify(bankingData));
+      setData(bankingData);
+      
+      // Re-filter data for selected user
+      if (selectedUserId && selectedUserId !== 'new') {
+        const user = bankingData.users.find((u: any) => u.id === selectedUserId);
+        const accounts = bankingData.accounts.filter((a: any) => a.userId === selectedUserId);
+        const creditCards = bankingData.creditCards.filter((c: any) => c.userId === selectedUserId);
+        const loans = bankingData.loans.filter((l: any) => l.userId === selectedUserId);
+        const transactions = bankingData.transactions[selectedUserId as keyof typeof bankingData.transactions] || {};
+        const groupedTransactions = bankingData.groupedTransactions[selectedUserId as keyof typeof bankingData.groupedTransactions] || [];
+        
+        setUserData({
+          user,
+          accounts,
+          creditCards,
+          loans,
+          transactions,
+          groupedTransactions
+        });
+      } else {
+        setUserData({
+          user: null,
+          accounts: bankingData.accounts,
+          creditCards: bankingData.creditCards,
+          loans: bankingData.loans,
+          transactions: bankingData.transactions,
+          groupedTransactions: []
+        });
+      }
+      
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <EnhancedBankingDataContext.Provider value={value}>
+      {children}
+    </EnhancedBankingDataContext.Provider>
+  );
+};
+
+// Custom hook to access banking data
+export const useEnhancedBankingData = () => {
+  const context = useContext(EnhancedBankingDataContext);
+  if (!context) {
+    throw new Error('useEnhancedBankingData must be used within an EnhancedBankingDataProvider');
+  }
+  return context;
+};
+
+
+
+
+==== File: components\preloaders\ImagePreloader.js ====
+// ImagePreloader.js
+// Specialized component for preloading banking images
+
+import React, { useState, useEffect } from 'react';
+
+/**
+ * Banking App Image Preloader
+ * 
+ * This utility aggressively preloads all images needed for the initial app experience,
+ * including card backgrounds, merchant icons, and UI elements.
+ * 
+ * @param {Function} onComplete - Callback when all images are loaded
+ * @param {Function} onProgress - Callback with loading progress (0-100)
+ * @param {Object} options - Configuration options
+ */
+const ImagePreloader = ({ onComplete, onProgress, options = {} }) => {
+  // Configuration with defaults
+  const config = {
+    timeout: options.timeout || 15000, // 15 second timeout default
+    retries: options.retries || 2,     // Retry failed images twice
+    parallel: options.parallel || 6,   // Load 6 images in parallel
+    ...options
+  };
+  
+  // Track loading state
+  const [loadStatus, setLoadStatus] = useState({
+    loaded: 0,
+    failed: 0,
+    total: 0,
+    inProgress: 0,
+    complete: false
+  });
+  
+  // List all images to preload by category
+  const imagesToPreload = {
+    essentialUI: [
+      // App UI elements - Priority 1
+      '/images/icons/logo.png',
+      '/images/ui/loading-spinner.svg',
+      '/images/ui/header-bg.png'
+    ],
+    
+    avatars: [
+      // User avatars - Priority 2
+      '/images/avatar/jess-coleman.png',
+      '/images/avatar/robert-thompson.png',
+    ],
+    
+    cards: [
+      // Credit card images - Priority 3
+      '/images/cards/visa-signature-bg.png',
+      '/images/cards/visa-platinum-bg.png',
+      '/images/cards/visa-logo.svg',
+      '/images/cards/chip.png'
+    ],
+    
+    merchantIcons: [
+      // Transaction merchant icons - Priority 4
+      '/images/icons/merchants/coffee.svg',
+      '/images/icons/merchants/shopping.svg',
+      '/images/icons/merchants/food.svg',
+      '/images/icons/merchants/entertainment.svg',
+      '/images/icons/merchants/transport.svg',
+      '/images/icons/merchants/utilities.svg',
+      '/images/icons/merchants/health.svg',
+      '/images/icons/merchants/payroll.svg',
+      '/images/icons/merchants/home.svg'
+    ],
+    
+    otherContent: [
+      // Marketing and secondary images - Priority 5
+      '/images/refer/refer-friend.png',
+      '/images/marketing/promo-banner.jpg',
+      '/images/ui/card-pattern.svg'
+    ]
+  };
+  
+  // Flatten and prioritize images
+  const allImages = [
+    ...imagesToPreload.essentialUI,
+    ...imagesToPreload.avatars,
+    ...imagesToPreload.cards,
+    ...imagesToPreload.merchantIcons,
+    ...imagesToPreload.otherContent
+  ];
+  
+  // Preload images in a controlled manner
+  useEffect(() => {
+    if (allImages.length === 0) {
+      onComplete && onComplete();
+      return;
+    }
+    
+    let active = true; // For cleanup
+    let queue = [...allImages];
+    let loading = 0;
+    let loadedCount = 0;
+    let failedCount = 0;
+    let retryMap = {};
+    
+    // Set initial state
+    setLoadStatus({
+      loaded: 0,
+      failed: 0,
+      total: queue.length,
+      inProgress: 0,
+      complete: false
+    });
+    
+    // Process the next image in queue
+    const processNext = () => {
+      if (!active) return;
+      
+      // If queue is empty and nothing is loading, we're done
+      if (queue.length === 0 && loading === 0) {
+        setLoadStatus(prev => ({
+          ...prev,
+          inProgress: 0,
+          complete: true
+        }));
+        onComplete && onComplete();
+        return;
+      }
+      
+      // Only load up to config.parallel images at once
+      while (queue.length > 0 && loading < config.parallel) {
+        const src = queue.shift();
+        loading++;
+        
+        const img = new Image();
+        const startTime = Date.now();
+        
+        // Handle successful load
+        img.onload = () => {
+          if (!active) return;
+          
+          loadedCount++;
+          loading--;
+          
+          setLoadStatus(prev => {
+            const newStatus = {
+              ...prev,
+              loaded: prev.loaded + 1,
+              inProgress: prev.inProgress - 1
+            };
+            
+            // Calculate and report progress
+            const progress = Math.round(((newStatus.loaded + newStatus.failed) / newStatus.total) * 100);
+            onProgress && onProgress(progress);
+            
+            return newStatus;
+          });
+          
+          // Process next image
+          processNext();
+        };
+        
+        // Handle failed load
+        img.onerror = () => {
+          if (!active) return;
+          
+          // Implement retry logic
+          const retryCount = retryMap[src] || 0;
+          
+          if (retryCount < config.retries) {
+            // Put back in queue for retry
+            retryMap[src] = retryCount + 1;
+            queue.push(src);
+          } else {
+            // Mark as failed after retries
+            failedCount++;
+            
+            setLoadStatus(prev => {
+              const newStatus = {
+                ...prev,
+                failed: prev.failed + 1,
+                inProgress: prev.inProgress - 1
+              };
+              
+              // Calculate and report progress even for failures
+              const progress = Math.round(((newStatus.loaded + newStatus.failed) / newStatus.total) * 100);
+              onProgress && onProgress(progress);
+              
+              return newStatus;
+            });
+          }
+          
+          loading--;
+          processNext();
+        };
+        
+        // Track in-progress loads
+        setLoadStatus(prev => ({
+          ...prev,
+          inProgress: prev.inProgress + 1
+        }));
+        
+        // Start loading image
+        img.src = src;
+        
+        // Set timeout for individual image load
+        setTimeout(() => {
+          if (img.complete) return;
+          // Force error event if image takes too long
+          img.dispatchEvent(new Event('error'));
+        }, config.timeout);
+      }
+    };
+    
+    // Start processing queue
+    processNext();
+    
+    // Cleanup function
+    return () => {
+      active = false;
+    };
+  }, [allImages, config, onComplete, onProgress]);
+  
+  // Component doesn't render anything visible
+  return null;
+};
+
+export default ImagePreloader;
+
+
+
+
+==== File: components\screens\AdminProfileSelector.tsx ====
+// components/screens/AdminProfileSelector.tsx
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { bankingData } from '@/lib/data/fakeBankingData';
+import { animated, useSpring } from 'react-spring';
+
+interface AdminProfileSelectorProps {
+  onSelectUser: (userId: string | null) => void;
+}
+
+const AdminProfileSelector: React.FC<AdminProfileSelectorProps> = ({ onSelectUser }) => {
+  const router = useRouter();
+  const [users, setUsers] = useState(bankingData.users);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Animation for the container
+  const containerSpring = useSpring({
+    from: { opacity: 0, y: 20 },
+    to: { opacity: 1, y: 0 },
+    config: { tension: 280, friction: 25 },
+    delay: 300,
+  });
+
+  // Animation for the title
+  const titleSpring = useSpring({
+    from: { opacity: 0, y: -20 },
+    to: { opacity: 1, y: 0 },
+    config: { tension: 280, friction: 25 },
+    delay: 400,
+  });
+
+  // Animation for the cards
+  const cardSpring = useSpring({
+    from: { opacity: 0, scale: 0.9 },
+    to: { opacity: 1, scale: 1 },
+    config: { tension: 280, friction: 25 },
+    delay: 500,
+  });
+
+  // Simulate loading
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 800);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Handle user selection
+  const handleSelectUser = (userId: string | null) => {
+    // Store the selected user ID in localStorage
+    if (userId) {
+      localStorage.setItem('selectedUserId', userId);
+    } else {
+      // For new user flow
+      localStorage.setItem('selectedUserId', 'new');
+    }
+    
+    // Call the callback
+    onSelectUser(userId);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen bg-app-black">
+        <div className="text-white text-center">
+          <div className="w-12 h-12 border-t-2 border-b-2 border-white rounded-full animate-spin mb-4 mx-auto"></div>
+          <p className="text-lg">Loading Admin Panel...</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-app-black text-white p-5">
+      <animated.div style={titleSpring} className="text-center mb-8 pt-6">
+        <h1 className="text-2xl font-bold mb-2">Banking App Admin</h1>
+        <p className="text-gray-400">Select a profile to continue</p>
+      </animated.div>
+
+      <animated.div style={containerSpring} className="max-w-md mx-auto">
+        {/* New User Option */}
+        <animated.div 
+          style={cardSpring} 
+          className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-xl p-5 mb-5 cursor-pointer hover:shadow-lg transition-shadow"
+          onClick={() => handleSelectUser(null)}
+        >
+          <div className="flex items-center">
+            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center mr-4">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+            </div>
+            <div>
+              <h2 className="text-xl font-bold">New User</h2>
+              <p className="text-blue-200">Start with a fresh account</p>
+            </div>
+          </div>
+        </animated.div>
+
+        <h3 className="text-lg font-medium mb-3 text-gray-300">Existing Profiles</h3>
+        
+        {/* Existing Users */}
+        {users.map((user, index) => {
+          // Find user's account
+          const userAccount = bankingData.accounts.find(account => account.userId === user.id);
+          // Find user's credit card
+          const userCard = bankingData.creditCards.find(card => card.userId === user.id);
+          
+          return (
+            <animated.div 
+              key={user.id}
+              style={cardSpring} 
+              className="bg-neutral-800 rounded-xl p-5 mb-4 cursor-pointer hover:bg-neutral-700 transition-colors"
+              onClick={() => handleSelectUser(user.id)}
+            >
+              <div className="flex items-center mb-3">
+                <img 
+                  src={user.avatar || '/images/avatar/placeholder.svg'} 
+                  alt={user.name} 
+                  className="w-12 h-12 rounded-full mr-4 object-cover border border-gray-700"
+                />
+                <div>
+                  <h2 className="text-xl font-bold">{user.name}</h2>
+                  <p className="text-gray-400">{user.occupation}</p>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-2 gap-3 text-sm">
+                <div className="bg-neutral-900 p-3 rounded-lg">
+                  <p className="text-gray-400 mb-1">Checking Balance</p>
+                  <p className="text-white font-medium">${userAccount?.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                </div>
+                <div className="bg-neutral-900 p-3 rounded-lg">
+                  <p className="text-gray-400 mb-1">Credit Card</p>
+                  <p className="text-white font-medium">{userCard?.name || 'None'}</p>
+                </div>
+              </div>
+            </animated.div>
+          );
+        })}
+
+        <div className="mt-8 text-center text-xs text-gray-500">
+          <p>This screen is only visible in development mode</p>
+          <p className="mt-1">Banking App Admin v1.0</p>
+        </div>
+      </animated.div>
+    </div>
+  );
+};
+
+export default AdminProfileSelector;
+
 
 
 
@@ -770,28 +1931,58 @@ export default AppContainer;
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import { motion } from 'framer-motion';
-import { CreditCard, Settings, ArrowLeftRight, AlertCircle, Lock } from 'lucide-react';
+import { animated, useSpring } from 'react-spring';
 import { getDefaultCard } from '@/lib/data/cards';
 import { getTransactions } from '@/lib/data/transactions';
+import { useEnhancedBankingData } from '@/components/preloaders/EnhancedBankingDataProvider';
 import CreditCardComponent from '../ui/card/CreditCard'; 
 import TransactionContainer from '../ui/transactions/TransactionContainer';
 import Header from '../ui/navigation/Header';
 import LoadingSpinner from '../ui/common/LoadingSpinner';
 import Icon from '../ui/icons/Icon';
-import SpendingChart from '../ui/charts/SpendingChart';
+import { BankingDataType, BankingCreditCard } from '@/lib/types';
+import { Lock } from 'lucide-react';
 
 const Home: React.FC = () => {
   const card = getDefaultCard();
   const transactions = getTransactions();
   const [isLoading, setIsLoading] = useState(true);
   const [showInfo, setShowInfo] = useState(false);
-  const [balance] = useState(25552.92);
+  const [balance, setBalance] = useState(25552.92);
   const payButtonsRef = useRef<HTMLDivElement>(null);
   const [buttonBottomPosition, setButtonBottomPosition] = useState(0);
-  const [isTransactionCollapsed, setIsTransactionCollapsed] = useState(true); // Start collapsed by default
-  const [showTransactions, setShowTransactions] = useState(false); // Initially hidden
+  const [isTransactionCollapsed, setIsTransactionCollapsed] = useState(true);
+  const [showTransactions, setShowTransactions] = useState(false);
   const isManageClickRef = useRef(false);
+  
+  // Get banking data from context
+  const { userData, isLoading: isBankingDataLoading } = useEnhancedBankingData();
+  
+  // React Spring animations
+  const cardSpring = useSpring({
+    opacity: isLoading ? 0 : 1,
+    transform: isLoading ? 'translateY(20px)' : 'translateY(0px)',
+    delay: 100,
+    config: { tension: 280, friction: 25 }
+  });
+  
+  const sectionSpring = useSpring({
+    opacity: isLoading ? 0 : 1,
+    transform: isLoading ? 'translateY(20px)' : 'translateY(0px)',
+    delay: 200,
+    config: { tension: 280, friction: 25 }
+  });
+  
+  const actionsSpring = useSpring({
+    opacity: isLoading ? 0 : 1,
+    transform: isLoading ? 'translateY(20px)' : 'translateY(0px)',
+    delay: 300,
+    config: { tension: 280, friction: 25 }
+  });
+
+  // Get card info from banking data if available
+  const cardInfo = userData?.creditCards?.[0];
+  const rewardsBalance = cardInfo?.rewardsBalance || 0;
 
   // Loading simulation
   useEffect(() => {
@@ -801,7 +1992,7 @@ const Home: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // When page loads or card info is toggled, calculate positions
+  // Calculate button positions for transaction container
   useEffect(() => {
     if (!isLoading) {
       const calculatePositions = () => {
@@ -813,13 +2004,8 @@ const Home: React.FC = () => {
         }
       };
       
-      // Calculate immediately
       calculatePositions();
-      
-      // And after a short delay to account for animations
       const animationDelay = setTimeout(calculatePositions, 350);
-      
-      // Also listen for window resize events
       window.addEventListener('resize', calculatePositions);
       
       return () => {
@@ -829,20 +2015,17 @@ const Home: React.FC = () => {
     }
   }, [isLoading, showInfo]); 
 
-  // Handle transactions card click - load full screen immediately
+  // Handle transactions click
   const handleTransactionsClick = () => {
-    // Show the transactions panel
     setShowTransactions(true);
-    // Directly set to fullscreen
     setIsTransactionCollapsed(false);
   };
 
-  // Handle manage button click with debouncing
+  // Handle manage button click
   const handleManageClick = () => {
     isManageClickRef.current = true;
     setIsTransactionCollapsed(!isTransactionCollapsed);
     
-    // If showing transactions and we're expanding
     if (showTransactions === false && !isTransactionCollapsed) {
       setShowTransactions(true);
     }
@@ -852,20 +2035,19 @@ const Home: React.FC = () => {
     }, 100);
   };
 
-  // Handle collapse state changes from the container
+  // Handle collapse state changes
   const handleCollapseChange = (collapsed: boolean) => {
-    console.log("Collapse state change:", collapsed); // Add debugging
     setIsTransactionCollapsed(collapsed);
     
-    // If fully collapsed, hide the transaction container after a delay
     if (collapsed) {
       setTimeout(() => {
         setShowTransactions(false);
-      }, 300); // Wait for collapse animation to finish
+      }, 300);
     }
   };
 
-  if (isLoading) {
+  // Show loading spinner if loading
+  if (isLoading || isBankingDataLoading) {
     return (
       <div className="flex items-center justify-center h-screen bg-app-black">
         <LoadingSpinner size="large" />
@@ -873,187 +2055,128 @@ const Home: React.FC = () => {
     );
   }
 
+  // Get user name and transactions from data
+  const userName = userData?.user?.name?.split(' ')[0] || 'Guest';
+  const bankingTransactions = userData?.groupedTransactions || transactions;
+
   return (
-    <div className="relative min-h-screen bg-app-black text-white animate-fade-in">
-      <Header userName="Jess" />
+    <div className="relative min-h-screen bg-app-black text-white">
+      <Header userName={userName} />
       
-      <div className="px-5">
-        {/* Card with simple animation */}
-        <motion.div 
-          className="mb-4"
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ 
-            type: "spring", 
-            damping: 25, 
-            stiffness: 120,
-            delay: 0.1 
-          }}
-        >
+      <div className="px-5  mx-auto max-w-md">
+        {/* Card with React Spring animation */}
+        <animated.div style={cardSpring} className="mb-4">
           <CreditCardComponent 
-            card={card} 
-            balance={balance} 
             showInfoState={[showInfo, setShowInfo]}
           />
-        </motion.div>
+        </animated.div>
         
-        {/* Feature grid */}
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          {/* Transactions button */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-[#212121] rounded-xl p-4 cursor-pointer h-28"
+        {/* Main sections grid */}
+        <animated.div style={sectionSpring} className="grid grid-cols-2 gap-4 mb-4">
+          {/* Transactions section */}
+          <div 
+            className="bg-[#212121] rounded-xl p-4 cursor-pointer hover:bg-neutral-700 transition-colors"
             onClick={handleTransactionsClick}
           >
-            <h3 className="font-medium mb-1">Transactions</h3>
-            <p className="text-gray-400 text-sm mb-3">Spent in April</p>
-            <div className="flex space-x-1">
-              <div className="w-10 h-3 bg-purple-600 rounded-md"></div>
-              <div className="w-6 h-3 bg-red-500 rounded-md"></div>
-              <div className="w-4 h-3 bg-blue-500 rounded-md"></div>
-              <div className="w-8 h-3 bg-yellow-400 rounded-md"></div>
+            <h3 className="text-sm font-medium mb-1">Transactions</h3>
+            <p className="text-xs text-gray-400 mb-2">Spent in April</p>
+            <div className="flex space-x-1 mb-1">
+              <div className="h-1 w-1/4 rounded-full bg-purple-500"></div>
+              <div className="h-1 w-1/4 rounded-full bg-red-500"></div>
+              <div className="h-1 w-1/4 rounded-full bg-blue-500"></div>
+              <div className="h-1 w-1/4 rounded-full bg-yellow-500"></div>
             </div>
-          </motion.div>
-
-          {/* Rewards */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-[#212121] rounded-xl p-4 h-28"
+          </div>
+          
+          {/* Rewards section */}
+          <div className="bg-[#212121] rounded-xl p-4">
+            <h3 className="text-sm font-medium mb-1">Rewards</h3>
+            <p className="text-xs text-gray-400 mb-2">Cash back earned</p>
+            <p className="text-green-500 font-semibold">${rewardsBalance.toFixed(2)}</p>
+          </div>
+        </animated.div>
+        
+        {/* Action buttons */}
+        <animated.div style={sectionSpring} className="grid grid-cols-2 gap-4 mb-4" ref={payButtonsRef}>
+          <button 
+            className="bg-[#212121] rounded-xl p-4 flex items-center justify-center hover:bg-neutral-700 transition-colors"
+            onClick={handleTransactionsClick}
           >
-            <h3 className="font-medium mb-1">Rewards</h3>
-            <p className="text-gray-400 text-sm mb-2">Cash back earned</p>
-            <p className="text-xl font-bold text-green-500">$342.89</p>
-          </motion.div>
-        </div>
-
-        {/* Second row of buttons */}
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          {/* Pay button */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="bg-[#212121] rounded-xl p-4 flex items-center cursor-pointer"
-          >
-            <div className="bg-neutral-700 p-2 rounded-full mr-3">
-              <Icon name="repeat" className="w-5 h-5" />
+            <div className="w-10 h-10 rounded-full bg-neutral-700 flex items-center justify-center mr-2">
+              <Icon name="repeat" className="w-5 h-5 text-gray-200" />
             </div>
-            <span>Pay</span>
-          </motion.div>
-
-          {/* Manage */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="bg-[#212121] rounded-xl p-4 flex items-center cursor-pointer"
-            onClick={handleManageClick}
-          >
-            <div className="bg-neutral-700 p-2 rounded-full mr-3">
-              <Settings className="w-5 h-5" />
+            <span className="text-sm text-gray-300">Pay</span>
+          </button>
+          
+          <button className="bg-[#212121] rounded-xl p-4 flex items-center justify-center hover:bg-neutral-700 transition-colors">
+            <div className="w-10 h-10 rounded-full bg-neutral-700 flex items-center justify-center mr-2">
+              <Icon name="settings" className="w-5 h-5 text-gray-200" />
             </div>
-            <span>Manage</span>
-          </motion.div>
-        </div>
-
-        {/* Refer and Earn card with image */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-          className="bg-[#212121] rounded-xl p-4 mb-4 overflow-hidden relative"
-        >
-          <div className="flex justify-between items-center">
-            <div className="w-3/5">
-              <h3 className="font-medium mb-1">Refer and Earn</h3>
-              <p className="text-gray-400 text-sm mb-3">Share a referral link to your friend and get rewarded</p>
-              <button className="bg-neutral-800 text-white px-4 py-2 rounded-full text-sm">
+            <span className="text-sm text-gray-300">Manage</span>
+          </button>
+        </animated.div>
+        
+        {/* Refer and Earn section */}
+        <animated.div style={actionsSpring} className="bg-[#212121] rounded-xl p-4 mb-4 relative overflow-hidden">
+          <div className="flex justify-between">
+            <div>
+              <h3 className="text-sm font-medium mb-1">Refer and Earn</h3>
+              <p className="text-xs text-gray-400 max-w-[70%]">
+                Share a referral link to your friend and get rewarded
+              </p>
+              <button className="mt-2 text-xs text-white bg-neutral-700 px-3 py-1 rounded-full hover:bg-neutral-600 transition-colors">
                 Learn more
               </button>
             </div>
-            <div className="absolute right-0 bottom-0">
-              <img 
-                src="/images/refer/refer-friend.png" 
-                alt="Refer a friend" 
-                className="h-24 object-contain"
-              />
+            <div className="absolute right-2 bottom-2">
+              <img src="/images/marketing/refer-friend.png" alt="Refer a friend" className="h-24 object-contain" />
             </div>
           </div>
-        </motion.div>
-
-        {/* Action buttons row - Updated to match pay/manage styling */}
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          {/* Balance Transfer */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
-            className="bg-[#212121] rounded-xl p-4 flex items-center cursor-pointer"
-          >
-            <div className="bg-neutral-700 p-2 rounded-full mr-3">
-              <ArrowLeftRight className="w-5 h-5" />
-            </div>
-            <span>Balance Transfer</span>
-          </motion.div>
-
-          {/* Lock/Unlock */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.9 }}
-            className="bg-[#212121] rounded-xl p-4 flex items-center cursor-pointer"
-          >
-            <div className="bg-neutral-700 p-2 rounded-full mr-3">
-              <Lock className="w-5 h-5" />
-            </div>
-            <span>Lock/Unlock</span>
-          </motion.div>
-        </div>
+        </animated.div>
         
-        {/* Statements and Documents full-width card */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1.0 }}
-          className="bg-[#212121] rounded-xl p-4 mb-4 flex items-center justify-between cursor-pointer"
-          ref={payButtonsRef}
-        >
-          <span className="font-medium">Statements and Documents</span>
-          <span className="text-gray-400 text-sm">View All</span>
-        </motion.div>
+        {/* Additional action buttons */}
+        <animated.div style={actionsSpring} className="grid grid-cols-2 gap-4 mb-4">
+          <button className="bg-[#212121] rounded-xl p-4 flex items-center justify-center hover:bg-neutral-700 transition-colors">
+            <div className="w-10 h-10 rounded-full bg-neutral-700 flex items-center justify-center mr-2">
+              <Icon name="transfer" className="w-5 h-5 text-gray-200" />
+            </div>
+            <span className="text-sm text-gray-300">Balance Transfer</span>
+          </button>
+          
+          <button className="bg-[#212121] rounded-xl p-4 flex items-center justify-center hover:bg-neutral-700 transition-colors">
+            <div className="w-10 h-10 rounded-full bg-neutral-700 flex items-center justify-center mr-2">
+              <Lock className="w-5 h-5 text-gray-200" />
+            </div>
+            <span className="text-sm text-gray-300">Lock/Unlock</span>
+          </button>
+        </animated.div>
         
-        {/* Adding bottom margin */}
-        <div className="mb-20"></div>
-      </div>
-      
-      {/* Transaction Container - Only show when showTransactions is true */}
-      {showTransactions && buttonBottomPosition > 0 && (
-        <motion.div
-          initial={{ y: 300, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ 
-            type: "spring", 
-            damping: 25, 
-            stiffness: 120
-          }}
-        >
+        {/* Statements section */}
+        <animated.div style={actionsSpring} className="bg-[#212121] rounded-xl p-4 mb-4">
+          <div className="flex justify-between items-center">
+            <h3 className="text-sm font-medium">Statements and Documents</h3>
+            <button className="text-xs text-gray-400 hover:text-white transition-colors">
+              View All
+            </button>
+          </div>
+        </animated.div>
+        
+        {/* Transaction Container */}
+        {showTransactions && buttonBottomPosition > 0 && (
           <TransactionContainer 
-            transactionGroups={transactions}
+            transactionGroups={bankingTransactions}
             buttonBottomPosition={buttonBottomPosition}
             isCollapsed={isTransactionCollapsed}
             onCollapseChange={handleCollapseChange}
           />
-        </motion.div>
-      )}
+        )}
+      </div>
     </div>
   );
 };
 
 export default Home;
+
 
 
 
@@ -1121,10 +2244,6 @@ export default Wallet;
 
 
 
-==== File: components\ui\card\CardInfo.tsx ====
-
-
-
 ==== File: components\ui\card\CardSelector.tsx ====
 'use client';
 
@@ -1153,7 +2272,8 @@ const CardSelector: React.FC<CardSelectorProps> = ({ cards, activeCardId, onCard
       <div className="relative overflow-hidden">
         {/* Current card */}
         <div className="transition-all duration-300 ease-in-out">
-          <CreditCard card={cards[currentIndex]} />
+          {/* Note: CreditCard component expects showInfoState prop, not card prop */}
+          <CreditCard />
         </div>
         
         {/* Card indicators */}
@@ -1181,30 +2301,70 @@ export default CardSelector;
 
 
 
-
 ==== File: components\ui\card\CreditCard.tsx ====
 // components/ui/card/CreditCard.tsx
 'use client';
 
-import React, { useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React, { useEffect, useRef, useState } from 'react';
+import { animated, useSpring, config } from 'react-spring';
 import { Info } from 'lucide-react';
 import { CardType } from '@/lib/types';
+import { useEnhancedBankingData } from '@/components/preloaders/EnhancedBankingDataProvider';
+import { BankingDataType, BankingCreditCard } from '@/lib/types';
 
 interface CreditCardProps {
-  card: CardType;
-  balance?: number;
   showInfoState?: [boolean, React.Dispatch<React.SetStateAction<boolean>>];
 }
 
 const CreditCard: React.FC<CreditCardProps> = ({ 
-  card, 
-  balance = 25552.92,
   showInfoState
 }) => {
   // Use local or parent-controlled state for showInfo
   const [showInfo, setShowInfo] = showInfoState || React.useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [contentHeight, setContentHeight] = useState(0);
+  
+  // Get banking data if available
+  const { userData } = useEnhancedBankingData();
+  
+  // Get card info from banking data
+  const cardInfo = userData?.creditCards?.[0];
+  
+  // Measure the content height when it changes
+  useEffect(() => {
+    if (contentRef.current) {
+      setContentHeight(contentRef.current.scrollHeight);
+    }
+  }, [userData, showInfo]);
+  
+  // Create spring animation for the info panel
+  const infoSpring = useSpring({
+    height: showInfo ? contentHeight : 0,
+    opacity: showInfo ? 1 : 0,
+    transform: showInfo ? 'translateY(0px)' : 'translateY(-8px)',
+    marginTop: showInfo ? 8 : 0,
+    config: {
+      mass: 1,
+      tension: 280,
+      friction: 26,
+      clamp: false,
+      velocity: 0.01
+    },
+    immediate: false
+  });
+
+  // Get card details from banking data with fallbacks
+  const balance = cardInfo?.currentBalance || 0;
+  const availableCredit = cardInfo?.availableCredit || 0;
+  const minimumPayment = cardInfo?.minimumPayment || 0;
+  const dueDate = cardInfo?.dueDate ? new Date(cardInfo.dueDate).toLocaleDateString('en-US', {
+    month: 'numeric',
+    day: 'numeric',
+    year: 'numeric'
+  }) : '';
+  const cardNumber = cardInfo?.cardNumber || '';
+  const cardColor = cardInfo?.color || '#7b2528';
 
   return (
     <div className="w-full" ref={cardRef}>
@@ -1212,7 +2372,7 @@ const CreditCard: React.FC<CreditCardProps> = ({
       <div
         className="relative w-full rounded-xl overflow-hidden shadow-lg transform transition-all duration-300 hover:scale-[1.01]"
         style={{
-          backgroundColor: '#7b2528', // Keep original red color
+          backgroundColor: cardColor,
         }}
       >
         {/* Card content */}
@@ -1232,42 +2392,34 @@ const CreditCard: React.FC<CreditCardProps> = ({
             </button>
           </div>
           
-          {/* Additional card info - Animated slide down */}
-          <AnimatePresence>
-            {showInfo && (
-              <motion.div 
-                className="mt-1 text-white"
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: "auto", opacity: 1 }}
-                exit={{ height: 0, opacity: 0, marginTop: 0 }}
-                transition={{ 
-                  duration: 0.3, 
-                  ease: "easeInOut"
-                }}
-              >
-                <div className="grid grid-cols-2">
-                  <div className="text-gray-300 text-sm">Available Credit:</div>
-                  <div className="text-right font-medium text-sm">$3,914.65</div>
-                  
-                  <div className="text-gray-300 text-sm">Minimum Payment:</div>
-                  <div className="text-right font-medium text-sm">$0.00</div>
-                  
-                  <div className="text-gray-300 text-sm">Due Date:</div>
-                  <div className="text-right font-medium text-sm">5/25/2025</div>
-                  
-                  <div className="text-gray-300 text-sm mt-1">AutoPay:</div>
-                  <div className="text-right font-medium text-sm mt-1">
-                    ON | <a href="#" className="text-neutral-400 hover:underline">Settings</a>
-                  </div>
+          {/* Additional card info - Animated with React Spring */}
+          <animated.div 
+            style={infoSpring}
+            className="text-white overflow-hidden"
+          >
+            <div ref={contentRef}>
+              <div className="grid grid-cols-2 gap-y-2">
+                <div className="text-gray-300 text-sm">Available Credit:</div>
+                <div className="text-right font-medium text-sm">${availableCredit.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+                
+                <div className="text-gray-300 text-sm">Minimum Payment:</div>
+                <div className="text-right font-medium text-sm">${minimumPayment.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
+                
+                <div className="text-gray-300 text-sm">Due Date:</div>
+                <div className="text-right font-medium text-sm">{dueDate}</div>
+                
+                <div className="text-gray-300 text-sm">AutoPay:</div>
+                <div className="text-right font-medium text-sm">
+                  ON | <a href="#" className="text-neutral-400 hover:underline">Settings</a>
                 </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+              </div>
+            </div>
+          </animated.div>
           
           {/* VISA bar at bottom */}
           <div className="relative mt-4 -mx-5 -mb-5 bg-black/40 py-2 px-5 flex justify-between items-center">
             <div className="text-white text-xl font-bold">VISA</div>
-            <div className="text-white text-base">•••• 9891</div>
+            <div className="text-white text-base">{cardNumber}</div>
           </div>
         </div>
       </div>
@@ -1279,12 +2431,14 @@ export default CreditCard;
 
 
 
+
 ==== File: components\ui\charts\SpendingChart.tsx ====
 // components/ui/charts/SpendingChart.tsx
 'use client';
 
 import React from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import { animated, useSpring } from 'react-spring';
 
 interface SpendingData {
   name: string;
@@ -1353,8 +2507,15 @@ const SpendingChart: React.FC<SpendingChartProps> = ({ selectedPeriod, periodOpt
     return option ? option.label : 'this month';
   };
 
+  // Add animation for chart
+  const chartAnimation = useSpring({
+    from: { opacity: 0, transform: 'scale(0.9)' },
+    to: { opacity: 1, transform: 'scale(1)' },
+    config: { tension: 280, friction: 25 },
+  });
+
   return (
-    <div className="w-full">
+    <animated.div className="w-full" style={chartAnimation}>
       {/* Chart container - reduced thickness to match inspiration better */}
       <div className="relative" style={{ height: '260px' }}>
         <ResponsiveContainer width="100%" height="100%">
@@ -1390,130 +2551,11 @@ const SpendingChart: React.FC<SpendingChartProps> = ({ selectedPeriod, periodOpt
           <p className="text-white font-semibold" style={{ fontSize: '36px' }}>{formatCurrency(totalSpent)}</p>
         </div>
       </div>
-    </div>
+    </animated.div>
   );
 };
 
 export default SpendingChart;
-
-
-
-==== File: components\ui\common\CustomBottomSheet.tsx ====
-'use client';
-
-import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence, useSpring, useMotionValue } from 'framer-motion';
-
-interface CustomBottomSheetProps {
-  children: React.ReactNode;
-  snapPoints: number[];
-  defaultSnap?: number;
-  expandOnContentDrag?: boolean;
-  onSnap?: (index: number) => void;
-}
-
-const CustomBottomSheet: React.FC<CustomBottomSheetProps> = ({
-  children,
-  snapPoints,
-  defaultSnap = 0,
-  expandOnContentDrag = false,
-  onSnap,
-}) => {
-  const [currentSnap, setCurrentSnap] = useState(defaultSnap);
-  const [isDragging, setIsDragging] = useState(false);
-  const contentRef = useRef<HTMLDivElement>(null);
-  const y = useMotionValue(0);
-  
-  // Update height whenever snap changes
-  useEffect(() => {
-    if (snapPoints && snapPoints.length > currentSnap) {
-      y.set(0); // Reset drag position
-    }
-  }, [currentSnap, snapPoints, y]);
-
-  // Find closest snap point on drag end
-  const findClosestSnapPoint = (dragY: number) => {
-    if (!snapPoints || snapPoints.length === 0) return 0;
-    
-    // Current position is the current snap point minus the drag amount
-    const currentHeight = snapPoints[currentSnap];
-    const targetHeight = currentHeight - dragY;
-    
-    // Find the closest snap point to the target height
-    let closestIndex = 0;
-    let closestDistance = Math.abs(snapPoints[0] - targetHeight);
-    
-    snapPoints.forEach((snap, index) => {
-      const distance = Math.abs(snap - targetHeight);
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        closestIndex = index;
-      }
-    });
-    
-    return closestIndex;
-  };
-
-  const handleDragEnd = (event: any, info: any) => {
-    // Find closest snap point based on drag velocity and position
-    const newSnapIndex = findClosestSnapPoint(info.offset.y);
-    setCurrentSnap(newSnapIndex);
-    
-    if (onSnap) {
-      onSnap(newSnapIndex);
-    }
-  };
-
-  return (
-    <motion.div
-      className="fixed bottom-0 left-0 right-0 bg-app-darkGray rounded-t-2xl shadow-lg z-10 overflow-hidden
-                md:left-1/2 md:transform md:-translate-x-1/2 md:max-w-md"
-      style={{ height: snapPoints[currentSnap] || 300 }}
-      initial={{ height: snapPoints[defaultSnap] || 300 }}
-      animate={{ height: snapPoints[currentSnap] || 300 }}
-      transition={{ type: "spring", damping: 20, stiffness: 300 }}
-    >
-      {/* Drag handle */}
-      <motion.div 
-        className="drag-handle-container cursor-grab active:cursor-grabbing"
-        drag="y"
-        dragConstraints={{ top: 0, bottom: 0 }}
-        dragElastic={0.1}
-        dragMomentum={false}
-        onDragStart={() => setIsDragging(true)}
-        onDragEnd={(e, info) => {
-          setIsDragging(false);
-          handleDragEnd(e, info);
-        }}
-        style={{ y }}
-      >
-        <div className="drag-handle"></div>
-      </motion.div>
-      
-      {/* Content */}
-      <motion.div 
-        ref={contentRef}
-        className="overflow-y-auto max-h-full"
-        drag={expandOnContentDrag ? "y" : false}
-        dragConstraints={{ top: 0, bottom: 0 }}
-        dragElastic={0.1}
-        dragMomentum={false}
-        onDragStart={() => expandOnContentDrag && setIsDragging(true)}
-        onDragEnd={(e, info) => {
-          if (expandOnContentDrag) {
-            setIsDragging(false);
-            handleDragEnd(e, info);
-          }
-        }}
-        style={{ touchAction: expandOnContentDrag ? 'none' : 'auto' }}
-      >
-        {children}
-      </motion.div>
-    </motion.div>
-  );
-};
-
-export default CustomBottomSheet;
 
 
 
@@ -1893,9 +2935,12 @@ export default Icon;
 
 ==== File: components\ui\navigation\BottomNav.tsx ====
 // components/ui/navigation/BottomNav.tsx
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { animated, useSpring } from 'react-spring';
 import Icon from '../icons/Icon';
 import { NavItemType } from '@/lib/types';
 
@@ -1910,12 +2955,25 @@ const BottomNav: React.FC = () => {
     { name: 'Transfer', icon: 'transfer', href: '/transfer' },
     { name: 'More', icon: 'more', href: '/more' },
   ];
+  
+  // Create a spring animation for the navbar
+  const navbarSpring = useSpring({
+    from: { y: 20 },
+    to: { y: 0 },
+    config: { tension: 280, friction: 25 },
+    delay: 300,
+  });
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-[#212121] py-3 px-4 flex justify-between items-center z-100
-      md:left-1/2 md:transform md:-translate-x-1/2 md:max-w-md
-      lg:max-w-md xl:max-w-md"
-      style={{ zIndex: 100 }} // Higher z-index to ensure it's above the transaction panel
+    <animated.div 
+      style={{
+        opacity: 1, // Always visible
+        transform: `translateY(${navbarSpring.y}px)`,
+        zIndex: 100
+      }}
+      className="fixed bottom-0 left-0 right-0 bg-[#212121] py-3 px-4 flex justify-between items-center
+        md:left-1/2 md:transform md:-translate-x-1/2 md:max-w-sm
+        lg:max-w-md xl:max-w-md"
     >
       {items.map((item) => {
         const isActive = pathname === item.href;
@@ -1944,7 +3002,7 @@ const BottomNav: React.FC = () => {
           </Link>
         );
       })}
-    </div>
+    </animated.div>
   );
 };
 
@@ -1952,23 +3010,46 @@ export default BottomNav;
 
 
 
+
 ==== File: components\ui\navigation\Header.tsx ====
 // components/ui/navigation/Header.tsx
+'use client';
+
 import React from 'react';
 import { Bell } from 'lucide-react';
+import { animated, useSpring } from 'react-spring';
+import { useEnhancedBankingData } from '@/components/preloaders/EnhancedBankingDataProvider';
 
 interface HeaderProps {
   userName: string;
 }
 
 const Header: React.FC<HeaderProps> = ({ userName }) => {
+  // Get user data for avatar
+  const { userData } = useEnhancedBankingData();
+  const userAvatar = userData?.user?.avatar || '/images/avatar/placeholder.svg';
+  // Create a spring animation for the header
+  const headerSpring = useSpring({
+    from: { opacity: 0, y: -10 },
+    to: { opacity: 1, y: 0 },
+    config: { tension: 280, friction: 25 },
+  });
+
+  // Animation for the notification dot
+  const notificationSpring = useSpring({
+    from: { transform: 'scale(0)' },
+    to: { transform: 'scale(1)' },
+    delay: 500,
+    config: { tension: 400, friction: 20 },
+  });
+
   return (
-    <div className="px-5 pt-8 pb-6">
+    <animated.div style={headerSpring} className="px-5 pt-8 pb-6 mx-auto max-w-md">
       <div className="flex justify-between items-center">
         <div className="flex items-center">
-          <div className="w-10 h-10 rounded-full mr-3 overflow-hidden">
+          <div className="w-10 h-10 rounded-full mr-3 overflow-hidden border border-gray-700">
             <img 
-              src="/images/avatar/jess-coleman.png" 
+              src={userAvatar} 
               alt="Profile" 
               className="w-full h-full object-cover"
             />
@@ -1977,10 +3058,13 @@ const Header: React.FC<HeaderProps> = ({ userName }) => {
         </div>
         <button className="relative p-1">
           <Bell className="w-6 h-6" />
-          <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full transform -translate-y-1/4 translate-x-1/4"></span>
+          <animated.span 
+            style={notificationSpring}
+            className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full transform -translate-y-1/4 translate-x-1/4"
+          ></animated.span>
         </button>
       </div>
-    </div>
+    </animated.div>
   );
 };
 
@@ -1994,7 +3078,7 @@ export default Header;
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { useSpring, animated } from 'react-spring';
+import { animated, useSpring } from 'react-spring';
 import { useDrag } from '@use-gesture/react';
 import TransactionList from './TransactionList';
 import { TransactionDateGroup } from '@/lib/types';
@@ -2033,7 +3117,6 @@ const TransactionContainer: React.FC<TransactionContainerProps> = ({
   
   // Synchronize with parent's collapsed state
   useEffect(() => {
-    console.log("isCollapsed prop changed:", isCollapsed);
     if (isCollapsed) {
       setViewMode('collapsed');
     } else {
@@ -2093,7 +3176,6 @@ const TransactionContainer: React.FC<TransactionContainerProps> = ({
       
       // Notify parent about collapse state changes
       if (onCollapseChange && (viewMode === 'collapsed') !== isCollapsed) {
-        console.log("Notifying parent of collapse change:", viewMode === 'collapsed');
         onCollapseChange(viewMode === 'collapsed');
       }
     }
@@ -2211,7 +3293,6 @@ const TransactionContainer: React.FC<TransactionContainerProps> = ({
         
         // Notify parent if needed
         if (onCollapseChange && (targetMode === 'collapsed') !== isCollapsed) {
-          console.log("Drag ended - notifying parent:", targetMode === 'collapsed');
           onCollapseChange(targetMode === 'collapsed');
         }
       } else {
@@ -2234,7 +3315,7 @@ const TransactionContainer: React.FC<TransactionContainerProps> = ({
     <animated.div
       ref={containerRef}
       className={`
-        fixed left-0 right-0 z-20 overflow-hidden
+        fixed left-0 right-0 overflow-hidden
         md:left-1/2 md:transform md:-translate-x-1/2 md:max-w-md
         ${viewMode === 'fullscreen' ? 'bg-app-black rounded-none' : 'bg-[#212121] rounded-t-3xl shadow-lg'}`
       }
@@ -2243,19 +3324,19 @@ const TransactionContainer: React.FC<TransactionContainerProps> = ({
         bottom: navbarHeight, // Position above bottom navigation
         top: 'auto', // Never attach to top
         maxHeight: viewMode === 'fullscreen' ? `calc(100vh - ${navbarHeight}px)` : 'none',
-        zIndex: 50, // Lower z-index to ensure it's below bottom navigation
+        zIndex: 50, // Ensure proper z-index
       }}
     >
       {/* Drag handle */}
       <div 
-        className="drag-handle-container"
+        className="drag-handle-container mt-1" 
         {...bind()}
       >
         <div className="drag-handle" />
       </div>
       
       {/* Header with title and controls */}
-      <div className="flex justify-between items-center px-6 py-2">
+      <div className="flex justify-between items-center px-6 pt-2 py-2">
         <h2 className="text-white text-xl font-medium">
           Transactions
         </h2>
@@ -2267,7 +3348,6 @@ const TransactionContainer: React.FC<TransactionContainerProps> = ({
               // Direct collapse
               setViewMode('collapsed');
               if (onCollapseChange) {
-                console.log("Collapse button clicked");
                 onCollapseChange(true);
               }
             }}
@@ -2288,7 +3368,7 @@ const TransactionContainer: React.FC<TransactionContainerProps> = ({
       
       {/* Chart section - Spending Chart First */}
       {viewMode === 'fullscreen' && (
-        <div className="px-6 mt-4 mb-4">
+        <div className="px-6 mt-2 mb-4">
           <SpendingChart 
             selectedPeriod={selectedPeriod} 
             periodOptions={periodOptions}
@@ -2339,23 +3419,41 @@ export default TransactionContainer;
 
 
 
+
 ==== File: components\ui\transactions\TransactionItem.tsx ====
 // components/ui/transactions/TransactionItem.tsx
 import React from 'react';
+import { animated, useSpring } from 'react-spring';
 import Icon from '../icons/Icon';
 import { TransactionType } from '@/lib/types';
 
 interface TransactionItemProps {
   transaction: TransactionType;
   isLastInGroup?: boolean;
+  index?: number;
 }
 
-const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, isLastInGroup = false }) => {
+const TransactionItem: React.FC<TransactionItemProps> = ({ 
+  transaction, 
+  isLastInGroup = false,
+  index = 0
+}) => {
   // Use a consistent gray color for all icon backgrounds to match the inspiration
   const iconBgColor = 'bg-neutral-700'; // Closer to #3b3b3b // Subtle gray that matches the inspiration
+  
+  // Create a spring animation with a staggered delay based on index
+  const springs = useSpring({
+    from: { opacity: 0, x: -5 },
+    to: { opacity: 1, x: 0 },
+    delay: index * 50, // Stagger the animations
+    config: { mass: 1, tension: 280, friction: 25 }
+  });
 
   return (
-    <div className={`flex items-center justify-between py-3 hover:bg-neutral-700/30 px-4 rounded-lg transition-colors ${!isLastInGroup ? 'border-b border-gray-700/30' : ''}`}>
+    <animated.div 
+      style={springs}
+      className={`flex items-center justify-between py-3 hover:bg-neutral-700/30 px-4 rounded-lg transition-colors ${!isLastInGroup ? 'border-b border-gray-700/30' : ''}`}
+    >
       <div className="flex items-center">
         <div className={`${iconBgColor} w-10 h-10 rounded-full flex items-center justify-center mr-3`}>
           <Icon name={transaction.icon} className="w-5 h-5 text-white" />
@@ -2373,23 +3471,22 @@ const TransactionItem: React.FC<TransactionItemProps> = ({ transaction, isLastIn
         </div>
         <div className="text-gray-400 text-sm">{transaction.timestamp}</div>
       </div>
-    </div>
+    </animated.div>
   );
 };
 
 export default TransactionItem;
-
-  
 
 
 
 ==== File: components\ui\transactions\TransactionList.tsx ====
 // components/ui/transactions/TransactionList.tsx
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { animated, useTransition } from 'react-spring';
 import TransactionItem from './TransactionItem';
 import { TransactionDateGroup } from '@/lib/types';
 import { getTransactionsByPeriod } from '@/lib/data/transactions';
+import { useBankingData } from '@/components/preloaders/BankingDataPreloader';
 
 interface TransactionListProps {
   transactionGroups: TransactionDateGroup[];
@@ -2401,89 +3498,74 @@ const TransactionList: React.FC<TransactionListProps> = ({
   selectedPeriod
 }) => {
   const [transactionGroups, setTransactionGroups] = useState<TransactionDateGroup[]>(initialGroups);
+  const { data } = useBankingData();
 
   // Update transactions when period changes
   useEffect(() => {
-    const updatedTransactions = getTransactionsByPeriod(selectedPeriod);
-    setTransactionGroups(updatedTransactions);
-  }, [selectedPeriod]);
-
-  // Define smoother animations
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1,
-      transition: { 
-        staggerChildren: 0.1,
-        delayChildren: 0.05
-      }
-    },
-    exit: { 
-      opacity: 0,
-      transition: { 
-        duration: 0.2
-      }
+    // If banking data is available, try to use it first
+    if (data && (data as any).groupedTransactions && (data as any).groupedTransactions.user1) {
+      setTransactionGroups((data as any).groupedTransactions.user1);
+    } else {
+      // Fall back to predefined transactions
+      const updatedTransactions = getTransactionsByPeriod(selectedPeriod);
+      setTransactionGroups(updatedTransactions);
     }
-  };
+  }, [selectedPeriod, data]);
 
-  const groupVariants = {
-    hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1,
-      transition: { duration: 0.3 }
-    },
-    exit: { 
-      opacity: 0,
-      transition: { duration: 0.2 }
+  // React Spring transitions for period changes
+  const transitions = useTransition(
+    // Use the selected period as the item we're transitioning
+    { period: selectedPeriod, groups: transactionGroups },
+    {
+      from: { opacity: 0, transform: 'translate3d(0,-20px,0)' },
+      enter: { opacity: 1, transform: 'translate3d(0,0px,0)' },
+      leave: { opacity: 0, transform: 'translate3d(0,-20px,0)' },
+      // Using a unique key based on the period to prevent old content from mixing with new
+      keys: item => item.period,
+      config: { mass: 1, tension: 280, friction: 25 }
     }
-  };
+  );
 
-  const itemVariants = {
-    hidden: { opacity: 0, x: -5 },
-    visible: { 
-      opacity: 1, 
-      x: 0,
-      transition: { duration: 0.2 }
+  // Transitions for individual groups
+  const groupTransitions = useTransition(
+    transactionGroups,
+    {
+      from: { opacity: 0, transform: 'translate3d(0,20px,0)' },
+      enter: { opacity: 1, transform: 'translate3d(0,0px,0)' },
+      leave: { opacity: 0, transform: 'translate3d(0,20px,0)' },
+      trail: 100, // Stagger the animations
+      keys: group => group.date,
+      config: { mass: 1, tension: 280, friction: 25 }
     }
-  };
+  );
 
   return (
     <div className="pb-32">
-      {/* Use a key based on the period to force a clean transition */}
-      <AnimatePresence mode="sync">
-        <motion.div
-          key={selectedPeriod}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-          variants={containerVariants}
-        >
-          {transactionGroups.map((group, groupIndex) => (
-            <motion.div 
-              key={group.date}
-              variants={groupVariants}
+      {/* Use the main transition for the entire list */}
+      {transitions((style, item) => (
+        <animated.div style={style}>
+          {/* Then animate each group separately */}
+          {groupTransitions((groupStyle, group) => (
+            <animated.div 
+              style={groupStyle}
               className="mb-4"
             >
-              <div className="sticky top-0 bg-[#1a1a1a] px-6 py-3 text-gray-400 text-xs uppercase font-semibold z-10 border-t border-gray-800">
+              <div className="sticky top-0 bg-[#1a1a1a] px-6 py-2 text-neutral-400 text-xs uppercase font-semibold z-10 ">
                 {group.date}
               </div>
               <div>
                 {group.transactions.map((transaction, transactionIndex) => (
-                  <motion.div
+                  <TransactionItem 
                     key={transaction.id}
-                    variants={itemVariants}
-                  >
-                    <TransactionItem 
-                      transaction={transaction} 
-                      isLastInGroup={transactionIndex === group.transactions.length - 1}
-                    />
-                  </motion.div>
+                    transaction={transaction} 
+                    isLastInGroup={transactionIndex === group.transactions.length - 1}
+                  />
                 ))}
               </div>
-            </motion.div>
+            </animated.div>
           ))}
-        </motion.div>
-      </AnimatePresence>
+        </animated.div>
+      ))}
     </div>
   );
 };
@@ -2492,47 +3574,121 @@ export default TransactionList;
 
 
 
+
+==== File: lib\config\preloaderConfig.ts ====
+// lib/config/preloaderConfig.ts
+export const preloaderConfig = {
+  // General preloader settings
+  enabled: true,  // Set to false to disable preloading in all environments
+  devModeEnabled: false, // Whether to enable preloading in development mode
+  
+  // Banking data preloader settings
+  bankingData: {
+    simulateApiDelay: 1500, // Milliseconds to simulate API loading time
+    preProcessData: true,   // Whether to pre-process data for faster rendering
+    persistData: true,      // Whether to persist data in localStorage
+    clearCacheOnReload: false // Whether to clear cache on full page reload
+  },
+  
+  // Image preloader settings
+  images: {
+    timeout: 10000,    // Milliseconds to wait before timing out image preloading
+    retries: 2,        // Number of retries for failed image loads
+    parallel: 8,       // Number of images to load in parallel
+    priorityImages: [  // These images will be loaded first
+      '/images/icons/logo.png',
+      '/images/avatar/jess-coleman.png',
+      '/images/cards/visa-signature-bg.png'
+    ]
+  },
+  
+  // Loading screen appearance
+  loadingScreen: {
+    logo: '/images/icons/logo.png',
+    title: 'Members 1st Banking',
+    showProgressBar: true,
+    showPercentage: true,
+    minDisplayTime: 1000, // Minimum time to show loading screen in milliseconds
+    transitionDuration: 500 // Transition duration in milliseconds
+  }
+};
+
+export default preloaderConfig;
+
+
+
+
 ==== File: lib\context\ThemeContext.tsx ====
+// lib/context/ThemeContext.tsx
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 
-type Theme = 'light' | 'dark';
+type Theme = 'dark' | 'light' | 'system';
 
 interface ThemeContextType {
   theme: Theme;
-  toggleTheme: () => void;
+  setTheme: (theme: Theme) => void;
+  isDarkMode: boolean;
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [theme, setTheme] = useState<Theme>('dark');
+interface ThemeProviderProps {
+  children: ReactNode;
+  defaultTheme?: Theme;
+}
 
-  const toggleTheme = () => {
-    setTheme(prevTheme => {
-      const newTheme = prevTheme === 'light' ? 'dark' : 'light';
-      localStorage.setItem('app-theme', newTheme);
-      return newTheme;
-    });
-  };
+export const ThemeProvider: React.FC<ThemeProviderProps> = ({ 
+  children, 
+  defaultTheme = 'dark' 
+}) => {
+  const [theme, setTheme] = useState<Theme>(defaultTheme);
+  const [isDarkMode, setIsDarkMode] = useState<boolean>(true);
 
-  // Initialize theme from localStorage or system preference
+  // Initialize theme from localStorage on mount
   useEffect(() => {
-    const savedTheme = localStorage.getItem('app-theme') as Theme | null;
-    
+    const savedTheme = localStorage.getItem('theme') as Theme | null;
     if (savedTheme) {
       setTheme(savedTheme);
-    } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      setTheme('dark');
+    }
+  }, []);
+
+  // Update localStorage when theme changes
+  useEffect(() => {
+    localStorage.setItem('theme', theme);
+    
+    // Apply theme to document
+    const root = document.documentElement;
+    
+    // Remove all theme classes
+    root.classList.remove('theme-dark', 'theme-light');
+    
+    // Determine if we should use dark mode
+    let shouldUseDarkMode = theme === 'dark';
+    
+    if (theme === 'system') {
+      shouldUseDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      
+      // Add listener for system theme changes
+      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+      const handleChange = (e: MediaQueryListEvent) => {
+        setIsDarkMode(e.matches);
+        root.classList.toggle('theme-dark', e.matches);
+        root.classList.toggle('theme-light', !e.matches);
+      };
+      
+      mediaQuery.addEventListener('change', handleChange);
+      return () => mediaQuery.removeEventListener('change', handleChange);
     }
     
-    // Apply theme class to body
-    document.body.className = theme === 'dark' ? 'bg-black text-white' : 'bg-white text-black';
+    // Apply the appropriate theme class
+    root.classList.add(shouldUseDarkMode ? 'theme-dark' : 'theme-light');
+    setIsDarkMode(shouldUseDarkMode);
   }, [theme]);
 
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme, setTheme, isDarkMode }}>
       {children}
     </ThemeContext.Provider>
   );
@@ -2545,7 +3701,6 @@ export const useTheme = (): ThemeContextType => {
   }
   return context;
 };
-
 
 
 
@@ -2573,6 +3728,533 @@ export const getDefaultCard = (): CardType => {
   return cards[0];
 };
 
+
+
+
+==== File: lib\data\fakeBankingData.js ====
+// Members 1st Credit Union Demo Banking Data Generator
+// This script creates realistic fake data for demo purposes
+
+// Utility functions
+const formatCurrency = (amount) => {
+    return amount.toLocaleString('en-US', { 
+      style: 'currency', 
+      currency: 'USD',
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  };
+  
+  const formatDate = (date) => {
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    });
+  };
+  
+  const generateAccountNumber = () => {
+    return Math.floor(Math.random() * 9000000) + 1000000;
+  };
+  
+  const generateCardNumber = () => {
+    return `•••• ${Math.floor(Math.random() * 9000) + 1000}`;
+  };
+  
+  const generateLoanNumber = () => {
+    return `LOAN-${Math.floor(Math.random() * 900000) + 100000}`;
+  };
+  
+  const generateRandomAmount = (min, max) => {
+    return Number((Math.random() * (max - min) + min).toFixed(2));
+  };
+  
+  // Transaction generation utilities
+  const merchants = [
+    { name: 'Starbucks', category: 'dining', icon: 'coffee', averageAmount: 5.45, frequency: 'high' },
+    { name: 'Whole Foods', category: 'groceries', icon: 'shopping', averageAmount: 85.32, frequency: 'medium' },
+    { name: 'Amazon', category: 'shopping', icon: 'shopping', averageAmount: 35.47, frequency: 'medium' },
+    { name: 'Netflix', category: 'subscription', icon: 'entertainment', averageAmount: 14.99, frequency: 'monthly' },
+    { name: 'Target', category: 'shopping', icon: 'shopping', averageAmount: 65.32, frequency: 'medium' },
+    { name: 'Uber', category: 'transport', icon: 'car', averageAmount: 24.50, frequency: 'medium' },
+    { name: 'AT&T', category: 'utilities', icon: 'utilities', averageAmount: 89.99, frequency: 'monthly' },
+    { name: 'Chevron', category: 'transport', icon: 'car', averageAmount: 48.75, frequency: 'medium' },
+    { name: 'Giant Food', category: 'groceries', icon: 'shopping', averageAmount: 125.45, frequency: 'medium' },
+    { name: 'Home Depot', category: 'home', icon: 'shopping', averageAmount: 87.35, frequency: 'low' },
+    { name: 'Chipotle', category: 'dining', icon: 'food', averageAmount: 18.25, frequency: 'medium' },
+    { name: 'Spotify', category: 'subscription', icon: 'entertainment', averageAmount: 9.99, frequency: 'monthly' },
+    { name: 'CVS Pharmacy', category: 'health', icon: 'health', averageAmount: 32.50, frequency: 'low' },
+    { name: 'PetSmart', category: 'pets', icon: 'shopping', averageAmount: 45.75, frequency: 'low' },
+    { name: 'AMC Theaters', category: 'entertainment', icon: 'entertainment', averageAmount: 28.50, frequency: 'low' }
+  ];
+  
+  const locations = {
+    'Starbucks': ['East Shore', 'Camp Hill', 'Mechanicsburg'],
+    'Target': ['Harrisburg', 'Colonial Park'],
+    'Chipotle': ['Camp Hill', 'Carlisle Pike'],
+    'Home Depot': ['Mechanicsburg', 'Carlisle'],
+    'Giant Food': ['Linglestown Rd', 'Camp Hill', 'Carlisle Pike'],
+    'Chevron': ['Jonestown Rd', 'Carlisle Pike', 'Cameron St'],
+    'CVS Pharmacy': ['Market St', 'Camp Hill', 'Mechanicsburg'],
+    'AMC Theaters': ['Colonial Park Mall']
+  };
+  
+  const getRandomLocation = (merchantName) => {
+    if (locations[merchantName]) {
+      const locs = locations[merchantName];
+      return locs[Math.floor(Math.random() * locs.length)];
+    }
+    return null;
+  };
+  
+  const getRandomTime = () => {
+    const hours = Math.floor(Math.random() * 12) + 1;
+    const minutes = Math.floor(Math.random() * 60);
+    const ampm = Math.random() > 0.5 ? 'AM' : 'PM';
+    return `${hours}:${minutes.toString().padStart(2, '0')}${ampm}`;
+  };
+  
+  const generateId = () => {
+    return Math.random().toString(36).substring(2, 11);
+  };
+  
+  const selectWeightedMerchant = (merchants) => {
+    // Simple weighted selection
+    const frequencyWeights = {
+      'high': 0.5,
+      'medium': 0.3,
+      'low': 0.15,
+      'monthly': 0.05
+    };
+    
+    // Calculate total weight
+    const totalWeight = merchants.reduce((sum, merchant) => {
+      return sum + frequencyWeights[merchant.frequency];
+    }, 0);
+    
+    // Select based on weight
+    let random = Math.random() * totalWeight;
+    let cumulativeWeight = 0;
+    
+    for (const merchant of merchants) {
+      cumulativeWeight += frequencyWeights[merchant.frequency];
+      if (random <= cumulativeWeight) {
+        return merchant;
+      }
+    }
+    
+    return merchants[0]; // Fallback
+  };
+  
+  // Generate transactions for a specific account
+  const createTransactions = (userId, accountId, months = 3) => {
+    const transactions = [];
+    const currentDate = new Date();
+    
+    // Create 3 months of transaction history
+    for (let day = 0; day < (months * 30); day++) {
+      const date = new Date(currentDate);
+      date.setDate(date.getDate() - day);
+      
+      // Add 0-5 transactions per day (weighted toward fewer)
+      const dailyTransactionCount = Math.floor(Math.random() * 3) + (day % 7 === 5 ? 3 : 0); // More on weekends
+      
+      for (let t = 0; t < dailyTransactionCount; t++) {
+        // Select random merchant with weighting toward frequent ones
+        const merchant = selectWeightedMerchant(merchants);
+        
+        // Vary amount slightly from average
+        const amount = merchant.averageAmount * (0.85 + (Math.random() * 0.3));
+        const location = getRandomLocation(merchant.name);
+        
+        transactions.push({
+          id: `txn-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+          userId,
+          accountId,
+          date: date.toISOString(),
+          merchant: merchant.name,
+          category: merchant.category,
+          icon: merchant.icon,
+          amount: parseFloat(amount.toFixed(2)),
+          isIncoming: Math.random() < 0.15, // 15% are income/refunds
+          status: 'completed',
+          location: location,
+          message: location ? null : 'Online Purchase',
+          timestamp: getRandomTime()
+        });
+      }
+      
+      // Add monthly salary for employed person on appropriate days
+      if (userId === 'user1' && (day % 14 === 0)) { // Bi-weekly payroll
+        transactions.push({
+          id: `txn-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+          userId,
+          accountId,
+          date: date.toISOString(),
+          merchant: 'Payroll Deposit',
+          category: 'income',
+          icon: 'payroll',
+          amount: 2654.33, // Net bi-weekly pay
+          isIncoming: true,
+          status: 'completed',
+          message: 'Direct Deposit - Salary',
+          timestamp: '9:00AM'
+        });
+      }
+      
+      // Monthly retirement income for second user
+      if (userId === 'user2' && (day % 30 === 1)) {
+        transactions.push({
+          id: `txn-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+          userId,
+          accountId,
+          date: date.toISOString(),
+          merchant: 'Social Security',
+          category: 'income',
+          icon: 'payroll',
+          amount: 2218.00,
+          isIncoming: true,
+          status: 'completed',
+          message: 'Direct Deposit - SS Benefit',
+          timestamp: '3:30AM'
+        });
+      }
+      
+      // Add monthly mortgage/rent payments
+      if (day % 30 === 5) {
+        transactions.push({
+          id: `txn-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+          userId,
+          accountId,
+          date: date.toISOString(),
+          merchant: userId === 'user1' ? 'Members 1st Mortgage' : 'Sunset Apartments',
+          category: 'housing',
+          icon: 'home',
+          amount: userId === 'user1' ? 1456.33 : 1100.00,
+          isIncoming: false,
+          status: 'completed',
+          message: userId === 'user1' ? 'Monthly Mortgage Payment' : 'Rent Payment',
+          timestamp: '8:00AM'
+        });
+      }
+    }
+    
+    return transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+  };
+  
+  // Group transactions by date (TODAY, YESTERDAY, or formatted date)
+  const groupTransactionsByDate = (transactions) => {
+    const today = new Date().toLocaleDateString();
+    const yesterday = new Date(Date.now() - 86400000).toLocaleDateString();
+    
+    const grouped = transactions.reduce((groups, transaction) => {
+      const txDate = new Date(transaction.date).toLocaleDateString();
+      let dateLabel;
+      
+      if (txDate === today) {
+        dateLabel = 'TODAY';
+      } else if (txDate === yesterday) {
+        dateLabel = 'YESTERDAY';
+      } else {
+        dateLabel = new Date(transaction.date).toLocaleDateString('en-US', {
+          month: 'short',
+          day: 'numeric', 
+          year: 'numeric'
+        }).toUpperCase();
+      }
+      
+      if (!groups[dateLabel]) {
+        groups[dateLabel] = [];
+      }
+      
+      groups[dateLabel].push(transaction);
+      return groups;
+    }, {});
+    
+    // Format for component
+    return Object.keys(grouped).map(date => ({
+      date,
+      transactions: grouped[date]
+    }));
+  };
+  
+  // Create two fake users with complete financial profiles
+  const generateFakeUsers = () => {
+    // --- USER 1: Young Professional ---
+    const user1 = {
+      id: 'user1',
+      name: 'Jessica Coleman',
+      username: 'jcoleman',
+      email: 'j.coleman@example.com',
+      avatar: '/images/avatar/jess-coleman.png',
+      phone: '(717) 555-1234',
+      address: '123 Pine Street, Harrisburg, PA 17101',
+      ssn: '•••-••-7890',
+      dob: '1992-05-15',
+      occupation: 'Marketing Manager',
+      income: 85000,
+      joinDate: '2019-03-22',
+      lastLogin: new Date().toISOString()
+    };
+    
+    // --- USER 2: Retired Individual ---
+    const user2 = {
+      id: 'user2',
+      name: 'Robert Thompson',
+      username: 'rthompson',
+      email: 'r.thompson@example.com',
+      avatar: '/images/avatar/robert-thompson.png',
+      phone: '(717) 555-8765',
+      address: '456 Oak Avenue, Mechanicsburg, PA 17055',
+      ssn: '•••-••-4321',
+      dob: '1958-09-30',
+      occupation: 'Retired (Former Teacher)',
+      income: 52000, // Combined retirement income
+      joinDate: '2002-07-14',
+      lastLogin: new Date().toISOString()
+    };
+    
+    // Banking Products for User 1
+    const user1Accounts = [
+      {
+        id: 'acct-1001',
+        userId: 'user1',
+        type: 'checking',
+        name: 'Members 1st Checking',
+        accountNumber: `****${generateAccountNumber().toString().slice(-4)}`,
+        routingNumber: '231382241',
+        balance: 3427.59,
+        availableBalance: 3227.59,
+        pendingTransactions: 2,
+        interestRate: 0.05,
+        openDate: '2019-03-22'
+      },
+      {
+        id: 'acct-1002',
+        userId: 'user1',
+        type: 'savings',
+        name: 'Members 1st Savings',
+        accountNumber: `****${generateAccountNumber().toString().slice(-4)}`,
+        routingNumber: '231382241',
+        balance: 15750.33,
+        interestRate: 1.75,
+        openDate: '2019-03-22'
+      },
+      {
+        id: 'acct-1003',
+        userId: 'user1',
+        type: 'moneyMarket',
+        name: 'Money Market Account',
+        accountNumber: `****${generateAccountNumber().toString().slice(-4)}`,
+        routingNumber: '231382241',
+        balance: 25000.00,
+        interestRate: 2.25,
+        openDate: '2020-11-15'
+      }
+    ];
+    
+    // Banking Products for User 2
+    const user2Accounts = [
+      {
+        id: 'acct-2001',
+        userId: 'user2',
+        type: 'checking',
+        name: 'Members 1st Checking',
+        accountNumber: `****${generateAccountNumber().toString().slice(-4)}`,
+        routingNumber: '231382241',
+        balance: 4850.26,
+        availableBalance: 4850.26,
+        pendingTransactions: 0,
+        interestRate: 0.05,
+        openDate: '2002-07-14'
+      },
+      {
+        id: 'acct-2002',
+        userId: 'user2',
+        type: 'savings',
+        name: 'Members 1st Savings',
+        accountNumber: `****${generateAccountNumber().toString().slice(-4)}`,
+        routingNumber: '231382241',
+        balance: 42365.78,
+        interestRate: 1.75,
+        openDate: '2002-07-14'
+      },
+      {
+        id: 'acct-2003',
+        userId: 'user2',
+        type: 'cd',
+        name: '11-Month Certificate',
+        accountNumber: `****${generateAccountNumber().toString().slice(-4)}`,
+        routingNumber: '231382241',
+        balance: 10000.00,
+        interestRate: 4.00, // APY
+        openDate: '2024-09-01',
+        maturityDate: '2025-08-01'
+      }
+    ];
+    
+    // Credit Cards
+    const creditCards = [
+      {
+        id: 'card-5001',
+        userId: 'user1',
+        type: 'visa',
+        name: 'Visa Signature Rewards',
+        cardNumber: '•••• 9891',
+        expiry: '05/27',
+        cvv: '•••',
+        creditLimit: 12000,
+        currentBalance: 2427.50,
+        availableCredit: 9572.50,
+        dueDate: '2025-05-25',
+        minimumPayment: 35.00,
+        rewardsBalance: 342.89,
+        rewardsType: 'cashback',
+        rewardsRate: '1.5%',
+        applyDate: '2020-04-15',
+        color: '#7b2528' // Red color for card design
+      },
+      {
+        id: 'card-5002',
+        userId: 'user2', 
+        type: 'visa',
+        name: 'Visa Platinum Low Rate',
+        cardNumber: '•••• 5432',
+        expiry: '09/26',
+        cvv: '•••',
+        creditLimit: 8000,
+        currentBalance: 1256.78,
+        availableCredit: 6743.22,
+        dueDate: '2025-05-15',
+        minimumPayment: 25.00,
+        rewardsBalance: 0,
+        rewardsType: 'none',
+        rewardsRate: '0%',
+        applyDate: '2015-02-10',
+        color: '#333333' // Dark gray for card design
+      }
+    ];
+    
+    // Loans
+    const loans = [
+      {
+        id: 'loan-7001',
+        userId: 'user1',
+        type: 'mortgage',
+        name: 'Home Mortgage',
+        loanNumber: generateLoanNumber(),
+        originalAmount: 320000,
+        currentBalance: 287650.50,
+        interestRate: 4.25,
+        monthlyPayment: 1456.33,
+        originationDate: '2020-08-15',
+        term: 30, // years
+        nextPaymentDate: '2025-06-01',
+        paymentsMade: 58,
+        paymentsRemaining: 302,
+        propertyAddress: '123 Pine Street, Harrisburg, PA 17101'
+      },
+      {
+        id: 'loan-7002',
+        userId: 'user1',
+        type: 'auto',
+        name: 'Auto Loan',
+        loanNumber: generateLoanNumber(),
+        originalAmount: 32000,
+        currentBalance: 18743.21,
+        interestRate: 3.25,
+        monthlyPayment: 505.86,
+        originationDate: '2022-11-10',
+        term: 5, // years
+        nextPaymentDate: '2025-06-05',
+        paymentsMade: 18,
+        paymentsRemaining: 42,
+        vehicle: '2022 Honda CR-V',
+        vin: 'JH4KA7650MC034521'
+      },
+      {
+        id: 'loan-7003',
+        userId: 'user2',
+        type: 'homeEquity',
+        name: 'Home Equity Freedom Line of Credit',
+        loanNumber: generateLoanNumber(),
+        originalAmount: 50000, // Credit line
+        currentBalance: 15000, // Current used amount
+        availableCredit: 35000,
+        interestRate: 6.25,
+        monthlyPayment: 250.00, // Minimum payment
+        originationDate: '2022-01-18',
+        term: 15, // years
+        nextPaymentDate: '2025-06-10',
+        paymentsMade: 28,
+        paymentsRemaining: 152,
+        propertyAddress: '456 Oak Avenue, Mechanicsburg, PA 17055'
+      }
+    ];
+    
+    // Generate transactions for each account
+    const user1Transactions = {};
+    const user2Transactions = {};
+    
+    user1Accounts.forEach(account => {
+      user1Transactions[account.id] = createTransactions('user1', account.id, 3);
+    });
+    
+    user2Accounts.forEach(account => {
+      user2Transactions[account.id] = createTransactions('user2', account.id, 3);
+    });
+    
+    // Format transactions for card view
+    const user1GroupedTransactions = groupTransactionsByDate(
+      user1Transactions[user1Accounts[0].id]
+    );
+    const user2GroupedTransactions = groupTransactionsByDate(
+      user2Transactions[user2Accounts[0].id]
+    );
+    
+    return {
+      users: [user1, user2],
+      accounts: [...user1Accounts, ...user2Accounts],
+      creditCards,
+      loans,
+      transactions: {
+        user1: user1Transactions,
+        user2: user2Transactions
+      },
+      groupedTransactions: {
+        user1: user1GroupedTransactions,
+        user2: user2GroupedTransactions
+      }
+    };
+  };
+  
+  // Execute the generator
+  const bankingData = generateFakeUsers();
+  console.log('Fake banking data generated successfully!');
+  
+  // Output sample data
+  console.log('Sample User:', bankingData.users[0].name);
+  console.log('Sample Account:', bankingData.accounts[0].name, 'Balance:', formatCurrency(bankingData.accounts[0].balance));
+  console.log('Sample Card:', bankingData.creditCards[0].name);
+  console.log('Sample Loan:', bankingData.loans[0].name, 'Balance:', formatCurrency(bankingData.loans[0].currentBalance));
+  console.log('Sample Transaction:', bankingData.groupedTransactions.user1[0].transactions[0].merchant, 
+    formatCurrency(bankingData.groupedTransactions.user1[0].transactions[0].amount));
+  
+  // Save data to localStorage (for web apps)
+  if (typeof window !== 'undefined' && window.localStorage) {
+    localStorage.setItem('members1stBankingData', JSON.stringify(bankingData));
+    console.log('Data saved to localStorage. Use localStorage.getItem("members1stBankingData") to retrieve.');
+  }
+  
+  // Export the data and generator functions
+  export {
+    bankingData,
+    generateFakeUsers,
+    createTransactions,
+    groupTransactionsByDate,
+    formatCurrency,
+    formatDate
+  };
 
 
 
@@ -3108,147 +4790,8 @@ export default useContainerPosition;
 
 
 
-==== File: lib\hooks\useSwipeableContainer.ts ====
-'use client';
-
-import { useState, useRef, useEffect } from 'react';
-
-interface UseSwipeableContainerOptions {
-  initialHeight: number;
-  maxHeight: number;
-  minHeight: number;
-  snapPoints?: number[];
-}
-
-export const useSwipeableContainer = ({
-  initialHeight,
-  maxHeight,
-  minHeight,
-  snapPoints = [],
-}: UseSwipeableContainerOptions) => {
-  const [height, setHeight] = useState(initialHeight);
-  const [isDragging, setIsDragging] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
-  const startYRef = useRef<number | null>(null);
-  const startHeightRef = useRef<number>(initialHeight);
-
-  const handleDragStart = (clientY: number) => {
-    startYRef.current = clientY;
-    startHeightRef.current = height;
-    setIsDragging(true);
-    
-    // Add a class to the body to prevent scrolling while dragging
-    document.body.classList.add('overflow-hidden');
-  };
-
-  const handleDrag = (clientY: number) => {
-    if (!isDragging || startYRef.current === null) {
-      return;
-    }
-
-    const deltaY = startYRef.current - clientY;
-    const newHeight = Math.min(maxHeight, Math.max(minHeight, startHeightRef.current + deltaY));
-    setHeight(newHeight);
-  };
-
-  const handleDragEnd = () => {
-    setIsDragging(false);
-    startYRef.current = null;
-    
-    // Remove the class from the body
-    document.body.classList.remove('overflow-hidden');
-
-    // Find the closest snap point, including min and max
-    const allSnapPoints = [...snapPoints, minHeight, maxHeight];
-    
-    if (allSnapPoints.length > 0) {
-      const closestSnapPoint = allSnapPoints.reduce((prev, curr) => {
-        return Math.abs(curr - height) < Math.abs(prev - height) ? curr : prev;
-      });
-      
-      // Animate to the snap point
-      setHeight(closestSnapPoint);
-    }
-  };
-
-  // Add a function to programmatically set the container height to a specific snap point
-  const snapTo = (snapPoint: number) => {
-    const validSnapPoint = Math.min(maxHeight, Math.max(minHeight, snapPoint));
-    setHeight(validSnapPoint);
-  };
-
-  useEffect(() => {
-    const handleTouchStart = (e: TouchEvent) => {
-      const handle = containerRef.current?.querySelector('.drag-handle');
-      if (handle && e.target instanceof Node && handle.contains(e.target)) {
-        e.preventDefault(); // Prevent default to avoid scroll interference
-        handleDragStart(e.touches[0].clientY);
-      }
-    };
-
-    const handleTouchMove = (e: TouchEvent) => {
-      if (isDragging) {
-        e.preventDefault(); // Prevent scrolling while dragging
-        handleDrag(e.touches[0].clientY);
-      }
-    };
-
-    const handleTouchEnd = () => {
-      if (isDragging) {
-        handleDragEnd();
-      }
-    };
-
-    // Mouse events for desktop support
-    const handleMouseDown = (e: MouseEvent) => {
-      const handle = containerRef.current?.querySelector('.drag-handle');
-      if (handle && e.target instanceof Node && handle.contains(e.target)) {
-        handleDragStart(e.clientY);
-      }
-    };
-
-    const handleMouseMove = (e: MouseEvent) => {
-      if (isDragging) {
-        handleDrag(e.clientY);
-      }
-    };
-
-    const handleMouseUp = () => {
-      if (isDragging) {
-        handleDragEnd();
-      }
-    };
-
-    // Touch events
-    document.addEventListener('touchstart', handleTouchStart, { passive: false });
-    document.addEventListener('touchmove', handleTouchMove, { passive: false });
-    document.addEventListener('touchend', handleTouchEnd);
-
-    // Mouse events
-    document.addEventListener('mousedown', handleMouseDown);
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
-
-    return () => {
-      // Clean up touch events
-      document.removeEventListener('touchstart', handleTouchStart);
-      document.removeEventListener('touchmove', handleTouchMove);
-      document.removeEventListener('touchend', handleTouchEnd);
-
-      // Clean up mouse events
-      document.removeEventListener('mousedown', handleMouseDown);
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
-    };
-  }, [isDragging, height, minHeight, maxHeight]);
-
-  return { containerRef, height, isDragging, snapTo };
-};
-
-
-
-
 ==== File: lib\types\index.ts ====
+// lib/types/index.ts
 export type CardType = {
   id: string;
   type: 'VISA' | 'MASTERCARD' | 'AMEX';
@@ -3266,8 +4809,8 @@ export type TransactionType = {
   isIncoming: boolean;
   timestamp: string;
   message?: string;
-  icon: string; // Updated to allow any icon name
-  category?: string; // Optional category for fallback icons
+  icon: string;
+  category?: string;
 };
 
 export type TransactionDateGroup = {
@@ -3281,67 +4824,151 @@ export type NavItemType = {
   href: string;
 };
 
-
-
-
-==== File: lib\utils\formatters.ts ====
-/**
- * Format currency amount with proper symbol and decimal places
- */
-export const formatCurrency = (amount: number, currency = 'USD', locale = 'en-US'): string => {
-  return new Intl.NumberFormat(locale, {
-    style: 'currency',
-    currency,
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(amount);
+// Add banking data types
+export type BankingUser = {
+  id: string;
+  name: string;
+  username: string;
+  email: string;
+  avatar: string;
+  phone: string;
+  address: string;
+  ssn: string;
+  dob: string;
+  occupation: string;
+  income: number;
+  joinDate: string;
+  lastLogin: string;
 };
 
-/**
- * Format date in desired format
- */
-export const formatDate = (date: Date | string, format = 'short'): string => {
-  if (typeof date === 'string') {
-    date = new Date(date);
-  }
-  
-  if (format === 'time') {
-    return date.toLocaleTimeString('en-US', { 
-      hour: 'numeric', 
-      minute: '2-digit',
-      hour12: true 
-    });
-  }
-  
-  if (format === 'short') {
-    return date.toLocaleDateString('en-US', {
-      month: 'short',
-      day: 'numeric'
-    });
-  }
-  
-  return date.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-  });
+export type BankingAccount = {
+  id: string;
+  userId: string;
+  type: string;
+  name: string;
+  accountNumber: string;
+  routingNumber: string;
+  balance: number;
+  availableBalance?: number;
+  pendingTransactions?: number;
+  interestRate: number;
+  openDate: string;
+  maturityDate?: string;
 };
 
+export type BankingCreditCard = {
+  id: string;
+  userId: string;
+  type: string;
+  name: string;
+  cardNumber: string;
+  expiry: string;
+  cvv: string;
+  creditLimit: number;
+  currentBalance: number;
+  availableCredit: number;
+  dueDate: string;
+  minimumPayment: number;
+  rewardsBalance: number;
+  rewardsType: string;
+  rewardsRate: string;
+  applyDate: string;
+  color: string;
+};
+
+export type BankingLoan = {
+  id: string;
+  userId: string;
+  type: string;
+  name: string;
+  loanNumber: string;
+  originalAmount: number;
+  currentBalance: number;
+  interestRate: number;
+  monthlyPayment: number;
+  originationDate: string;
+  term: number;
+  nextPaymentDate: string;
+  paymentsMade: number;
+  paymentsRemaining: number;
+  availableCredit?: number;
+  propertyAddress?: string;
+  vehicle?: string;
+  vin?: string;
+};
+
+export type BankingTransaction = {
+  id: string;
+  userId: string;
+  accountId: string;
+  date: string;
+  merchant: string;
+  category: string;
+  icon: string;
+  amount: number;
+  isIncoming: boolean;
+  status: string;
+  location?: string;
+  message?: string;
+  timestamp: string;
+};
+
+export type BankingDataType = {
+  users: BankingUser[];
+  accounts: BankingAccount[];
+  creditCards: BankingCreditCard[];
+  loans: BankingLoan[];
+  transactions: {
+    [userId: string]: {
+      [accountId: string]: BankingTransaction[];
+    };
+  };
+  groupedTransactions: {
+    [userId: string]: TransactionDateGroup[];
+  };
+};
+
+
+
+
+==== File: lib\utils\appInit.ts ====
+// lib/utils/appInit.ts
+// Import this file in your _app.tsx to initialize app-wide features
+
+import { useEffect } from 'react';
+
 /**
- * Group transactions by date
+ * Initialize application-wide features
+ * Place in _app.tsx component
  */
-export const groupTransactionsByDate = (transactions: any[]): { [key: string]: any[] } => {
-  const grouped = transactions.reduce((acc, transaction) => {
-    const date = transaction.date;
-    if (!acc[date]) {
-      acc[date] = [];
+export const useAppInitialization = () => {
+  useEffect(() => {
+    // Only run on client-side
+    if (typeof window !== 'undefined') {
+      console.log('?? Initializing app features...');
+      
+      // Initialize banking data if not already loaded
+      if (!localStorage.getItem('members1stBankingData')) {
+        console.log('?? Initializing banking data...');
+        // Will be handled by the BankingDataProvider
+      }
+      
+      // Initialize PWA features if in standalone mode
+      if (window.matchMedia('(display-mode: standalone)').matches || 
+          (window.navigator as any).standalone) {
+        console.log('?? Running in PWA mode');
+        // Additional PWA-specific initializations
+      }
+      
+      console.log('? App initialization complete!');
     }
-    acc[date].push(transaction);
-    return acc;
-  }, {});
+  }, []);
   
-  return grouped;
+  // No return value needed for this hook
+  return null;
 };
+
+export default useAppInitialization;
 
 
 
@@ -3380,6 +5007,43 @@ export const setupIOSFullscreen = () => {
     setTimeout(goFullScreen, 100);
     setTimeout(goFullScreen, 500); // iOS sometimes needs a longer delay
   };
+
+
+
+==== File: pages\_app.tsx ====
+// pages/_app.tsx
+import React, { useState, useEffect } from 'react';
+import type { AppProps } from 'next/app';
+import { BankingDataProvider } from '@/components/preloaders/BankingDataPreloader';
+import CompleteBankingPreloader from '@/components/preloaders/CompleteBankingPreloader';
+import { useAppInitialization } from '@/lib/utils/appInit';
+
+export default function App({ Component, pageProps }: AppProps) {
+  const [isPreloaded, setIsPreloaded] = useState(false);
+  
+  // Initialize app features
+  useAppInitialization();
+  
+  // Skip preloading in development mode for faster refreshes
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'development') {
+      setIsPreloaded(true);
+    }
+  }, []);
+
+  return (
+    <BankingDataProvider>
+      {process.env.NODE_ENV === 'development' || isPreloaded ? (
+        <Component {...pageProps} />
+      ) : (
+        <CompleteBankingPreloader onComplete={() => setIsPreloaded(true)}>
+          <Component {...pageProps} />
+        </CompleteBankingPreloader>
+      )}
+    </BankingDataProvider>
+  );
+}
+
 
 
 
@@ -3422,6 +5086,360 @@ export default function Document() {
     </Html>
   );
 }
+
+
+
+==== File: public\sw-register.js ====
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', async function() {
+    try {
+      const registration = await navigator.serviceWorker.register('/sw.js');
+      console.log('? Service Worker registered:', registration.scope);
+      
+      // Ensure the service worker is controlling the page
+      if (!navigator.serviceWorker.controller) {
+        console.log('Loading fresh service worker controller...');
+      }
+    } catch (err) {
+      console.error('? Service Worker registration failed:', err);
+    }
+  });
+}
+
+
+
+
+==== File: public\sw.js ====
+const CACHE_NAME = 'banking-app-cache-v2';
+const urlsToCache = [
+  '/',
+  '/insights',
+  '/wallet',
+  '/more',
+  '/new',
+  '/deposit',
+  '/transfer',
+  '/images/avatar/jess-coleman.png',
+  '/images/refer/refer-friend.png',
+  '/manifest.json',
+  '/icons/icon-192x192.png',
+  '/icons/icon-512x512.png',
+  '/icons/apple-icon-180.png'
+];
+
+// Install the service worker
+self.addEventListener('install', (event) => {
+  console.log('Service Worker installing...');
+  
+  // Skip waiting forces the waiting service worker to become the active service worker
+  self.skipWaiting();
+  
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => {
+      console.log('Service Worker caching app shell');
+      return cache.addAll(urlsToCache);
+    })
+  );
+});
+
+// Activate the service worker
+self.addEventListener('activate', (event) => {
+  console.log('Service Worker activating...');
+  
+  // Claim control immediately
+  self.clients.claim();
+  
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (cacheName !== CACHE_NAME) {
+            console.log('Service Worker: clearing old cache', cacheName);
+            return caches.delete(cacheName);
+          }
+        })
+      );
+    })
+  );
+});
+
+// Intercept fetch requests
+self.addEventListener('fetch', (event) => {
+  // Skip non-GET requests
+  if (event.request.method !== 'GET') return;
+  
+  // Handle API calls differently
+  if (event.request.url.includes('/api/')) {
+    event.respondWith(networkFirst(event.request));
+  } else {
+    event.respondWith(cacheFirst(event.request));
+  }
+});
+
+// Cache-first strategy for static assets
+async function cacheFirst(request) {
+  const cachedResponse = await caches.match(request);
+  if (cachedResponse) {
+    return cachedResponse;
+  }
+  
+  try {
+    const networkResponse = await fetch(request);
+    
+    // Cache valid responses
+    if (networkResponse && networkResponse.status === 200 && networkResponse.type === 'basic') {
+      const cache = await caches.open(CACHE_NAME);
+      cache.put(request, networkResponse.clone());
+    }
+    
+    return networkResponse;
+  } catch (error) {
+    console.error('Fetch failed:', error);
+    // If fetch fails, we have nothing in cache, return fallback
+    return new Response('Network error', { status: 408, headers: { 'Content-Type': 'text/plain' } });
+  }
+}
+
+// Network-first strategy for API calls
+async function networkFirst(request) {
+  try {
+    const networkResponse = await fetch(request);
+    
+    // Cache valid responses
+    if (networkResponse && networkResponse.status === 200) {
+      const cache = await caches.open(CACHE_NAME);
+      cache.put(request, networkResponse.clone());
+    }
+    
+    return networkResponse;
+  } catch (error) {
+    const cachedResponse = await caches.match(request);
+    if (cachedResponse) {
+      return cachedResponse;
+    }
+    
+    // If fetch fails and we have nothing in cache, return fallback
+    return new Response('Network error', { status: 408, headers: { 'Content-Type': 'text/plain' } });
+  }
+}
+
+// Handle push notifications (if needed in the future)
+self.addEventListener('push', (event) => {
+  if (!event.data) return;
+  
+  const data = event.data.json();
+  const options = {
+    body: data.body,
+    icon: '/icons/icon-192x192.png',
+    badge: '/icons/apple-icon-180.png',
+    vibrate: [100, 50, 100],
+    data: {
+      url: data.url || '/'
+    }
+  };
+  
+  event.waitUntil(
+    self.registration.showNotification(data.title, options)
+  );
+});
+
+// Handle notification clicks
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  
+  event.waitUntil(
+    clients.matchAll({ type: 'window' }).then((clientList) => {
+      const url = event.notification.data.url;
+      
+      // Check if there's already a window/tab open with the target URL
+      for (const client of clientList) {
+        if (client.url === url && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      
+      // If not, open a new window/tab
+      if (clients.openWindow) {
+        return clients.openWindow(url);
+      }
+    })
+  );
+});
+
+
+
+==== File: public\test-nav.html ====
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Navigation Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: white;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        header {
+            background-color: #1e1e1e;
+            padding: 1rem;
+            text-align: center;
+        }
+        main {
+            flex: 1;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .test-container {
+            max-width: 600px;
+            width: 100%;
+            background-color: #2a2a2a;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        h1 {
+            margin-top: 0;
+        }
+        button {
+            background-color: #0070f3;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 0.5rem;
+        }
+        button:hover {
+            background-color: #0051a8;
+        }
+        .cache-info {
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: #333;
+            border-radius: 8px;
+        }
+        .timestamp {
+            font-size: 0.8rem;
+            color: #aaa;
+            margin-top: 1rem;
+        }
+        .nav-frame {
+            width: 100%;
+            max-width: 500px;
+            height: 400px;
+            border: 2px solid #444;
+            border-radius: 8px;
+            margin-top: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Navigation Test Page</h1>
+    </header>
+    <main>
+        <div class="test-container">
+            <h2>Test Bottom Navigation</h2>
+            <p>This page helps you test the bottom navigation component in isolation and verify that caching is working correctly.</p>
+            
+            <div>
+                <button id="clearCacheBtn">Clear Cache</button>
+                <button id="reloadBtn">Reload Page</button>
+                <button id="addTimestampBtn">Add Timestamp to URL</button>
+            </div>
+            
+            <div class="cache-info">
+                <h3>Cache Status</h3>
+                <p>Page loaded at: <span id="loadTime"></span></p>
+                <p>Cache-Control header: <span id="cacheControl">Checking...</span></p>
+                <p>Service Worker: <span id="serviceWorker">Checking...</span></p>
+                <div class="timestamp">
+                    URL parameter timestamp: <span id="urlTimestamp">None</span>
+                </div>
+            </div>
+        </div>
+        
+        <h3>Navigation Component Preview</h3>
+        <p>View the app in the frame below to test the navigation:</p>
+        <iframe src="/" class="nav-frame" id="navFrame"></iframe>
+    </main>
+
+    <script>
+        // Set load time
+        document.getElementById('loadTime').textContent = new Date().toLocaleTimeString();
+        
+        // Check URL for timestamp
+        const urlParams = new URLSearchParams(window.location.search);
+        const timestamp = urlParams.get('t');
+        document.getElementById('urlTimestamp').textContent = timestamp || 'None';
+        
+        // Button handlers
+        document.getElementById('clearCacheBtn').addEventListener('click', () => {
+            if ('caches' in window) {
+                caches.keys().then(cacheNames => {
+                    cacheNames.forEach(cacheName => {
+                        caches.delete(cacheName);
+                    });
+                    alert('Browser caches cleared!');
+                });
+            } else {
+                alert('Cache API not supported in this browser');
+            }
+        });
+        
+        document.getElementById('reloadBtn').addEventListener('click', () => {
+            window.location.reload(true);
+        });
+        
+        document.getElementById('addTimestampBtn').addEventListener('click', () => {
+            const newUrl = new URL(window.location.href);
+            newUrl.searchParams.set('t', Date.now());
+            window.location.href = newUrl.toString();
+        });
+        
+        // Check cache control header
+        fetch(window.location.href, { method: 'HEAD' })
+            .then(response => {
+                const cacheControl = response.headers.get('cache-control');
+                document.getElementById('cacheControl').textContent = cacheControl || 'Not set';
+            })
+            .catch(err => {
+                document.getElementById('cacheControl').textContent = 'Error checking: ' + err.message;
+            });
+            
+        // Check service worker
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.getRegistrations()
+                .then(registrations => {
+                    if (registrations.length > 0) {
+                        document.getElementById('serviceWorker').textContent = 'Active (' + registrations.length + ' registered)';
+                    } else {
+                        document.getElementById('serviceWorker').textContent = 'No active service workers';
+                    }
+                })
+                .catch(err => {
+                    document.getElementById('serviceWorker').textContent = 'Error checking: ' + err.message;
+                });
+        } else {
+            document.getElementById('serviceWorker').textContent = 'Not supported in this browser';
+        }
+        
+        // Reload iframe with timestamp to prevent caching
+        document.getElementById('navFrame').src = '/?iframe_t=' + Date.now();
+    </script>
+</body>
+</html>
+
 
 
 

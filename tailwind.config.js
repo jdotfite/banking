@@ -15,9 +15,10 @@ module.exports = {
           red: '#E53E3E', // Slightly adjusted red
           redLight: '#F56565', // For gradient
           redDark: '#C53030', // For gradient
+          dark: '#212121', // Custom card background color
         },
         app: {
-        customGray: '#1A1A1A', // Exact gray from example
+          customGray: '#1A1A1A', // Exact gray from example
           black: '#121212', // Pure black for background
           darkGray: '#151515', // For transaction container
           mediumGray: '#2D3748', // For inactive icons
@@ -32,8 +33,3 @@ module.exports = {
   },
   plugins: [],
 };
-
-
-
-
-

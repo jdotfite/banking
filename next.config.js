@@ -11,6 +11,28 @@ const withPWA = require('next-pwa')({
 const nextConfig = {
   reactStrictMode: true,
   swcMinify: true,
+  
+  // Optimize compilation
+  compiler: {
+    // Enables the styled-components SWC transform
+    styledComponents: true,
+    // Remove console.log in production
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  
+  // Optimize images
+  images: {
+    domains: [],
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 60,
+  },
+  
+  // Optimize builds
+  experimental: {
+    optimizeCss: true, // Enable CSS optimization
+    optimizePackageImports: ['lucide-react'],
+  },
+  
   async redirects() {
     return [
       {
@@ -20,6 +42,7 @@ const nextConfig = {
       },
     ];
   },
+  
   async headers() {
     return [
       {
@@ -27,7 +50,9 @@ const nextConfig = {
         headers: [
           {
             key: 'Cache-Control',
-            value: 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400',
+            value: process.env.NODE_ENV === 'development' 
+              ? 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0' 
+              : 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400',
           },
           {
             key: 'X-Content-Type-Options',
@@ -45,6 +70,7 @@ const nextConfig = {
       },
     ];
   },
+  
   webpack: (config, { isServer }) => {
     if (!isServer) {
       config.resolve.fallback = {
@@ -52,6 +78,20 @@ const nextConfig = {
         path: false,
       };
     }
+    
+    // Add optimization for CSS modules
+    if (!isServer) {
+      config.optimization.splitChunks.cacheGroups = {
+        ...config.optimization.splitChunks.cacheGroups,
+        styles: {
+          name: 'styles',
+          test: /\.(css|scss)$/,
+          chunks: 'all',
+          enforce: true,
+        },
+      };
+    }
+    
     return config;
   },
 };

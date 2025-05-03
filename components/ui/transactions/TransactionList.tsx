@@ -1,9 +1,10 @@
 // components/ui/transactions/TransactionList.tsx
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { animated, useTransition } from 'react-spring';
 import TransactionItem from './TransactionItem';
 import { TransactionDateGroup } from '@/lib/types';
 import { getTransactionsByPeriod } from '@/lib/data/transactions';
+import { useBankingData } from '@/components/preloaders/BankingDataPreloader';
 
 interface TransactionListProps {
   transactionGroups: TransactionDateGroup[];
@@ -15,89 +16,74 @@ const TransactionList: React.FC<TransactionListProps> = ({
   selectedPeriod
 }) => {
   const [transactionGroups, setTransactionGroups] = useState<TransactionDateGroup[]>(initialGroups);
+  const { data } = useBankingData();
 
   // Update transactions when period changes
   useEffect(() => {
-    const updatedTransactions = getTransactionsByPeriod(selectedPeriod);
-    setTransactionGroups(updatedTransactions);
-  }, [selectedPeriod]);
-
-  // Define smoother animations
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1,
-      transition: { 
-        staggerChildren: 0.1,
-        delayChildren: 0.05
-      }
-    },
-    exit: { 
-      opacity: 0,
-      transition: { 
-        duration: 0.2
-      }
+    // If banking data is available, try to use it first
+    if (data && (data as any).groupedTransactions && (data as any).groupedTransactions.user1) {
+      setTransactionGroups((data as any).groupedTransactions.user1);
+    } else {
+      // Fall back to predefined transactions
+      const updatedTransactions = getTransactionsByPeriod(selectedPeriod);
+      setTransactionGroups(updatedTransactions);
     }
-  };
+  }, [selectedPeriod, data]);
 
-  const groupVariants = {
-    hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1,
-      transition: { duration: 0.3 }
-    },
-    exit: { 
-      opacity: 0,
-      transition: { duration: 0.2 }
+  // React Spring transitions for period changes
+  const transitions = useTransition(
+    // Use the selected period as the item we're transitioning
+    { period: selectedPeriod, groups: transactionGroups },
+    {
+      from: { opacity: 0, transform: 'translate3d(0,-20px,0)' },
+      enter: { opacity: 1, transform: 'translate3d(0,0px,0)' },
+      leave: { opacity: 0, transform: 'translate3d(0,-20px,0)' },
+      // Using a unique key based on the period to prevent old content from mixing with new
+      keys: item => item.period,
+      config: { mass: 1, tension: 280, friction: 25 }
     }
-  };
+  );
 
-  const itemVariants = {
-    hidden: { opacity: 0, x: -5 },
-    visible: { 
-      opacity: 1, 
-      x: 0,
-      transition: { duration: 0.2 }
+  // Transitions for individual groups
+  const groupTransitions = useTransition(
+    transactionGroups,
+    {
+      from: { opacity: 0, transform: 'translate3d(0,20px,0)' },
+      enter: { opacity: 1, transform: 'translate3d(0,0px,0)' },
+      leave: { opacity: 0, transform: 'translate3d(0,20px,0)' },
+      trail: 100, // Stagger the animations
+      keys: group => group.date,
+      config: { mass: 1, tension: 280, friction: 25 }
     }
-  };
+  );
 
   return (
     <div className="pb-32">
-      {/* Use a key based on the period to force a clean transition */}
-      <AnimatePresence mode="sync">
-        <motion.div
-          key={selectedPeriod}
-          initial="hidden"
-          animate="visible"
-          exit="exit"
-          variants={containerVariants}
-        >
-          {transactionGroups.map((group, groupIndex) => (
-            <motion.div 
-              key={group.date}
-              variants={groupVariants}
+      {/* Use the main transition for the entire list */}
+      {transitions((style, item) => (
+        <animated.div style={style}>
+          {/* Then animate each group separately */}
+          {groupTransitions((groupStyle, group) => (
+            <animated.div 
+              style={groupStyle}
               className="mb-4"
             >
-              <div className="sticky top-0 bg-[#1a1a1a] px-6 py-3 text-gray-400 text-xs uppercase font-semibold z-10 border-t border-gray-800">
+              <div className="sticky top-0 bg-[#1a1a1a] px-6 py-2 text-neutral-400 text-xs uppercase font-semibold z-10 ">
                 {group.date}
               </div>
               <div>
                 {group.transactions.map((transaction, transactionIndex) => (
-                  <motion.div
+                  <TransactionItem 
                     key={transaction.id}
-                    variants={itemVariants}
-                  >
-                    <TransactionItem 
-                      transaction={transaction} 
-                      isLastInGroup={transactionIndex === group.transactions.length - 1}
-                    />
-                  </motion.div>
+                    transaction={transaction} 
+                    isLastInGroup={transactionIndex === group.transactions.length - 1}
+                  />
                 ))}
               </div>
-            </motion.div>
+            </animated.div>
           ))}
-        </motion.div>
-      </AnimatePresence>
+        </animated.div>
+      ))}
     </div>
   );
 };

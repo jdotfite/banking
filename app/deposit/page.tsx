@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import BottomNav from '@/components/ui/navigation/BottomNav';
 
 export default function DepositPage() {
   return (
@@ -9,7 +8,6 @@ export default function DepositPage() {
       <div className="flex items-center justify-center h-screen bg-black text-white">
         <h1 className="text-2xl font-bold">Mobile Deposit</h1>
       </div>
-      <BottomNav />
     </main>
   );
 }

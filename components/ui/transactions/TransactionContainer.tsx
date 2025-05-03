@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { useSpring, animated } from 'react-spring';
+import { animated, useSpring } from 'react-spring';
 import { useDrag } from '@use-gesture/react';
 import TransactionList from './TransactionList';
 import { TransactionDateGroup } from '@/lib/types';
@@ -41,7 +41,6 @@ const TransactionContainer: React.FC<TransactionContainerProps> = ({
   
   // Synchronize with parent's collapsed state
   useEffect(() => {
-    console.log("isCollapsed prop changed:", isCollapsed);
     if (isCollapsed) {
       setViewMode('collapsed');
     } else {
@@ -101,7 +100,6 @@ const TransactionContainer: React.FC<TransactionContainerProps> = ({
       
       // Notify parent about collapse state changes
       if (onCollapseChange && (viewMode === 'collapsed') !== isCollapsed) {
-        console.log("Notifying parent of collapse change:", viewMode === 'collapsed');
         onCollapseChange(viewMode === 'collapsed');
       }
     }
@@ -219,7 +217,6 @@ const TransactionContainer: React.FC<TransactionContainerProps> = ({
         
         // Notify parent if needed
         if (onCollapseChange && (targetMode === 'collapsed') !== isCollapsed) {
-          console.log("Drag ended - notifying parent:", targetMode === 'collapsed');
           onCollapseChange(targetMode === 'collapsed');
         }
       } else {
@@ -242,7 +239,7 @@ const TransactionContainer: React.FC<TransactionContainerProps> = ({
     <animated.div
       ref={containerRef}
       className={`
-        fixed left-0 right-0 z-20 overflow-hidden
+        fixed left-0 right-0 overflow-hidden
         md:left-1/2 md:transform md:-translate-x-1/2 md:max-w-md
         ${viewMode === 'fullscreen' ? 'bg-app-black rounded-none' : 'bg-[#212121] rounded-t-3xl shadow-lg'}`
       }
@@ -251,19 +248,19 @@ const TransactionContainer: React.FC<TransactionContainerProps> = ({
         bottom: navbarHeight, // Position above bottom navigation
         top: 'auto', // Never attach to top
         maxHeight: viewMode === 'fullscreen' ? `calc(100vh - ${navbarHeight}px)` : 'none',
-        zIndex: 50, // Lower z-index to ensure it's below bottom navigation
+        zIndex: 50, // Ensure proper z-index
       }}
     >
       {/* Drag handle */}
       <div 
-        className="drag-handle-container"
+        className="drag-handle-container mt-1" 
         {...bind()}
       >
         <div className="drag-handle" />
       </div>
       
       {/* Header with title and controls */}
-      <div className="flex justify-between items-center px-6 py-2">
+      <div className="flex justify-between items-center px-6 pt-2 py-2">
         <h2 className="text-white text-xl font-medium">
           Transactions
         </h2>
@@ -275,7 +272,6 @@ const TransactionContainer: React.FC<TransactionContainerProps> = ({
               // Direct collapse
               setViewMode('collapsed');
               if (onCollapseChange) {
-                console.log("Collapse button clicked");
                 onCollapseChange(true);
               }
             }}
@@ -296,7 +292,7 @@ const TransactionContainer: React.FC<TransactionContainerProps> = ({
       
       {/* Chart section - Spending Chart First */}
       {viewMode === 'fullscreen' && (
-        <div className="px-6 mt-4 mb-4">
+        <div className="px-6 mt-2 mb-4">
           <SpendingChart 
             selectedPeriod={selectedPeriod} 
             periodOptions={periodOptions}

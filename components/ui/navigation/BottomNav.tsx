@@ -1,7 +1,10 @@
 // components/ui/navigation/BottomNav.tsx
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { animated, useSpring } from 'react-spring';
 import Icon from '../icons/Icon';
 import { NavItemType } from '@/lib/types';
 
@@ -16,12 +19,25 @@ const BottomNav: React.FC = () => {
     { name: 'Transfer', icon: 'transfer', href: '/transfer' },
     { name: 'More', icon: 'more', href: '/more' },
   ];
+  
+  // Create a spring animation for the navbar
+  const navbarSpring = useSpring({
+    from: { y: 20 },
+    to: { y: 0 },
+    config: { tension: 280, friction: 25 },
+    delay: 300,
+  });
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-[#212121] py-3 px-4 flex justify-between items-center z-100
-      md:left-1/2 md:transform md:-translate-x-1/2 md:max-w-md
-      lg:max-w-md xl:max-w-md"
-      style={{ zIndex: 100 }} // Higher z-index to ensure it's above the transaction panel
+    <animated.div 
+      style={{
+        opacity: 1, // Always visible
+        transform: `translateY(${navbarSpring.y}px)`,
+        zIndex: 100
+      }}
+      className="fixed bottom-0 left-0 right-0 bg-[#212121] py-3 px-4 flex justify-between items-center
+        md:left-1/2 md:transform md:-translate-x-1/2 md:max-w-sm
+        lg:max-w-md xl:max-w-md"
     >
       {items.map((item) => {
         const isActive = pathname === item.href;
@@ -50,7 +66,7 @@ const BottomNav: React.FC = () => {
           </Link>
         );
       })}
-    </div>
+    </animated.div>
   );
 };
 

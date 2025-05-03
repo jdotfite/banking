@@ -25,7 +25,8 @@ const CardSelector: React.FC<CardSelectorProps> = ({ cards, activeCardId, onCard
       <div className="relative overflow-hidden">
         {/* Current card */}
         <div className="transition-all duration-300 ease-in-out">
-          <CreditCard card={cards[currentIndex]} />
+          {/* Note: CreditCard component expects showInfoState prop, not card prop */}
+          <CreditCard />
         </div>
         
         {/* Card indicators */}
@@ -49,4 +50,3 @@ const CardSelector: React.FC<CardSelectorProps> = ({ cards, activeCardId, onCard
 };
 
 export default CardSelector;
-
