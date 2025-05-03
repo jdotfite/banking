@@ -8,9 +8,15 @@ interface CreatePasswordScreenProps {
   };
   onChange: (field: string, value: string) => void;
   onNext: () => void;
+  isSubmitting?: boolean; // Added isSubmitting prop
 }
 
-const CreatePasswordScreen: React.FC<CreatePasswordScreenProps> = ({ formData, onChange, onNext }) => {
+const CreatePasswordScreen: React.FC<CreatePasswordScreenProps> = ({ 
+  formData, 
+  onChange, 
+  onNext,
+  isSubmitting = false // Added with default value
+}) => {
   const [error, setError] = useState('');
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
@@ -108,11 +114,13 @@ const CreatePasswordScreen: React.FC<CreatePasswordScreenProps> = ({ formData, o
               value={formData.password}
               onChange={(e) => onChange('password', e.target.value)}
               className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700"
+              disabled={isSubmitting}
             />
             <button
               type="button"
               onClick={togglePasswordVisibility}
               className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              disabled={isSubmitting}
             >
               {showPassword ? 'Hide' : 'Show'}
             </button>
@@ -139,12 +147,15 @@ const CreatePasswordScreen: React.FC<CreatePasswordScreenProps> = ({ formData, o
           </p>
         </div>
 
-        {/* Next button */}
+        {/* Next button with loading state */}
         <button
           type="submit"
-          className="w-full p-4 bg-transparent border-2 border-black text-black uppercase font-medium rounded-lg mt-6 hover:bg-gray-50 transition-colors"
+          disabled={isSubmitting}
+          className={`w-full p-4 bg-transparent border-2 border-black text-black uppercase font-medium rounded-lg mt-6 ${
+            isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:bg-gray-50'
+          } transition-colors`}
         >
-          NEXT
+          {isSubmitting ? 'CREATING ACCOUNT...' : 'NEXT'}
         </button>
       </form>
     </div>
