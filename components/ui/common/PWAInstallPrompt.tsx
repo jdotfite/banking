@@ -14,6 +14,9 @@ const PWAInstallPrompt: React.FC = () => {
   const [isIOS, setIsIOS] = useState(false);
   
   useEffect(() => {
+    // Clear any existing PWA prompt flags to ensure the prompt shows
+    localStorage.removeItem('pwaPromptSeen');
+    
     const iosCheck = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
     setIsIOS(iosCheck);
     
@@ -33,38 +36,43 @@ const PWAInstallPrompt: React.FC = () => {
     const handler = (e: Event) => {
       // Prevent the default browser install prompt
       e.preventDefault();
-      console.log('beforeinstallprompt event fired');
+      console.log('beforeinstallprompt event captured successfully');
       
       // Store the event for later use
       deferredPrompt = e as BeforeInstallPromptEvent;
       setInstallPrompt(deferredPrompt);
       
-      // Show the install prompt if user hasn't seen it
-      const hasSeenPrompt = localStorage.getItem('pwaPromptSeen');
-      if (!hasSeenPrompt) setShowPrompt(true);
+      // Always show the install prompt when the event is fired
+      setShowPrompt(true);
     };
 
     // Add event listeners
     window.addEventListener('beforeinstallprompt', handler);
     
     window.addEventListener('appinstalled', () => {
-      console.log('PWA was installed');
+      console.log('PWA was installed successfully');
       setShowPrompt(false);
-      localStorage.setItem('pwaPromptSeen', 'true');
     });
     
-    // Show the prompt if user hasn't seen it and not in standalone mode
-    const hasSeenPrompt = localStorage.getItem('pwaPromptSeen');
-    if (!hasSeenPrompt && !isStandalone) {
-      // For debugging - check if we're eligible for installation
-      if ('getInstalledRelatedApps' in navigator) {
-        console.log('getInstalledRelatedApps is available');
-      }
-      
-      // Show the prompt anyway for iOS
-      if (iosCheck) {
-        setShowPrompt(true);
-      }
+    // For iOS devices, always show the install instructions
+    if (iosCheck && !isStandalone) {
+      console.log('iOS device detected, showing install instructions');
+      setShowPrompt(true);
+    }
+    
+    // Debug logging for PWA eligibility
+    console.log('PWA install prompt component initialized');
+    console.log('Is standalone mode:', isStandalone);
+    console.log('Is iOS device:', iosCheck);
+    
+    if ('getInstalledRelatedApps' in navigator) {
+      console.log('getInstalledRelatedApps is available');
+      // @ts-ignore - TypeScript doesn't know about this API yet
+      navigator.getInstalledRelatedApps().then((apps: any[]) => {
+        console.log('Installed related apps:', apps);
+      }).catch((err: any) => {
+        console.error('Error checking installed apps:', err);
+      });
     }
 
     return () => {
@@ -73,7 +81,7 @@ const PWAInstallPrompt: React.FC = () => {
   }, []);
 
   const handleInstall = async () => {
-    console.log('Install button clicked, installPrompt:', !!installPrompt);
+    console.log('Install button clicked, installPrompt available:', !!installPrompt);
     
     if (installPrompt) {
       try {
@@ -90,9 +98,10 @@ const PWAInstallPrompt: React.FC = () => {
         if (choiceResult.outcome === 'accepted') {
           console.log('User accepted the install prompt');
           setShowPrompt(false);
-          localStorage.setItem('pwaPromptSeen', 'true');
         } else {
           console.log('User dismissed the install prompt');
+          // Don't permanently dismiss, allow the prompt to show again later
+          setTimeout(() => setShowPrompt(true), 24 * 60 * 60 * 1000); // Show again after 24 hours
         }
         
         // Clear the saved prompt since it can't be used twice
@@ -104,19 +113,19 @@ const PWAInstallPrompt: React.FC = () => {
       // For iOS, show instructions for adding to home screen
       alert('To install this app on your iPhone: tap the Share button, then "Add to Home Screen"');
       setShowPrompt(false);
-      localStorage.setItem('pwaPromptSeen', 'true');
     } else {
       console.log('No install prompt available');
-      // If no install prompt is available, just hide the banner
+      // If no install prompt is available, just hide the banner temporarily
       setShowPrompt(false);
-      localStorage.setItem('pwaPromptSeen', 'true');
+      // Try again after a short delay
+      setTimeout(() => setShowPrompt(true), 60 * 1000); // Show again after 1 minute
     }
   };
 
   const handleDismiss = () => {
     setShowPrompt(false);
-    localStorage.setItem('pwaPromptSeen', 'true');
-    setTimeout(() => localStorage.removeItem('pwaPromptSeen'), 7 * 24 * 60 * 60 * 1000);
+    // Don't permanently dismiss, allow the prompt to show again later
+    setTimeout(() => setShowPrompt(true), 3 * 24 * 60 * 60 * 1000); // Show again after 3 days
   };
 
   if (!showPrompt) return null;
@@ -144,6 +153,14 @@ const PWAInstallPrompt: React.FC = () => {
               className="bg-neutral-800 text-white px-3 py-1 rounded text-sm font-medium hover:bg-blue-700 transition-colors"
             >
               Install
+            </button>
+          )}
+          {isIOS && (
+            <button
+              onClick={handleInstall}
+              className="bg-neutral-800 text-white px-3 py-1 rounded text-sm font-medium hover:bg-blue-700 transition-colors flex items-center"
+            >
+              <Share size={16} className="mr-1" /> Add to Home
             </button>
           )}
           <button
