@@ -1,7 +1,7 @@
 // components/AppRoot.tsx
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { UserProvider, useUser } from '@/components/context/UserContext';
 import { EnhancedBankingDataProvider } from '@/components/preloaders/EnhancedBankingDataProvider';
 import { BankingDataProvider } from '@/components/preloaders/BankingDataPreloader';
@@ -13,7 +13,6 @@ import LoadingSpinner from '@/components/ui/common/LoadingSpinner';
 // Inner component that uses the context
 const AppContent: React.FC = () => {
   const { selectedUserId, isAdminMode, setSelectedUserId, resetUserSelection } = useUser();
-  const [isLoading, setIsLoading] = useState(true);
 
   // Reset to admin screen when app is closed
   useEffect(() => {
@@ -27,14 +26,6 @@ const AppContent: React.FC = () => {
     };
   }, [resetUserSelection]);
 
-  // Simulate initial loading
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, []);
-
   // Handle redirection to onboarding flow when selectedUserId is 'new'
   useEffect(() => {
     if (selectedUserId === 'new' && typeof window !== 'undefined') {
@@ -47,21 +38,6 @@ const AppContent: React.FC = () => {
   const handleSelectUser = (userId: string | null) => {
     setSelectedUserId(userId);
   };
-
-  if (isLoading) {
-    return (
-      <div className="flex flex-col items-center justify-center h-screen bg-white space-y-4">
-        <div className="animate-pulse">
-          <img 
-            src="/icons/logo.png" 
-            alt="App Logo"
-            className="w-32 h-32"
-          />
-        </div>
-        <LoadingSpinner size="large" color="text-gray-600" />
-      </div>
-    );
-  }
 
   // Show admin screen if in admin mode
   if (isAdminMode) {

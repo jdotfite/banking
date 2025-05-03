@@ -68,10 +68,17 @@ const AdminProfileSelector: React.FC<AdminProfileSelectorProps> = ({ onSelectUse
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen bg-app-black">
-        <div className="text-white text-center">
-          <div className="w-12 h-12 border-t-2 border-b-2 border-white rounded-full animate-spin mb-4 mx-auto"></div>
-          <p className="text-lg">Loading Admin Panel...</p>
+      <div className="flex items-center justify-center h-screen bg-[#1c1c1c]">
+        <div className="w-24 h-24">
+          <img 
+            src="/icons/icon-192x192.png" 
+            alt="Members 1st" 
+            className="w-full h-full object-contain animate-spin"
+            style={{
+              animationDuration: '2s',
+              animationTimingFunction: 'cubic-bezier(0.68, -0.55, 0.27, 1.55)'
+            }}
+          />
         </div>
       </div>
     );
