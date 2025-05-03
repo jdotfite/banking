@@ -26,6 +26,7 @@
     "react-spring": "^9.7.5",
     "react-spring-bottom-sheet": "^3.4.1",
     "recharts": "^2.15.3",
+    "swr": "^2.3.3",
     "workbox-window": "^7.0.0"
   },
   "devDependencies": {
