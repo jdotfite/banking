@@ -3,8 +3,11 @@ const withPWA = require('next-pwa')({
   dest: 'public',            // where sw.js and other assets go
   register: true,            // automatically register service worker
   skipWaiting: true,         // activate new service worker immediately
-  disable: process.env.NODE_ENV === 'development', // disable PWA in development
+  disable: false,            // enable PWA in all environments for testing
   buildExcludes: [/app-build-manifest.json$/], // Fix for precaching error
+  // Include specific routes in the service worker
+  scope: '/',
+  sw: '/sw.js',
 });
 
 /** @type {import('next').NextConfig} */

@@ -10,6 +10,13 @@
   "scope": "/",
   "start_url": "/",
   "categories": ["finance"],
+  "screenshots": [
+    {
+      "src": "/images/marketing/screenshot1.png",
+      "sizes": "1080x1920",
+      "type": "image/png"
+    }
+  ],
   "icons": [
     {
       "src": "/icons/icon-192x192.png",
@@ -22,6 +29,14 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "View Transactions",
+      "short_name": "Transactions",
+      "description": "View your recent transactions",
+      "url": "/wallet"
     }
   ]
 }

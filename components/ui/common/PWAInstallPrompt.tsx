@@ -27,21 +27,45 @@ const PWAInstallPrompt: React.FC = () => {
       return;
     }
     
+    // Store the event for later use
+    let deferredPrompt: BeforeInstallPromptEvent | null = null;
+    
     const handler = (e: Event) => {
+      // Prevent the default browser install prompt
       e.preventDefault();
-      setInstallPrompt(e as BeforeInstallPromptEvent);
+      console.log('beforeinstallprompt event fired');
+      
+      // Store the event for later use
+      deferredPrompt = e as BeforeInstallPromptEvent;
+      setInstallPrompt(deferredPrompt);
+      
+      // Show the install prompt if user hasn't seen it
       const hasSeenPrompt = localStorage.getItem('pwaPromptSeen');
       if (!hasSeenPrompt) setShowPrompt(true);
     };
 
+    // Add event listeners
     window.addEventListener('beforeinstallprompt', handler);
+    
     window.addEventListener('appinstalled', () => {
+      console.log('PWA was installed');
       setShowPrompt(false);
       localStorage.setItem('pwaPromptSeen', 'true');
     });
     
+    // Show the prompt if user hasn't seen it and not in standalone mode
     const hasSeenPrompt = localStorage.getItem('pwaPromptSeen');
-    if (!hasSeenPrompt && !isStandalone) setShowPrompt(true);
+    if (!hasSeenPrompt && !isStandalone) {
+      // For debugging - check if we're eligible for installation
+      if ('getInstalledRelatedApps' in navigator) {
+        console.log('getInstalledRelatedApps is available');
+      }
+      
+      // Show the prompt anyway for iOS
+      if (iosCheck) {
+        setShowPrompt(true);
+      }
+    }
 
     return () => {
       window.removeEventListener('beforeinstallprompt', handler);
@@ -49,18 +73,41 @@ const PWAInstallPrompt: React.FC = () => {
   }, []);
 
   const handleInstall = async () => {
+    console.log('Install button clicked, installPrompt:', !!installPrompt);
+    
     if (installPrompt) {
       try {
+        // Show the install prompt
+        console.log('Calling prompt() method...');
         await installPrompt.prompt();
+        
+        // Wait for the user to respond to the prompt
+        console.log('Waiting for user choice...');
         const choiceResult = await installPrompt.userChoice;
+        
+        console.log('User choice was:', choiceResult.outcome);
+        
         if (choiceResult.outcome === 'accepted') {
+          console.log('User accepted the install prompt');
           setShowPrompt(false);
           localStorage.setItem('pwaPromptSeen', 'true');
+        } else {
+          console.log('User dismissed the install prompt');
         }
+        
+        // Clear the saved prompt since it can't be used twice
+        setInstallPrompt(null);
       } catch (error) {
         console.error('Install error:', error);
       }
+    } else if (isIOS) {
+      // For iOS, show instructions for adding to home screen
+      alert('To install this app on your iPhone: tap the Share button, then "Add to Home Screen"');
+      setShowPrompt(false);
+      localStorage.setItem('pwaPromptSeen', 'true');
     } else {
+      console.log('No install prompt available');
+      // If no install prompt is available, just hide the banner
       setShowPrompt(false);
       localStorage.setItem('pwaPromptSeen', 'true');
     }
@@ -79,7 +126,7 @@ const PWAInstallPrompt: React.FC = () => {
       <div className="max-w-6xl mx-auto flex items-center justify-between">
         <div className="flex items-center">
           <img 
-            src="/images/icons/icon.png" 
+            src="/icons/icon-192x192.png" 
             alt="App Logo"
             className="w-8 h-8 mr-3"
           />
@@ -101,7 +148,7 @@ const PWAInstallPrompt: React.FC = () => {
           )}
           <button
             onClick={handleDismiss}
-            className="text-white hover:text-blue-100"
+            className="text-gray-800 hover:text-gray-600"
             aria-label="Close"
           >
             <X size={20} />

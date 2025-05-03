@@ -2,6 +2,7 @@
 import type { Metadata } from 'next';
 import { Outfit } from 'next/font/google';
 import './globals.css';
+import RegisterServiceWorker from '@/components/RegisterServiceWorker';
 
 const outfit = Outfit({
   subsets: ['latin'],
@@ -33,7 +34,9 @@ export default function RootLayout({
         <meta name="apple-mobile-web-app-title" content="Banking App" />
       </head>
       <body className={`${outfit.className} bg-gray-900 min-h-screen font-outfit`}>
+        <RegisterServiceWorker />
         {children}
+        {/* Keep the script for backward compatibility */}
         <script src="/sw-register.js" defer></script>
       </body>
     </html>
