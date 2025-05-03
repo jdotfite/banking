@@ -117,7 +117,7 @@ const AdminProfileSelector: React.FC<AdminProfileSelectorProps> = ({ onSelectUse
             <animated.div 
               key={user.id}
               style={cardSpring} 
-              className="bg-neutral-800 rounded-xl p-5 mb-4 cursor-pointer hover:bg-neutral-700 transition-colors"
+              className="bg-[#212121] rounded-xl p-5 mb-4 cursor-pointer hover:bg-neutral-700 transition-colors"
               onClick={() => handleSelectUser(user.id)}
             >
               <div className="flex items-center mb-3">
@@ -150,7 +150,7 @@ const AdminProfileSelector: React.FC<AdminProfileSelectorProps> = ({ onSelectUse
               </div>
               
               <div className="grid grid-cols-2 gap-3 text-sm">
-                <div className="bg-neutral-900 p-3 rounded-lg">
+                <div className="bg-neutral-700 p-3 rounded-lg">
                   <p className="text-gray-400 mb-1">Checking Balance</p>
                   <p className="text-white font-medium">${userAccount?.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
                 </div>

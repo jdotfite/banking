@@ -15,16 +15,25 @@ const slides = [
     subtitle: 'Start building credit, say goodbye to monthly fees, and enjoy personalized service from a credit union that cares.',
     bgColor: '#7c2984', // Purple
     textColor: 'white',
-    image: '/images/onboarding/girl-celebrate.png',
+    image: '/images/onboarding/shanice-m1st.png',
     imageAlt: 'Members 1st Banking App Screenshot'
   },
   {
+    id: 'mobile',
+    title: 'Banking in your pocket',
+    subtitle: 'Manage your money on the go with our easy-to-use mobile app and digital wallet integration.',
+    bgColor: '#039fd7', // Blue
+    textColor: 'white',
+    image: '/images/onboarding/mike-m1st.png',
+    imageAlt: 'Mobile Banking Illustration'
+  },
+  {
     id: 'card',
-    title: 'Get paid early',
-    subtitle: 'Celebrate payday up to 2 days early when you set up a qualifying direct deposit.',
+    title: 'Personal Concierge',
+    subtitle: ': Chat one-on-one with a local Member Concierge directly in the app, no chatbots—just real people who know you, your goals, and your community.',
     bgColor: '#5ea63a', // Green
     textColor: 'white',
-    image: '/images/onboarding/girl-celebrate.png',
+    image: '/images/onboarding/woman-m1st.png',
     imageAlt: 'Members 1st Credit Card'
   },
   {
@@ -33,7 +42,7 @@ const slides = [
     subtitle: 'No monthly fees, no minimum balances, and access to over 30,000 fee-free ATMs nationwide.',
     bgColor: '#f36919', // Orange
     textColor: 'white',
-    image: '/images/onboarding/girl-celebrate.png',
+    image: '/images/onboarding/guy-bye.png',
     imageAlt: 'No Fees Illustration'
   },
   {
@@ -42,7 +51,7 @@ const slides = [
     subtitle: 'Start building credit with our Signature Rewards card and track your FICO score for free.',
     bgColor: '#213d70', // Blue Dark
     textColor: 'white',
-    image: '/images/onboarding/girl-celebrate.png',
+    image: '/images/onboarding/credit-score.png',
     imageAlt: 'Credit Score Illustration'
   },
   {
@@ -51,17 +60,8 @@ const slides = [
     subtitle: 'Enjoy peace of mind with our advanced security features and 24/7 fraud monitoring.',
     bgColor: '#d90981', // Pink
     textColor: 'white',
-    image: '/images/onboarding/girl-celebrate.png',
+    image: '/images/onboarding/shield-security.png',
     imageAlt: 'Security Features Illustration'
-  },
-  {
-    id: 'mobile',
-    title: 'Banking in your pocket',
-    subtitle: 'Manage your money on the go with our easy-to-use mobile app and digital wallet integration.',
-    bgColor: '#039fd7', // Blue
-    textColor: 'white',
-    image: '/images/onboarding/girl-celebrate.png',
-    imageAlt: 'Mobile Banking Illustration'
   }
 ];
 

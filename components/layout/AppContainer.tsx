@@ -8,6 +8,7 @@ import { EnhancedBankingDataProvider } from '@/components/preloaders/EnhancedBan
 import { BankingDataProvider } from '@/components/preloaders/BankingDataPreloader';
 import ThemeContextProvider from '@/lib/context/ThemeContextProvider';
 import IOSFullScreenProvider from '@/lib/utils/IOSFullScreenProvider';
+import PWAInstallPrompt from '@/components/ui/common/PWAInstallPrompt';
 
 interface AppContainerProps {
   children: ReactNode;
@@ -26,6 +27,9 @@ const AppContainer: React.FC<AppContainerProps> = ({ children }) => {
           <BankingDataProvider>
             <EnhancedBankingDataProvider>
               <div className="min-h-screen bg-neutral-800 text-white relative pb-16">
+                {/* PWA Install Prompt */}
+                <PWAInstallPrompt />
+                
                 {/* Main content */}
                 <div className="mx-auto max-w-md">
                   <main className="relative">
