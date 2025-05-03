@@ -26,6 +26,13 @@ const AppContent: React.FC = () => {
     };
   }, [resetUserSelection]);
 
+  // Redirect new users to onboarding
+  useEffect(() => {
+    if (selectedUserId === 'new' && typeof window !== 'undefined') {
+      window.location.href = '/onboarding';
+    }
+  }, [selectedUserId]);
+
   // Handle user selection from admin screen
   const handleSelectUser = (userId: string | null) => {
     setSelectedUserId(userId);
@@ -40,11 +47,6 @@ const AppContent: React.FC = () => {
   if (selectedUserId) {
     // If it's a new user, show loading spinner while redirect happens
     if (selectedUserId === 'new') {
-      useEffect(() => {
-        if (typeof window !== 'undefined') {
-          window.location.href = '/onboarding';
-        }
-      }, []);
       return <LoadingSpinner size="large" fullScreen={true} />;
     }
     return <Home />;

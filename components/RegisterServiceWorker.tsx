@@ -7,6 +7,19 @@ export default function RegisterServiceWorker() {
     const registerSW = async () => {
       if ('serviceWorker' in navigator) {
         try {
+          // Clear any caches that might be causing issues
+          if ('caches' in window) {
+            try {
+              const cacheNames = await caches.keys();
+              await Promise.all(
+                cacheNames.map(cacheName => caches.delete(cacheName))
+              );
+              console.log('All caches cleared successfully');
+            } catch (error) {
+              console.error('Error clearing caches:', error);
+            }
+          }
+          
           // Unregister any existing service workers first to ensure clean registration
           const registrations = await navigator.serviceWorker.getRegistrations();
           for (const registration of registrations) {

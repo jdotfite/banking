@@ -1,13 +1,13 @@
 ﻿// next.config.js
 const withPWA = require('next-pwa')({
   dest: 'public',            // where sw.js and other assets go
-  register: true,            // automatically register service worker
+  register: false,           // disable automatic registration - we'll handle it manually
   skipWaiting: true,         // activate new service worker immediately
   disable: false,            // enable PWA in all environments for testing
   buildExcludes: [/app-build-manifest.json$/], // Fix for precaching error
   // Include specific routes in the service worker
   scope: '/',
-  sw: '/sw.js',
+  sw: 'sw.js',  // Remove leading slash to fix path issues
   // Ensure caching is set up correctly
   runtimeCaching: [
     {
@@ -184,6 +184,10 @@ const nextConfig = {
             value: process.env.NODE_ENV === 'development' 
               ? 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0' 
               : 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400',
+          },
+          {
+            key: 'Service-Worker-Allowed',
+            value: '/',
           },
           {
             key: 'X-Content-Type-Options',

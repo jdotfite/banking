@@ -12,6 +12,9 @@
     "build:clean": "rimraf .next && next build",
     "clear-cache:win": "powershell -ExecutionPolicy Bypass -File ./scripts/clear-cache-and-restart.ps1",
     "clear-cache:unix": "bash ./scripts/clear-cache-and-restart.sh",
+    "fix-sw:win": "powershell -ExecutionPolicy Bypass -File ./scripts/fix-sw-and-restart.ps1",
+    "fix-sw:unix": "bash ./scripts/fix-sw-and-restart.sh",
+    "fix-sw": "node ./scripts/fix-sw-and-restart.js",
     "test-nav": "next dev && echo 'Navigate to http://localhost:3000/test-nav.html to test navigation'"
   },
   "dependencies": {

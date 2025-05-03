@@ -38,10 +38,7 @@ export default function RootLayout({
         <RegisterServiceWorker />
         <PWAInstallPrompt />
         {children}
-        {/* Keep the script for backward compatibility */}
-        <script src="/sw-register.js" defer></script>
-        {/* Add service worker fix script */}
-        <script src="/fix-service-worker.js" defer></script>
+        {/* Remove duplicate service worker registration scripts */}
       </body>
     </html>
   );
