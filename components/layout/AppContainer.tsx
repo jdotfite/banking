@@ -30,6 +30,11 @@ const AppContainer: React.FC<AppContainerProps> = ({ children }) => {
                 {/* PWA Install Prompt */}
                 <PWAInstallPrompt />
                 
+                {/* Loading Spinner Container - fixed position above everything */}
+                <div className="fixed inset-0 z-[200] pointer-events-none">
+                  {/* Spinner will be rendered here when needed */}
+                </div>
+                
                 {/* Main content */}
                 <div className="mx-auto max-w-md">
                   <main className="relative">

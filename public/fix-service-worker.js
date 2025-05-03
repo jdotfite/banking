@@ -50,12 +50,7 @@ async function fixServiceWorker() {
   }
   
   console.log('✅ Service worker fix completed!');
-  console.log('🔄 Reloading page in 2 seconds...');
-  
-  // Reload the page after a short delay
-  setTimeout(() => {
-    window.location.reload(true);
-  }, 2000);
+  console.log('🔄 Please manually refresh the page to complete the update');
 }
 
 // Run the fix

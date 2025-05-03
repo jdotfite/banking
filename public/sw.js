@@ -69,11 +69,18 @@ if (!self.define) {
 }
 define(['./workbox-e43f5367'], (function (workbox) { 'use strict';
 
-  // Use more conservative update strategy
-  workbox.registerRoute("/", new workbox.StaleWhileRevalidate({
+  importScripts();
+  self.skipWaiting();
+  workbox.clientsClaim();
+  workbox.registerRoute("/", new workbox.NetworkFirst({
     "cacheName": "start-url",
     plugins: [{
-      cacheWillUpdate: async ({response}) => {
+      cacheWillUpdate: async ({
+        request,
+        response,
+        event,
+        state
+      }) => {
         if (response && response.type === 'opaqueredirect') {
           return new Response(response.body, {
             status: 200,
@@ -85,24 +92,8 @@ define(['./workbox-e43f5367'], (function (workbox) { 'use strict';
       }
     }]
   }), 'GET');
-
-  // Cache static assets with CacheFirst strategy
-  workbox.registerRoute(
-    /\.(?:js|css|png|jpg|jpeg|svg|gif|webp|woff2)$/,
-    new workbox.CacheFirst({
-      cacheName: "static-assets",
-      plugins: [
-        new workbox.ExpirationPlugin({
-          maxEntries: 100,
-          maxAgeSeconds: 30 * 24 * 60 * 60, // 30 Days
-        }),
-      ],
-    })
-  );
-
-  // Default to NetworkOnly for API calls and other dynamic content
   workbox.registerRoute(/.*/i, new workbox.NetworkOnly({
-    "cacheName": "dynamic-content",
+    "cacheName": "dev",
     plugins: []
   }), 'GET');
 
