@@ -40,34 +40,18 @@ const CompleteBankingPreloader = ({ children, onComplete }) => {
   
   // Loading screen component
   const LoadingScreen = () => (
-    <div className="fixed inset-0 bg-app-black flex flex-col items-center justify-center z-50">
-      <div className="w-24 h-24 mb-8">
+    <div className="fixed inset-0 bg-[#1c1c1c] flex flex-col items-center justify-center z-50">
+      <div className="w-24 h-24">
         <img 
           src={config.loadingScreen.logo} 
           alt="Members 1st" 
-          className="w-full h-full object-contain animate-pulse"
+          className="w-full h-full object-contain animate-spin"
+          style={{
+            animationDuration: '2s',
+            animationTimingFunction: 'cubic-bezier(0.68, -0.55, 0.27, 1.55)'
+          }}
         />
       </div>
-      
-      <h1 className="text-2xl font-medium text-white mb-8">
-        {config.loadingScreen.title}
-      </h1>
-      
-      {/* Progress bar */}
-      {config.loadingScreen.showProgressBar && (
-        <div className="w-64 h-2 bg-gray-800 rounded-full overflow-hidden mb-4">
-          <div 
-            className="h-full bg-red-600 rounded-full transition-all duration-300 ease-out"
-            style={{ width: `${totalProgress}%` }}
-          ></div>
-        </div>
-      )}
-      
-      {config.loadingScreen.showPercentage && (
-        <p className="text-gray-400 text-sm">
-          {totalProgress < 100 ? `Loading your account... ${totalProgress}%` : 'Almost ready...'}
-        </p>
-      )}
     </div>
   );
   

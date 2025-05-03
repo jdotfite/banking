@@ -29,9 +29,6 @@ export const preloaderConfig = {
   // Loading screen appearance
   loadingScreen: {
     logo: '/images/icons/logo.png',
-    title: 'Members 1st Banking',
-    showProgressBar: true,
-    showPercentage: true,
     minDisplayTime: 1000, // Minimum time to show loading screen in milliseconds
     transitionDuration: 500 // Transition duration in milliseconds
   }
