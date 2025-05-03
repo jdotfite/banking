@@ -43,7 +43,7 @@ const CompleteBankingPreloader = ({ children, onComplete }) => {
     <div className="fixed inset-0 bg-[#1c1c1c] flex flex-col items-center justify-center z-50">
       <div className="w-24 h-24">
         <img 
-          src="/icons/icon-192x192.png" 
+          src="/icons/icon-transparent.png" 
           alt="Members 1st" 
           className="w-full h-full object-contain animate-spin"
           style={{
