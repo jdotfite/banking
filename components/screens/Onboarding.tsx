@@ -208,7 +208,7 @@ const Onboarding: React.FC = () => {
 
   return (
     <div 
-      className="flex flex-col h-screen w-full overflow-hidden"
+      className="flex flex-col min-h-[100dvh] w-full overflow-hidden"
       style={{ 
         backgroundColor: slides[currentSlide].bgColor,
         color: slides[currentSlide].textColor,
@@ -246,7 +246,7 @@ const Onboarding: React.FC = () => {
       </div>
 
       {/* Dark gray bottom section - with text content moved here */}
-      <div className="w-full bg-neutral-900 text-white min-h-[400px] flex flex-col">
+      <div className="w-full bg-neutral-900 text-white flex flex-col" style={{ minHeight: '40%' }}>
         {/* Text content */}
         <div className="w-full px-6 pt-8 pb-4 text-center flex-1">
           <h1 className="text-3xl font-bold mb-4">{slides[currentSlide].title}</h1>
