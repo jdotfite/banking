@@ -1,21 +1,9 @@
-// components/preloaders/EnhancedBankingDataProvider.tsx
 'use client';
 
-// Disable TypeScript checking for this file
-// @ts-nocheck
-
-import React, { useState, useEffect, createContext, useContext, ReactNode } from 'react';
+import React, { useState, useEffect, createContext, useContext } from 'react';
+import type { ReactNode } from 'react';
 import { bankingData } from '@/lib/data/fakeBankingData';
 import { useUser } from '@/components/context/UserContext';
-
-// Define the context types
-type EnhancedBankingDataContextType = {
-  data: any;
-  userData: any;
-  isLoading: boolean;
-  error: Error | null;
-  refreshData: () => void;
-};
 
 // Create the context
 const EnhancedBankingDataContext = createContext<EnhancedBankingDataContextType | null>(null);
@@ -31,8 +19,15 @@ interface EnhancedBankingDataProviderProps {
  * Filters data based on selected user from UserContext
  */
 export const EnhancedBankingDataProvider: React.FC<EnhancedBankingDataProviderProps> = ({ children }) => {
-  const [data, setData] = useState<any>(null);
-  const [userData, setUserData] = useState<any>(null);
+  const [data, setData] = useState<BankingData | null>(null);
+  const [userData, setUserData] = useState<{
+    user: BankingUser | null;
+    accounts: BankAccount[];
+    creditCards: CreditCard[];
+    loans: Loan[];
+    transactions: Record<string, Transaction[]>;
+    groupedTransactions: GroupedTransaction[];
+  } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   

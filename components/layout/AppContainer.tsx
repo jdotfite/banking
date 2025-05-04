@@ -26,7 +26,7 @@ const AppContainer: React.FC<AppContainerProps> = ({ children }) => {
         <UserProvider>
           <BankingDataProvider>
             <EnhancedBankingDataProvider>
-              <div className="min-h-screen bg-neutral-800 text-white relative pb-16">
+              <div className="min-h-screen bg-[#1d1d1d] text-white relative">
                 {/* PWA Install Prompt */}
                 <PWAInstallPrompt />
                 

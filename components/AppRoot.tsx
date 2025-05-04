@@ -7,7 +7,7 @@ import { EnhancedBankingDataProvider } from '@/components/preloaders/EnhancedBan
 import { BankingDataProvider } from '@/components/preloaders/BankingDataPreloader';
 import AppContainer from '@/components/layout/AppContainer';
 import AdminProfileSelector from '@/components/screens/AdminProfileSelector';
-import Home from '@/components/screens/Home';
+import Home from '@/app/home/page';
 import LoadingSpinner from '@/components/ui/common/LoadingSpinner';
 
 // Inner component that uses the context

@@ -10,22 +10,22 @@ import AnimatedElement from '@/components/ui/common/AnimatedElement';
 // Define the onboarding slides content
 const slides = [
   {
-    id: 'banking',
-    title: 'Banking that puts you first',
-    subtitle: 'Start building credit, say goodbye to monthly fees, and enjoy personalized service from a credit union that cares.',
-    bgColor: '#7c2984', // Purple
-    textColor: 'white',
-    image: '/images/onboarding/shanice-m1st.png',
-    imageAlt: 'Members 1st Banking App Screenshot'
-  },
-  {
-    id: 'mobile',
-    title: 'Banking in your pocket',
-    subtitle: 'Manage your money on the go with our easy-to-use mobile app and digital wallet integration.',
+    id: 'award',
+    title: 'Award-Winning Service',
+    subtitle: 'Honored by Forbes and Newsweek for top-tier service and voted Harrisburg Magazine’s Simply the Best for 20 years—reflecting our member-first focus',
     bgColor: '#039fd7', // Blue
     textColor: 'white',
     image: '/images/onboarding/mike-m1st.png',
-    imageAlt: 'Mobile Banking Illustration'
+    imageAlt: 'M1st CEO Mike Wilson Holding Award'
+  },
+  {
+    id: 'milestones',
+    title: 'Celebrating Your Milestones',
+    subtitle: 'We’re here to cheer you on—from your very first account to life’s biggest achievements. Enjoy personalized guidance, milestone rewards, and a community that celebrates every step with you.',
+    bgColor: '#fec20f', // yellow
+    textColor: 'black',
+    image: '/images/onboarding/balloons.png',
+    imageAlt: 'Balloons with M1st Logo on them'
   },
   {
     id: 'card',
@@ -62,6 +62,15 @@ const slides = [
     textColor: 'white',
     image: '/images/onboarding/shield-security.png',
     imageAlt: 'Security Features Illustration'
+  },
+  {
+    id: 'banking',
+    title: 'Banking that puts you first',
+    subtitle: 'Start building credit, say goodbye to monthly fees, and enjoy personalized service from a credit union that cares.',
+    bgColor: '#7c2984', // Purple
+    textColor: 'white',
+    image: '/images/onboarding/shanice-m1st.png',
+    imageAlt: 'Members 1st Banking App Screenshot'
   }
 ];
 
