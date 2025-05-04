@@ -4,7 +4,7 @@ import { animated, useSpring } from 'react-spring';
 import Icon from '../icons/Icon';
 import { TransactionType } from '@/lib/types';
 
-interface TransactionItemProps {
+export interface TransactionItemProps {
   transaction: TransactionType;
   isLastInGroup?: boolean;
   index?: number;

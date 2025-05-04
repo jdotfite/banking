@@ -30,11 +30,11 @@ const DateOfBirthScreen: React.FC<DateOfBirthScreenProps> = ({ formData, onChang
       // If birthday hasn't occurred yet this year, subtract one year
       const adjustedAge = age - 1;
       if (adjustedAge < 18) {
-        setError('You must be 18 years or older to join Chime');
+        setError('You must be 18 years or older to join');
         return false;
       }
     } else if (age < 18) {
-      setError('You must be 18 years or older to join Chime');
+      setError('You must be 18 years or older to join');
       return false;
     }
 

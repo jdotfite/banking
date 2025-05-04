@@ -1,8 +1,10 @@
 // components/ui/transactions/TransactionList.tsx
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
+import * as React from 'react';
 import { animated, useTransition } from 'react-spring';
 import TransactionItem from './TransactionItem';
-import { TransactionDateGroup } from '@/lib/types';
+import type { TransactionItemProps } from './TransactionItem';
+import { TransactionDateGroup, TransactionType } from '@/lib/types';
 import { getTransactionsByPeriod } from '@/lib/data/transactions';
 import { useBankingData } from '@/components/preloaders/BankingDataPreloader';
 
@@ -22,7 +24,35 @@ const TransactionList: React.FC<TransactionListProps> = ({
   useEffect(() => {
     // If banking data is available, try to use it first
     if (data && (data as any).groupedTransactions && (data as any).groupedTransactions.user1) {
-      setTransactionGroups((data as any).groupedTransactions.user1);
+      // Convert fake data to match TransactionDateGroup type
+      const convertedGroups = (data as any).groupedTransactions.user1.map((group: {
+        date: string;
+        transactions: Array<{
+          id: string;
+          merchant: string;
+          location?: string;
+          amount: number;
+          isIncoming: boolean;
+          timestamp: string;
+          message?: string;
+          icon: string;
+          category?: string;
+        }>;
+      }) => ({
+        date: group.date,
+        transactions: group.transactions.map((tx): TransactionType => ({
+          id: tx.id,
+          merchant: tx.merchant,
+          location: tx.location,
+          amount: tx.amount,
+          isIncoming: tx.isIncoming,
+          timestamp: tx.timestamp,
+          message: tx.message,
+          icon: tx.icon,
+          category: tx.category
+        }))
+      }));
+      setTransactionGroups(convertedGroups);
     } else {
       // Fall back to predefined transactions
       const updatedTransactions = getTransactionsByPeriod(selectedPeriod);
@@ -72,12 +102,13 @@ const TransactionList: React.FC<TransactionListProps> = ({
                 {group.date}
               </div>
               <div>
-                {group.transactions.map((transaction, transactionIndex) => (
-                  <TransactionItem 
-                    key={transaction.id}
-                    transaction={transaction} 
-                    isLastInGroup={transactionIndex === group.transactions.length - 1}
-                  />
+                {group.transactions.map((transaction: TransactionType, transactionIndex: number) => (
+                  <div key={transaction.id}>
+                    <TransactionItem 
+                      transaction={transaction} 
+                      isLastInGroup={transactionIndex === group.transactions.length - 1}
+                    />
+                  </div>
                 ))}
               </div>
             </animated.div>

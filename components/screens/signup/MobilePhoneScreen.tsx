@@ -70,10 +70,7 @@ const MobilePhoneScreen: React.FC<MobilePhoneScreenProps> = ({ formData, onChang
 
   return (
     <div className="max-w-md mx-auto">
-      {/* Logo */}
-      <div className="flex justify-center mb-6">
-        <div className="text-green-500 text-3xl font-bold">chime</div>
-      </div>
+
 
       {/* Form title */}
       <h1 className="text-3xl font-bold mb-4">Your mobile phone</h1>
