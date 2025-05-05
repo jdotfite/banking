@@ -12,7 +12,7 @@ const slides = [
   {
     id: 'award',
     title: 'Award-Winning Service',
-    subtitle: 'Honored by Forbes and Newsweek for top-tier service and voted Harrisburg Magazine\'s Simply the Best for 20 years—reflecting our member-first focus',
+    subtitle: 'Recognized by Forbes, Newsweek & Harrisburg Magazine\'s Simply the Best for 20 years—reflecting our member-first focus.',
     bgColor: '#039fd7',
     textColor: 'white',
     image: '/images/onboarding/mike-m1st.png',
@@ -21,7 +21,7 @@ const slides = [
   {
     id: 'milestones',
     title: 'Celebrating Your Milestones',
-    subtitle: 'We\'re here to cheer you on—from your very first account to life\'s biggest achievements. Enjoy personalized guidance, milestone rewards, and a community that celebrates every step with you.',
+    subtitle: 'From your first account to life\'s biggest milestones, we\'re here with tailored guidance, rewards, and a community cheering you on.',
     bgColor: '#fec20f',
     textColor: 'black',
     image: '/images/onboarding/balloons.png',
@@ -234,27 +234,19 @@ const Onboarding: React.FC<OnboardingProps> = () => {
               className="max-h-[70%] max-w-full object-contain"
             />
           </div>
-
-          {/* Text content - animated with same timing as image */}
-          <div className="w-full px-6 pt-4 pb-8 text-center">
-            <animated.h1 
-              style={slideAnimation}
-              className="text-3xl font-bold mb-4"
-            >
-              {slides[currentSlide].title}
-            </animated.h1>
-            <animated.p 
-              style={slideAnimation}
-              className="text-md opacity-90 line-clamp-3"
-            >
-              {slides[currentSlide].subtitle}
-            </animated.p>
-          </div>
         </animated.div>
       </div>
 
       {/* Dark gray bottom section */}
-      <div className="w-full bg-neutral-900 text-white flex flex-col" style={{ height: '30%' }}>
+      <div className="w-full bg-neutral-900 text-white flex flex-col" style={{ height: '40%' }}>
+        {/* Text content - animated with same timing as image */}
+        <animated.div 
+          style={slideAnimation}
+          className="w-full px-6 pt-8 pb-4 text-center flex-1 overflow-y-hidden"
+        >
+          <h1 className="text-3xl font-bold mb-4">{slides[currentSlide].title}</h1>
+          <p className="text-md opacity-90 line-clamp-3">{slides[currentSlide].subtitle}</p>
+        </animated.div>
         
         {/* Pagination dots */}
         <div className="flex justify-center space-x-2 py-4">
