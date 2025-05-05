@@ -166,10 +166,10 @@ const Onboarding: React.FC<OnboardingProps> = () => {
     opacity: 1,
     transform: 'translateX(0%)',
     from: { 
-      opacity: initialLoad ? 0 : 0, 
-      transform: initialLoad ? 'translateX(0%)' : `translateX(${slideDirection === 'right' ? '100%' : '-100%'})` 
+      opacity: (initialLoad && currentSlide === 0) ? 1 : 0,
+      transform: (initialLoad && currentSlide === 0) ? 'translateX(0%)' : `translateX(${slideDirection === 'right' ? '100%' : '-100%'})`
     },
-    reset: !initialLoad,
+    reset: !(initialLoad && currentSlide === 0),
     config: { tension: 280, friction: 60 },
     onRest: () => {
       // Restart auto-advance timer after animation completes
@@ -237,8 +237,8 @@ const Onboarding: React.FC<OnboardingProps> = () => {
         </animated.div>
       </div>
 
-      {/* Dark gray bottom section */}
-      <div className="w-full bg-neutral-900 text-white flex flex-col" style={{ height: '40%' }}>
+      {/* Dark gray bottom section - height controlled by this style */}
+      <div className="w-full bg-neutral-900 text-white flex flex-col" style={{ height: '45%' }}>
         {/* Text content - animated with same timing as image */}
         <animated.div 
           style={slideAnimation}
