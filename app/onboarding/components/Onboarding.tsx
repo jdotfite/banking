@@ -65,8 +65,8 @@ const slides = [
   },
   {
     id: 'CIO',
-    title: 'Meet Our Chief Information Officer',
-    subtitle: 'By day he’s the CIO; by night, our Cyber Superhero - guarding your data like a digital fortress.',
+    title: 'CIO-Engineered Cyber Shield',
+    subtitle: 'With quantum-resistant encryption and a zero-trust battle plan, we’re ensuring your Members 1st funds rest safer than a superhero’s secret identity.',
     bgColor: '#5ea63a',
     textColor: 'white',
     image: '/images/onboarding/garth-m1st.png',
