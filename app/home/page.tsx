@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import { EnhancedBankingDataProvider } from '@/components/preloaders/EnhancedBankingDataProvider';
 import { animated, useSpring } from 'react-spring';
 import { getDefaultCard } from '@/lib/data/cards';
 import { getTransactions } from '@/lib/data/transactions';
@@ -128,7 +129,8 @@ export default function HomePage() {
   const bankingTransactions = userData?.groupedTransactions || transactions;
 
   return (
-    <div className="relative min-h-screen bg-app-black text-white">
+    <EnhancedBankingDataProvider>
+      <div className="relative min-h-screen bg-app-black text-white">
       <Header userName={userName} />
       
       <div className="px-5  mx-auto max-w-md">
@@ -239,6 +241,7 @@ export default function HomePage() {
           />
         )}
       </div>
-    </div>
+      </div>
+    </EnhancedBankingDataProvider>
   );
 }

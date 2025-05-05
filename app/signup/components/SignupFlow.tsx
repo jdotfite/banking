@@ -3,11 +3,11 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { X, ArrowLeft } from 'lucide-react';
-import BasicInfoScreen from './BasicInfoScreen';
-import DateOfBirthScreen from './DateOfBirthScreen';
-import MobilePhoneScreen from './MobilePhoneScreen';
-import AddressScreen from './AddressScreen';
-import CreatePasswordScreen from './CreatePasswordScreen';
+import BasicInfoScreen from '@/app/signup/components/BasicInfoScreen';
+import DateOfBirthScreen from '@/app/signup/components/DateOfBirthScreen';
+import MobilePhoneScreen from '@/app/signup/components/MobilePhoneScreen';
+import AddressScreen from '@/app/signup/components/AddressScreen';
+import CreatePasswordScreen from '@/app/signup/components/CreatePasswordScreen';
 
 // Define the steps in the signup flow
 enum SignupStep {
