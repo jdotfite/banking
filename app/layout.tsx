@@ -4,6 +4,7 @@ import { Outfit } from 'next/font/google';
 import './globals.css';
 import RegisterServiceWorker from '@/components/RegisterServiceWorker';
 import PWAInstallPrompt from '@/components/ui/common/PWAInstallPrompt';
+import AppContainer from '@/components/layout/AppContainer';
 
 const outfit = Outfit({
   subsets: ['latin'],
@@ -36,9 +37,9 @@ export default function RootLayout({
       </head>
       <body className={`${outfit.className} bg-gray-900 min-h-screen font-outfit`}>
         <RegisterServiceWorker />
-        <PWAInstallPrompt />
-        {children}
-        {/* Remove duplicate service worker registration scripts */}
+        <AppContainer>
+          {children}
+        </AppContainer>
       </body>
     </html>
   );
