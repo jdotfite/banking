@@ -36,6 +36,9 @@ declare global {
     currentBalance: number;
     rewardsBalance: number;
     nickname?: string;
+    minimumPayment: number;
+    dueDate: string;
+    color: string;
   }
 
   interface Loan {
