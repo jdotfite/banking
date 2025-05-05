@@ -46,7 +46,7 @@ export type BankingUser = {
   income: number;
   joinDate: string;
   lastLogin: string;
-  memberSince?: string; // Make optional to match fake data
+  memberSince?: string; // Explicitly marked as optional
 };
 
 export type BankingAccount = {

@@ -69,7 +69,7 @@ export const EnhancedBankingDataProvider: React.FC<EnhancedBankingDataProviderPr
           bankingDataObj = bankingData;
         }
         
-        setData(bankingDataObj);
+        setData(bankingDataObj as any);
         
         // Filter data for selected user
         if (selectedUserId && selectedUserId !== 'new') {
@@ -87,17 +87,17 @@ export const EnhancedBankingDataProvider: React.FC<EnhancedBankingDataProviderPr
             loans,
             transactions,
             groupedTransactions
-          });
+          } as any);
         } else if (isNewUser) {
           // For new user flow, provide empty data structure
-          setUserData({
-            user: null,
-            accounts: [],
-            creditCards: [],
-            loans: [],
-            transactions: {},
-            groupedTransactions: []
-          });
+        setUserData({
+          user: null,
+          accounts: [],
+          creditCards: [],
+          loans: [],
+          transactions: {},
+          groupedTransactions: []
+        } as any);
         } else {
           // No user selected, provide full data
           setUserData({
@@ -107,7 +107,7 @@ export const EnhancedBankingDataProvider: React.FC<EnhancedBankingDataProviderPr
             loans: bankingDataObj.loans,
             transactions: bankingDataObj.transactions,
             groupedTransactions: []
-          });
+          } as any);
         }
       } catch (err) {
         console.error('Error loading banking data:', err);
@@ -130,7 +130,7 @@ export const EnhancedBankingDataProvider: React.FC<EnhancedBankingDataProviderPr
       setIsLoading(true);
       localStorage.removeItem('members1stBankingData');
       localStorage.setItem('members1stBankingData', JSON.stringify(bankingData));
-      setData(bankingData);
+      setData(bankingData as any);
       
       // Re-filter data for selected user
       if (selectedUserId && selectedUserId !== 'new') {
@@ -148,7 +148,7 @@ export const EnhancedBankingDataProvider: React.FC<EnhancedBankingDataProviderPr
           loans,
           transactions,
           groupedTransactions
-        });
+        } as any);
       } else {
         setUserData({
           user: null,
@@ -157,7 +157,7 @@ export const EnhancedBankingDataProvider: React.FC<EnhancedBankingDataProviderPr
           loans: bankingData.loans,
           transactions: bankingData.transactions,
           groupedTransactions: []
-        });
+        } as any);
       }
       
       setIsLoading(false);

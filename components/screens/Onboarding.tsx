@@ -28,15 +28,6 @@ const slides = [
     imageAlt: 'Balloons with M1st Logo on them'
   },
   {
-    id: 'card',
-    title: 'Personal Concierge',
-    subtitle: 'Chat one-on-one with a local Member Concierge directly in the app, no chatbots—just real people who know you, your goals, and your community.',
-    bgColor: '#5ea63a',
-    textColor: 'white',
-    image: '/images/onboarding/woman-m1st.png',
-    imageAlt: 'Members 1st Credit Card'
-  },
-  {
     id: 'fees',
     title: 'Say goodbye to fees',
     subtitle: 'No monthly fees, no minimum balances, and access to over 30,000 fee-free ATMs nationwide.',
@@ -71,6 +62,15 @@ const slides = [
     textColor: 'white',
     image: '/images/onboarding/shanice-m1st.png',
     imageAlt: 'Members 1st Banking App Screenshot'
+  },
+  {
+    id: 'CIO',
+    title: 'Meet Our Chief Information Officer',
+    subtitle: 'By day he’s the CIO; by night, our Cyber Superhero - guarding your data like a digital fortress.',
+    bgColor: '#5ea63a',
+    textColor: 'white',
+    image: '/images/onboarding/garth-m1st.png',
+    imageAlt: 'Members 1st Credit Card'
   }
 ];
 
