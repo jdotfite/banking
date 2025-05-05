@@ -177,6 +177,28 @@ const Onboarding: React.FC<OnboardingProps> = () => {
     }
   });
 
+  // Touch event handlers for swipe gestures
+  const handleTouchStart = (e: React.TouchEvent) => {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+    const xDiff = touchStartX.current - touchEndX;
+    const yDiff = touchStartY.current - touchEndY;
+
+    // Only consider horizontal swipes with minimal vertical movement
+    if (Math.abs(xDiff) > Math.abs(yDiff) && Math.abs(xDiff) > 50) {
+      if (xDiff > 0) {
+        nextSlide(); // Swipe left
+      } else {
+        prevSlide(); // Swipe right
+      }
+    }
+  };
+
   return (
     <div 
       className="flex flex-col w-full overflow-hidden"
@@ -186,6 +208,8 @@ const Onboarding: React.FC<OnboardingProps> = () => {
         transition: 'background-color 0.5s ease-in-out',
         height: 'calc(var(--vh, 1vh) * 100)'
       }}
+      onTouchStart={handleTouchStart}
+      onTouchEnd={handleTouchEnd}
     >
       {/* Logo */}
       <div className="flex justify-center pt-12 pb-4">
@@ -196,29 +220,41 @@ const Onboarding: React.FC<OnboardingProps> = () => {
         />
       </div>
 
-      {/* Main content area - Image only */}
+      {/* Main content area */}
       <div className="relative flex-1 overflow-hidden">
         <animated.div 
           style={slideAnimation}
-          className="absolute inset-0 flex items-end justify-center"
+          className="absolute inset-0 flex flex-col items-center justify-center"
         >
-          <div className="w-full h-full flex items-end justify-center">
+          {/* Image */}
+          <div className="flex-1 w-full flex items-end justify-center">
             <img 
               src={slides[currentSlide].image} 
               alt={slides[currentSlide].imageAlt}
-              className="max-h-[80%] max-w-full object-contain"
+              className="max-h-[70%] max-w-full object-contain"
             />
+          </div>
+
+          {/* Text content - animated with same timing as image */}
+          <div className="w-full px-6 pt-4 pb-8 text-center">
+            <animated.h1 
+              style={slideAnimation}
+              className="text-3xl font-bold mb-4"
+            >
+              {slides[currentSlide].title}
+            </animated.h1>
+            <animated.p 
+              style={slideAnimation}
+              className="text-md opacity-90 line-clamp-3"
+            >
+              {slides[currentSlide].subtitle}
+            </animated.p>
           </div>
         </animated.div>
       </div>
 
       {/* Dark gray bottom section */}
-      <div className="w-full bg-neutral-900 text-white flex flex-col" style={{ height: '40%' }}>
-        {/* Text content */}
-        <div className="w-full px-6 pt-8 pb-4 text-center flex-1 overflow-y-hidden">
-          <h1 className="text-3xl font-bold mb-4">{slides[currentSlide].title}</h1>
-          <p className="text-md opacity-90 line-clamp-3">{slides[currentSlide].subtitle}</p>
-        </div>
+      <div className="w-full bg-neutral-900 text-white flex flex-col" style={{ height: '30%' }}>
         
         {/* Pagination dots */}
         <div className="flex justify-center space-x-2 py-4">
