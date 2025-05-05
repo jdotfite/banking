@@ -10,9 +10,18 @@ declare global {
   interface BankingUser {
     id: string;
     name: string;
+    username: string;
     email: string;
+    avatar: string;
     phone: string;
-    memberSince: string;
+    address: string;
+    ssn: string;
+    dob: string;
+    occupation: string;
+    income: number;
+    joinDate: string;
+    lastLogin: string;
+    memberSince?: string;
   }
 
   interface BankAccount {
