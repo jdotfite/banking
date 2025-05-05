@@ -256,8 +256,8 @@ const Onboarding: React.FC<OnboardingProps> = () => {
             style={slideAnimation}
             className="w-full px-6 pt-8 h-32 overflow-hidden"
           >
-            <h1 className="text-2xl md:text-3xl font-bold mb-2 md:mb-4">{slides[currentSlide].title}</h1>
-            <p className="text-sm md:text-md opacity-90 line-clamp-3 overflow-ellipsis">{slides[currentSlide].subtitle}</p>
+            <h1 className="text-3xl md:text-4xl font-bold mb-2 md:mb-4">{slides[currentSlide].title}</h1>
+            <p className="md:text-md opacity-90 line-clamp-3 overflow-ellipsis">{slides[currentSlide].subtitle}</p>
           </animated.div>
           
           {/* Spacer to push content to edges */}
@@ -291,7 +291,7 @@ const Onboarding: React.FC<OnboardingProps> = () => {
               </button>
               <button
                 onClick={handleLogin}
-                className="w-full py-3 bg-transparent text-white font-medium hover:bg-white/10 transition-colors"
+                className="w-full py-3 bg-transparent text-white font-medium rounded-lg hover:bg-white/10 transition-colors"
               >
                 Log in
               </button>
