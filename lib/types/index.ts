@@ -46,12 +46,13 @@ export type BankingUser = {
   income: number;
   joinDate: string;
   lastLogin: string;
+  memberSince?: string; // Make optional to match fake data
 };
 
 export type BankingAccount = {
   id: string;
   userId: string;
-  type: string;
+  type: string; // Allow any string value
   name: string;
   accountNumber: string;
   routingNumber: string;
@@ -69,7 +70,7 @@ export type BankingCreditCard = {
   type: string;
   name: string;
   cardNumber: string;
-  expiry: string;
+  expiry: string; // Alias for expirationDate
   cvv: string;
   creditLimit: number;
   currentBalance: number;
@@ -81,6 +82,7 @@ export type BankingCreditCard = {
   rewardsRate: string;
   applyDate: string;
   color: string;
+  expirationDate?: string; // Make optional
 };
 
 export type BankingLoan = {
@@ -102,6 +104,8 @@ export type BankingLoan = {
   propertyAddress?: string;
   vehicle?: string;
   vin?: string;
+  paymentDueDate?: string; // Make optional
+  minimumPayment?: number; // Make optional
 };
 
 export type BankingTransaction = {

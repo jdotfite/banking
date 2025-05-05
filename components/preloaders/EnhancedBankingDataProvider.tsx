@@ -4,6 +4,23 @@ import React, { useState, useEffect, createContext, useContext } from 'react';
 import type { ReactNode } from 'react';
 import { bankingData } from '@/lib/data/fakeBankingData';
 import { useUser } from '@/components/context/UserContext';
+import { TransactionDateGroup } from '@/lib/types';
+
+// Context type
+interface EnhancedBankingDataContextType {
+  data: BankingData | null;
+  userData: {
+    user: BankingUser | null;
+    accounts: BankAccount[];
+    creditCards: CreditCard[];
+    loans: Loan[];
+    transactions: Record<string, Transaction[]>;
+    groupedTransactions: TransactionDateGroup[];
+  } | null;
+  isLoading: boolean;
+  error: Error | null;
+  refreshData: () => void;
+}
 
 // Create the context
 const EnhancedBankingDataContext = createContext<EnhancedBankingDataContextType | null>(null);
@@ -26,7 +43,7 @@ export const EnhancedBankingDataProvider: React.FC<EnhancedBankingDataProviderPr
     creditCards: CreditCard[];
     loans: Loan[];
     transactions: Record<string, Transaction[]>;
-    groupedTransactions: GroupedTransaction[];
+    groupedTransactions: TransactionDateGroup[];
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);

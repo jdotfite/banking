@@ -25,33 +25,22 @@ const TransactionList: React.FC<TransactionListProps> = ({
     // If banking data is available, try to use it first
     if (data && (data as any).groupedTransactions && (data as any).groupedTransactions.user1) {
       // Convert fake data to match TransactionDateGroup type
-      const convertedGroups = (data as any).groupedTransactions.user1.map((group: {
-        date: string;
-        transactions: Array<{
-          id: string;
-          merchant: string;
-          location?: string;
-          amount: number;
-          isIncoming: boolean;
-          timestamp: string;
-          message?: string;
-          icon: string;
-          category?: string;
-        }>;
-      }) => ({
-        date: group.date,
-        transactions: group.transactions.map((tx): TransactionType => ({
-          id: tx.id,
-          merchant: tx.merchant,
-          location: tx.location,
-          amount: tx.amount,
-          isIncoming: tx.isIncoming,
-          timestamp: tx.timestamp,
-          message: tx.message,
-          icon: tx.icon,
-          category: tx.category
-        }))
-      }));
+      const convertedGroups = (data as any).groupedTransactions.user1.map((group: any) => {
+        return {
+          date: group.date,
+          transactions: group.transactions.map((tx: any) => ({
+            id: tx.id,
+            merchant: tx.merchant,
+            location: tx.location,
+            amount: tx.amount,
+            isIncoming: tx.isIncoming,
+            timestamp: tx.timestamp,
+            message: tx.message,
+            icon: tx.icon,
+            category: tx.category
+          }))
+        } as TransactionDateGroup;
+      });
       setTransactionGroups(convertedGroups);
     } else {
       // Fall back to predefined transactions
