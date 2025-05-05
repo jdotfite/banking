@@ -70,9 +70,9 @@ const AdminProfileSelector: React.FC<AdminProfileSelectorProps> = ({ onSelectUse
     return (
       <div className="flex items-center justify-center overflow-hidden" 
            style={{ height: 'calc(var(--vh, 1vh) * 100)' }}>
-        <div className="w-24 h-24">
+        <div className="w-28 h-28">
           <img 
-            src="/icons/icon-192x192.png" 
+            src="/images/icons/logo.svg" 
             alt="Members 1st" 
             className="w-full h-full object-contain animate-spin"
             style={{

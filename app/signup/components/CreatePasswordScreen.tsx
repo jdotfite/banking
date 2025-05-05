@@ -8,14 +8,14 @@ interface CreatePasswordScreenProps {
   };
   onChange: (field: string, value: string) => void;
   onNext: () => void;
-  isSubmitting?: boolean; // Added isSubmitting prop
+  isSubmitting?: boolean;
 }
 
 const CreatePasswordScreen: React.FC<CreatePasswordScreenProps> = ({ 
   formData, 
   onChange, 
   onNext,
-  isSubmitting = false // Added with default value
+  isSubmitting = false
 }) => {
   const [error, setError] = useState('');
   const [passwordStrength, setPasswordStrength] = useState(0);
@@ -108,23 +108,27 @@ const CreatePasswordScreen: React.FC<CreatePasswordScreenProps> = ({
         <div className="space-y-4">
           {/* Password input */}
           <div className="relative">
+            <label htmlFor="password" className="sr-only">Password</label>
             <input
+              id="password"
               type={showPassword ? 'text' : 'password'}
               placeholder="Password"
               value={formData.password}
               onChange={(e) => onChange('password', e.target.value)}
-              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700"
+              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700 appearance-none"
+              autoComplete="new-password"
               disabled={isSubmitting}
             />
             <button
               type="button"
               onClick={togglePasswordVisibility}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 p-2 touch-manipulation"
               disabled={isSubmitting}
+              aria-label={showPassword ? "Hide password" : "Show password"}
             >
               {showPassword ? 'Hide' : 'Show'}
             </button>
-            {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+            {error && <p id="password-error" className="text-red-500 text-sm mt-1" role="alert">{error}</p>}
           </div>
 
           {/* Password strength indicator */}
@@ -138,6 +142,7 @@ const CreatePasswordScreen: React.FC<CreatePasswordScreenProps> = ({
                 passwordStrength === 4 ? 'w-4/5 bg-blue-500' :
                 'w-full bg-green-500'
               }`}
+              aria-hidden="true"
             ></div>
           </div>
 
@@ -152,8 +157,8 @@ const CreatePasswordScreen: React.FC<CreatePasswordScreenProps> = ({
           type="submit"
           disabled={isSubmitting}
           className={`w-full p-4 bg-transparent border-2 border-black text-black uppercase font-medium rounded-lg mt-6 ${
-            isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:bg-gray-50'
-          } transition-colors`}
+            isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:bg-gray-50 active:bg-gray-100'
+          } transition-colors touch-manipulation`}
         >
           {isSubmitting ? 'CREATING ACCOUNT...' : 'NEXT'}
         </button>

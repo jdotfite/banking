@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import Image from 'next/image';
 
 interface BasicInfoScreenProps {
   formData: {
@@ -82,26 +81,38 @@ const BasicInfoScreen: React.FC<BasicInfoScreenProps> = ({ formData, onChange, o
         <div className="space-y-4">
           {/* First name */}
           <div>
+            <label htmlFor="firstName" className="sr-only">First name</label>
             <input
+              id="firstName"
               type="text"
               placeholder="First name"
               value={formData.firstName}
               onChange={(e) => onChange('firstName', e.target.value)}
-              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700"
+              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700 appearance-none"
+              autoComplete="given-name"
+              autoCapitalize="words"
+              autoCorrect="off"
+              spellCheck="false"
             />
-            {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
+            {errors.firstName && <p id="firstName-error" className="text-red-500 text-sm mt-1" role="alert">{errors.firstName}</p>}
           </div>
 
           {/* Last name */}
           <div>
+            <label htmlFor="lastName" className="sr-only">Last name</label>
             <input
+              id="lastName"
               type="text"
               placeholder="Last name"
               value={formData.lastName}
               onChange={(e) => onChange('lastName', e.target.value)}
-              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700"
+              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700 appearance-none"
+              autoComplete="family-name"
+              autoCapitalize="words"
+              autoCorrect="off"
+              spellCheck="false"
             />
-            {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
+            {errors.lastName && <p id="lastName-error" className="text-red-500 text-sm mt-1" role="alert">{errors.lastName}</p>}
           </div>
 
           {/* Legal name note */}
@@ -109,14 +120,21 @@ const BasicInfoScreen: React.FC<BasicInfoScreenProps> = ({ formData, onChange, o
 
           {/* Email */}
           <div>
+            <label htmlFor="email" className="sr-only">Email</label>
             <input
+              id="email"
               type="email"
+              inputMode="email"
               placeholder="Email"
               value={formData.email}
               onChange={(e) => onChange('email', e.target.value)}
-              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700"
+              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700 appearance-none"
+              autoComplete="email"
+              autoCapitalize="off"
+              autoCorrect="off"
+              spellCheck="false"
             />
-            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+            {errors.email && <p id="email-error" className="text-red-500 text-sm mt-1" role="alert">{errors.email}</p>}
           </div>
         </div>
 

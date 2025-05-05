@@ -4,9 +4,16 @@ import React, { useState, useEffect, createContext, useContext } from 'react';
 import type { ReactNode } from 'react';
 import { bankingData } from '@/lib/data/fakeBankingData';
 import { useUser } from '@/components/context/UserContext';
-import { TransactionDateGroup } from '@/lib/types';
+import { 
+  TransactionDateGroup,
+  BankingDataType as BankingData,
+  BankingUser,
+  BankingAccount as BankAccount,
+  BankingCreditCard as CreditCard,
+  BankingLoan as Loan,
+  BankingTransaction as Transaction
+} from '@/lib/types';
 
-// Context type
 interface EnhancedBankingDataContextType {
   data: BankingData | null;
   userData: {
@@ -22,19 +29,12 @@ interface EnhancedBankingDataContextType {
   refreshData: () => void;
 }
 
-// Create the context
 const EnhancedBankingDataContext = createContext<EnhancedBankingDataContextType | null>(null);
 
-// Props for the provider component
 interface EnhancedBankingDataProviderProps {
   children: ReactNode;
 }
 
-/**
- * Enhanced Banking Data Provider
- * Provides access to preloaded banking data throughout the app
- * Filters data based on selected user from UserContext
- */
 export const EnhancedBankingDataProvider: React.FC<EnhancedBankingDataProviderProps> = ({ children }) => {
   const [data, setData] = useState<BankingData | null>(null);
   const [userData, setUserData] = useState<{
@@ -47,69 +47,79 @@ export const EnhancedBankingDataProvider: React.FC<EnhancedBankingDataProviderPr
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
+  const [hasMounted, setHasMounted] = useState(false);
   
-  // Get user context
-  const { selectedUserId, isNewUser } = useUser();
+  const { selectedUserId, isNewUser } = useUser() as {
+    selectedUserId: string | null;
+    isNewUser: boolean;
+  };
 
-  // Load data on mount and when selectedUserId changes
   useEffect(() => {
+    setHasMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!hasMounted) return;
+
     const loadData = async () => {
       try {
         setIsLoading(true);
         
-        // Get cached data if available
         const cachedData = localStorage.getItem('members1stBankingData');
-        let bankingDataObj;
+        let bankingDataObj: BankingData;
         
         if (cachedData) {
-          bankingDataObj = JSON.parse(cachedData);
+          bankingDataObj = JSON.parse(cachedData) as BankingData;
         } else {
-          // Process and cache the data
           localStorage.setItem('members1stBankingData', JSON.stringify(bankingData));
-          bankingDataObj = bankingData;
+          bankingDataObj = bankingData as unknown as BankingData;
         }
         
-        setData(bankingDataObj as any);
+        setData(bankingDataObj);
         
-        // Filter data for selected user
         if (selectedUserId && selectedUserId !== 'new') {
-          const user = bankingDataObj.users.find((u: any) => u.id === selectedUserId);
-          const accounts = bankingDataObj.accounts.filter((a: any) => a.userId === selectedUserId);
-          const creditCards = bankingDataObj.creditCards.filter((c: any) => c.userId === selectedUserId);
-          const loans = bankingDataObj.loans.filter((l: any) => l.userId === selectedUserId);
-          const transactions = bankingDataObj.transactions[selectedUserId as keyof typeof bankingDataObj.transactions] || {};
-          const groupedTransactions = bankingDataObj.groupedTransactions[selectedUserId as keyof typeof bankingDataObj.groupedTransactions] || [];
+          const user = bankingDataObj.users.find((u) => u.id === selectedUserId) || null;
+          const accounts = bankingDataObj.accounts.filter((a) => a.userId === selectedUserId);
+          const creditCards = bankingDataObj.creditCards.filter((c) => c.userId === selectedUserId);
+          const loans = bankingDataObj.loans.filter((l) => l.userId === selectedUserId);
+          const userTransactions = bankingDataObj.transactions[selectedUserId] || {};
+          const transactions: Record<string, Transaction[]> = {};
+          
+          // Convert account transactions to proper type
+          Object.entries(userTransactions).forEach(([accountId, accountTransactions]) => {
+            transactions[accountId] = accountTransactions as Transaction[];
+          });
+
+          const groupedTransactions = bankingDataObj.groupedTransactions[selectedUserId] || [];
           
           setUserData({
-            user,
+            user: user || null,
             accounts,
             creditCards,
             loans,
             transactions,
-            groupedTransactions
-          } as any);
+            groupedTransactions: groupedTransactions as TransactionDateGroup[]
+          });
         } else if (isNewUser) {
-          // For new user flow, provide empty data structure
-        setUserData({
-          user: null,
-          accounts: [],
-          creditCards: [],
-          loans: [],
-          transactions: {},
-          groupedTransactions: []
-        } as any);
+          setUserData({
+            user: null,
+            accounts: [],
+            creditCards: [],
+            loans: [],
+            transactions: {},
+            groupedTransactions: []
+          });
         } else {
-          // No user selected, provide full data
           setUserData({
             user: null,
             accounts: bankingDataObj.accounts,
             creditCards: bankingDataObj.creditCards,
             loans: bankingDataObj.loans,
-            transactions: bankingDataObj.transactions,
+            transactions: {},
             groupedTransactions: []
-          } as any);
+          });
         }
-      } catch (err) {
+      } catch (err: unknown) {
         console.error('Error loading banking data:', err);
         setError(err instanceof Error ? err : new Error('Unknown error loading banking data'));
       } finally {
@@ -118,9 +128,8 @@ export const EnhancedBankingDataProvider: React.FC<EnhancedBankingDataProviderPr
     };
 
     loadData();
-  }, [selectedUserId, isNewUser]);
+  }, [selectedUserId, isNewUser, hasMounted]);
 
-  // Context value
   const value = {
     data,
     userData,
@@ -132,13 +141,18 @@ export const EnhancedBankingDataProvider: React.FC<EnhancedBankingDataProviderPr
       localStorage.setItem('members1stBankingData', JSON.stringify(bankingData));
       setData(bankingData as any);
       
-      // Re-filter data for selected user
       if (selectedUserId && selectedUserId !== 'new') {
-        const user = bankingData.users.find((u: any) => u.id === selectedUserId);
+        const user = bankingData.users.find((u) => u.id === selectedUserId) || null;
         const accounts = bankingData.accounts.filter((a: any) => a.userId === selectedUserId);
         const creditCards = bankingData.creditCards.filter((c: any) => c.userId === selectedUserId);
         const loans = bankingData.loans.filter((l: any) => l.userId === selectedUserId);
-        const transactions = bankingData.transactions[selectedUserId as keyof typeof bankingData.transactions] || {};
+        const userTransactions = bankingData.transactions[selectedUserId as keyof typeof bankingData.transactions] || {};
+        const transactions: Record<string, Transaction[]> = {};
+        
+        Object.entries(userTransactions).forEach(([accountId, accountTransactions]) => {
+          transactions[accountId] = accountTransactions as Transaction[];
+        });
+
         const groupedTransactions = bankingData.groupedTransactions[selectedUserId as keyof typeof bankingData.groupedTransactions] || [];
         
         setUserData({
@@ -147,15 +161,15 @@ export const EnhancedBankingDataProvider: React.FC<EnhancedBankingDataProviderPr
           creditCards,
           loans,
           transactions,
-          groupedTransactions
-        } as any);
+          groupedTransactions: groupedTransactions as TransactionDateGroup[]
+        });
       } else {
         setUserData({
           user: null,
           accounts: bankingData.accounts,
           creditCards: bankingData.creditCards,
           loans: bankingData.loans,
-          transactions: bankingData.transactions,
+          transactions: {},
           groupedTransactions: []
         } as any);
       }
@@ -164,6 +178,10 @@ export const EnhancedBankingDataProvider: React.FC<EnhancedBankingDataProviderPr
     }
   };
 
+  if (!hasMounted) {
+    return null;
+  }
+
   return (
     <EnhancedBankingDataContext.Provider value={value}>
       {children}
@@ -171,7 +189,6 @@ export const EnhancedBankingDataProvider: React.FC<EnhancedBankingDataProviderPr
   );
 };
 
-// Custom hook to access banking data
 export const useEnhancedBankingData = () => {
   const context = useContext(EnhancedBankingDataContext);
   if (!context) {

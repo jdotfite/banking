@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 interface MobilePhoneScreenProps {
   formData: {
@@ -13,6 +13,16 @@ interface MobilePhoneScreenProps {
 const MobilePhoneScreen: React.FC<MobilePhoneScreenProps> = ({ formData, onChange, onNext }) => {
   const [error, setError] = useState('');
   const [marketingConsent, setMarketingConsent] = useState(true);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // Focus input on component mount
+  useEffect(() => {
+    if (inputRef.current) {
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
+    }
+  }, []);
 
   // Validate phone number
   const validatePhoneNumber = () => {
@@ -70,8 +80,6 @@ const MobilePhoneScreen: React.FC<MobilePhoneScreenProps> = ({ formData, onChang
 
   return (
     <div className="max-w-md mx-auto">
-
-
       {/* Form title */}
       <h1 className="text-3xl font-bold mb-4">Your mobile phone</h1>
       <p className="text-gray-600 mb-6">Your number is used to protect your account and keep in touch.</p>
@@ -85,13 +93,16 @@ const MobilePhoneScreen: React.FC<MobilePhoneScreenProps> = ({ formData, onChang
               Mobile phone number
             </label>
             <input
+              ref={inputRef}
               id="phone-input"
               type="tel"
+              inputMode="tel"
               placeholder="Mobile phone number (no VOIP)"
               value={formData.mobilePhone}
               onChange={handlePhoneChange}
               aria-describedby={error ? "phone-error" : undefined}
-              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700"
+              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700 appearance-none"
+              autoComplete="tel"
             />
             {error && (
               <p id="phone-error" className="text-red-500 text-sm mt-1" role="alert">

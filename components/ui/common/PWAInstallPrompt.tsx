@@ -135,13 +135,12 @@ const PWAInstallPrompt: React.FC = () => {
       <div className="max-w-6xl mx-auto flex items-center justify-between">
         <div className="flex items-center">
           <img 
-            src="/icons/icon-192x192.png" 
+            src="/images/icons/logo-pwa.png" 
             alt="App Logo"
             className="w-8 h-8 mr-3"
           />
           <div>
-            <h3 className="font-semibold">Install Banking App</h3>
-            <p className="text-sm opacity-90">
+             <p className="text-sm leading-none opacity-90">
               {isIOS ? 'Add to home screen for full app experience' : 'Install for better experience'}
             </p>
           </div>
@@ -160,7 +159,7 @@ const PWAInstallPrompt: React.FC = () => {
               onClick={handleInstall}
               className="bg-neutral-800 text-white px-3 py-1 rounded text-sm font-medium hover:bg-blue-700 transition-colors flex items-center"
             >
-              <Share size={16} className="mr-1" /> Add to Home
+              <Share size={12} className="mr-1" /> Install
             </button>
           )}
           <button

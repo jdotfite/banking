@@ -1,0 +1,966 @@
+==== File: page.tsx ====
+'use client';
+
+import React from 'react';
+import SignupFlow from '@/app/signup/components/SignupFlow';
+
+export default function SignupPage() {
+  return <SignupFlow />;
+}
+
+
+
+
+==== File: components\AddressScreen.tsx ====
+'use client';
+
+import React, { useState } from 'react';
+
+interface AddressScreenProps {
+  formData: {
+    streetAddress: string;
+    aptSuite: string;
+    zipCode: string;
+    city: string;
+    state: string;
+  };
+  onChange: (field: string, value: string) => void;
+  onNext: () => void;
+}
+
+const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNext }) => {
+  const [errors, setErrors] = useState({
+    streetAddress: '',
+    zipCode: '',
+    city: '',
+    state: ''
+  });
+
+  // US states for dropdown
+  const states = [
+    'AL', 'AK', 'AZ', 'AR', 'CA', 'CO', 'CT', 'DE', 'FL', 'GA',
+    'HI', 'ID', 'IL', 'IN', 'IA', 'KS', 'KY', 'LA', 'ME', 'MD',
+    'MA', 'MI', 'MN', 'MS', 'MO', 'MT', 'NE', 'NV', 'NH', 'NJ',
+    'NM', 'NY', 'NC', 'ND', 'OH', 'OK', 'OR', 'PA', 'RI', 'SC',
+    'SD', 'TN', 'TX', 'UT', 'VT', 'VA', 'WA', 'WV', 'WI', 'WY'
+  ];
+
+  // Validate form before proceeding
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = {
+      streetAddress: '',
+      zipCode: '',
+      city: '',
+      state: ''
+    };
+
+    // Validate street address
+    if (!formData.streetAddress.trim()) {
+      newErrors.streetAddress = 'Street address is required';
+      isValid = false;
+    }
+
+    // Validate ZIP code (5 digits)
+    if (!formData.zipCode.trim()) {
+      newErrors.zipCode = 'ZIP code is required';
+      isValid = false;
+    } else if (!/^\d{5}$/.test(formData.zipCode)) {
+      newErrors.zipCode = 'Please enter a valid 5-digit ZIP code';
+      isValid = false;
+    }
+
+    // Validate city
+    if (!formData.city.trim()) {
+      newErrors.city = 'City is required';
+      isValid = false;
+    }
+
+    // Validate state
+    if (!formData.state) {
+      newErrors.state = 'State is required';
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  // Handle next button click
+  const handleNext = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (validateForm()) {
+      onNext();
+    }
+  };
+
+  return (
+    <div className="max-w-md mx-auto">
+      {/* Form title */}
+      <h1 className="text-3xl font-bold mb-4">Your home address</h1>
+      <p className="text-gray-600 mb-6">We need to verify your home address. This is also where we'll send your new card.</p>
+
+      {/* Form */}
+      <form onSubmit={handleNext}>
+        <div className="space-y-4">
+          {/* Street address */}
+          <div>
+            <input
+              type="text"
+              placeholder="Street address (no P.O. boxes)"
+              value={formData.streetAddress}
+              onChange={(e) => onChange('streetAddress', e.target.value)}
+              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700"
+            />
+            {errors.streetAddress && <p className="text-red-500 text-sm mt-1">{errors.streetAddress}</p>}
+          </div>
+
+          {/* Apt/Suite (optional) */}
+          <div>
+            <input
+              type="text"
+              placeholder="Apt / Suite number (optional)"
+              value={formData.aptSuite}
+              onChange={(e) => onChange('aptSuite', e.target.value)}
+              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700"
+            />
+          </div>
+
+          {/* ZIP Code */}
+          <div>
+            <input
+              type="text"
+              placeholder="ZIP Code"
+              value={formData.zipCode}
+              onChange={(e) => onChange('zipCode', e.target.value.replace(/\D/g, '').substring(0, 5))}
+              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700"
+            />
+            {errors.zipCode && <p className="text-red-500 text-sm mt-1">{errors.zipCode}</p>}
+          </div>
+
+          {/* City and State */}
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <input
+                type="text"
+                placeholder="City"
+                value={formData.city}
+                onChange={(e) => onChange('city', e.target.value)}
+                className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700"
+              />
+              {errors.city && <p className="text-red-500 text-sm mt-1">{errors.city}</p>}
+            </div>
+            <div>
+              <select
+                value={formData.state}
+                onChange={(e) => onChange('state', e.target.value)}
+                className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700 appearance-none"
+              >
+                <option value="">State</option>
+                {states.map(state => (
+                  <option key={state} value={state}>{state}</option>
+                ))}
+              </select>
+              {errors.state && <p className="text-red-500 text-sm mt-1">{errors.state}</p>}
+            </div>
+          </div>
+        </div>
+
+        {/* Next button */}
+        <button
+          type="submit"
+          className="w-full p-4 bg-transparent border-2 border-black text-black uppercase font-medium rounded-lg mt-6 hover:bg-gray-50 transition-colors"
+        >
+          NEXT
+        </button>
+      </form>
+    </div>
+  );
+};
+
+export default AddressScreen;
+
+
+
+
+==== File: components\BasicInfoScreen.tsx ====
+'use client';
+
+import React, { useState } from 'react';
+import Image from 'next/image';
+
+interface BasicInfoScreenProps {
+  formData: {
+    firstName: string;
+    lastName: string;
+    email: string;
+  };
+  onChange: (field: string, value: string) => void;
+  onNext: () => void;
+}
+
+const BasicInfoScreen: React.FC<BasicInfoScreenProps> = ({ formData, onChange, onNext }) => {
+  const [errors, setErrors] = useState({
+    firstName: '',
+    lastName: '',
+    email: ''
+  });
+
+  // Validate form before proceeding
+  const validateForm = () => {
+    let isValid = true;
+    const newErrors = {
+      firstName: '',
+      lastName: '',
+      email: ''
+    };
+
+    // Validate first name
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = 'First name is required';
+      isValid = false;
+    }
+
+    // Validate last name
+    if (!formData.lastName.trim()) {
+      newErrors.lastName = 'Last name is required';
+      isValid = false;
+    }
+
+    // Validate email
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email address';
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  // Handle next button click
+  const handleNext = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (validateForm()) {
+      onNext();
+    }
+  };
+
+  return (
+    <div className="max-w-md mx-auto">
+      {/* Image */}
+      <div className="flex justify-center mb-6">
+        <img 
+          src="/images/signup/steps.png" 
+          alt="Signup steps"
+          className="max-h-[200px] max-w-full object-contain"
+        />
+      </div>
+
+      {/* Form title */}
+      <h1 className="text-gray-600 text-3xl font-bold mb-4">Let's get started</h1>
+      <p className="text-gray-600 mb-6">Let's start with some basic information.</p>
+
+      {/* Form */}
+      <form onSubmit={handleNext}>
+        <div className="space-y-4">
+          {/* First name */}
+          <div>
+            <input
+              type="text"
+              placeholder="First name"
+              value={formData.firstName}
+              onChange={(e) => onChange('firstName', e.target.value)}
+              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700"
+            />
+            {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
+          </div>
+
+          {/* Last name */}
+          <div>
+            <input
+              type="text"
+              placeholder="Last name"
+              value={formData.lastName}
+              onChange={(e) => onChange('lastName', e.target.value)}
+              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700"
+            />
+            {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
+          </div>
+
+          {/* Legal name note */}
+          <p className="text-gray-500 text-sm">Use your legal name. You can add a preferred name later.</p>
+
+          {/* Email */}
+          <div>
+            <input
+              type="email"
+              placeholder="Email"
+              value={formData.email}
+              onChange={(e) => onChange('email', e.target.value)}
+              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700"
+            />
+            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+          </div>
+        </div>
+
+        {/* Next button */}
+        <button
+          type="submit"
+          className="w-full p-4 bg-transparent border-2 border-black text-black uppercase font-medium rounded-lg mt-6 hover:bg-gray-50 transition-colors"
+        >
+          NEXT
+        </button>
+
+        {/* Legal disclosures */}
+        <p className="text-center text-gray-500 text-sm mt-4">
+          See legal disclosures
+        </p>
+      </form>
+    </div>
+  );
+};
+
+export default BasicInfoScreen;
+
+
+
+
+==== File: components\CreatePasswordScreen.tsx ====
+'use client';
+
+import React, { useState, useEffect } from 'react';
+
+interface CreatePasswordScreenProps {
+  formData: {
+    password: string;
+  };
+  onChange: (field: string, value: string) => void;
+  onNext: () => void;
+  isSubmitting?: boolean; // Added isSubmitting prop
+}
+
+const CreatePasswordScreen: React.FC<CreatePasswordScreenProps> = ({ 
+  formData, 
+  onChange, 
+  onNext,
+  isSubmitting = false // Added with default value
+}) => {
+  const [error, setError] = useState('');
+  const [passwordStrength, setPasswordStrength] = useState(0);
+  const [showPassword, setShowPassword] = useState(false);
+
+  // Update password strength when password changes
+  useEffect(() => {
+    calculatePasswordStrength(formData.password);
+  }, [formData.password]);
+
+  // Calculate password strength
+  const calculatePasswordStrength = (password: string) => {
+    if (!password) {
+      setPasswordStrength(0);
+      return;
+    }
+
+    let strength = 0;
+    
+    // Length check
+    if (password.length >= 8) {
+      strength += 1;
+    }
+    
+    // Uppercase check
+    if (/[A-Z]/.test(password)) {
+      strength += 1;
+    }
+    
+    // Lowercase check
+    if (/[a-z]/.test(password)) {
+      strength += 1;
+    }
+    
+    // Number check
+    if (/\d/.test(password)) {
+      strength += 1;
+    }
+    
+    // Special character check
+    if (/[^A-Za-z0-9]/.test(password)) {
+      strength += 1;
+    }
+    
+    setPasswordStrength(strength);
+  };
+
+  // Validate password
+  const validatePassword = () => {
+    if (!formData.password) {
+      setError('Password is required');
+      return false;
+    }
+
+    if (formData.password.length < 8) {
+      setError('Password must be at least 8 characters long');
+      return false;
+    }
+
+    if (!/[A-Z]/.test(formData.password) || !/[a-z]/.test(formData.password) || !/\d/.test(formData.password)) {
+      setError('Password must include uppercase, lowercase, and numbers');
+      return false;
+    }
+
+    setError('');
+    return true;
+  };
+
+  // Handle next button click
+  const handleNext = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (validatePassword()) {
+      onNext();
+    }
+  };
+
+  // Toggle password visibility
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
+
+  return (
+    <div className="max-w-md mx-auto">
+      {/* Form title */}
+      <h1 className="text-3xl font-bold mb-4">Create password</h1>
+      <p className="text-gray-600 mb-6">Strong passwords keep your account safer.</p>
+
+      {/* Form */}
+      <form onSubmit={handleNext}>
+        <div className="space-y-4">
+          {/* Password input */}
+          <div className="relative">
+            <input
+              type={showPassword ? 'text' : 'password'}
+              placeholder="Password"
+              value={formData.password}
+              onChange={(e) => onChange('password', e.target.value)}
+              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700"
+              disabled={isSubmitting}
+            />
+            <button
+              type="button"
+              onClick={togglePasswordVisibility}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+              disabled={isSubmitting}
+            >
+              {showPassword ? 'Hide' : 'Show'}
+            </button>
+            {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+          </div>
+
+          {/* Password strength indicator */}
+          <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
+            <div 
+              className={`h-full ${
+                passwordStrength === 0 ? 'w-0' :
+                passwordStrength === 1 ? 'w-1/5 bg-red-500' :
+                passwordStrength === 2 ? 'w-2/5 bg-orange-500' :
+                passwordStrength === 3 ? 'w-3/5 bg-yellow-500' :
+                passwordStrength === 4 ? 'w-4/5 bg-blue-500' :
+                'w-full bg-green-500'
+              }`}
+            ></div>
+          </div>
+
+          {/* Password requirements */}
+          <p className="text-gray-500 text-sm">
+            Use 8+ characters with uppercase, lowercase, and numbers
+          </p>
+        </div>
+
+        {/* Next button with loading state */}
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className={`w-full p-4 bg-transparent border-2 border-black text-black uppercase font-medium rounded-lg mt-6 ${
+            isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:bg-gray-50'
+          } transition-colors`}
+        >
+          {isSubmitting ? 'CREATING ACCOUNT...' : 'NEXT'}
+        </button>
+      </form>
+    </div>
+  );
+};
+
+export default CreatePasswordScreen;
+
+
+
+==== File: components\DateOfBirthScreen.tsx ====
+'use client';
+
+import React, { useState } from 'react';
+
+interface DateOfBirthScreenProps {
+  formData: {
+    dateOfBirth: string;
+  };
+  onChange: (field: string, value: string) => void;
+  onNext: () => void;
+}
+
+const DateOfBirthScreen: React.FC<DateOfBirthScreenProps> = ({ formData, onChange, onNext }) => {
+  const [error, setError] = useState('');
+
+  // Validate date of birth
+  const validateDateOfBirth = () => {
+    if (!formData.dateOfBirth) {
+      setError('Date of birth is required');
+      return false;
+    }
+
+    // Check if the user is at least 18 years old
+    const dob = new Date(formData.dateOfBirth);
+    const today = new Date();
+    const age = today.getFullYear() - dob.getFullYear();
+    const monthDiff = today.getMonth() - dob.getMonth();
+    
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+      // If birthday hasn't occurred yet this year, subtract one year
+      const adjustedAge = age - 1;
+      if (adjustedAge < 18) {
+        setError('You must be 18 years or older to join');
+        return false;
+      }
+    } else if (age < 18) {
+      setError('You must be 18 years or older to join');
+      return false;
+    }
+
+    setError('');
+    return true;
+  };
+
+  // Handle next button click
+  const handleNext = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (validateDateOfBirth()) {
+      onNext();
+    }
+  };
+
+  return (
+    <div className="max-w-md mx-auto">
+      {/* Form title */}
+      <h1 className="text-3xl font-bold mb-4">Your date of birth</h1>
+      <p className="text-gray-600 mb-6">You must be 18 years old or older to join.</p>
+
+      {/* Form */}
+      <form onSubmit={handleNext}>
+        <div className="space-y-4">
+          {/* Date of birth input */}
+          <div>
+            <input
+              type="date"
+              placeholder="Date of birth"
+              value={formData.dateOfBirth}
+              onChange={(e) => onChange('dateOfBirth', e.target.value)}
+              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700"
+            />
+            {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
+          </div>
+        </div>
+
+        {/* Next button */}
+        <button
+          type="submit"
+          className="w-full p-4 bg-transparent border-2 border-black text-black uppercase font-medium rounded-lg mt-6 hover:bg-gray-50 transition-colors"
+        >
+          NEXT
+        </button>
+      </form>
+    </div>
+  );
+};
+
+export default DateOfBirthScreen;
+
+
+
+
+==== File: components\MobilePhoneScreen.tsx ====
+'use client';
+
+import React, { useState } from 'react';
+
+interface MobilePhoneScreenProps {
+  formData: {
+    mobilePhone: string;
+  };
+  onChange: (field: string, value: string) => void;
+  onNext: () => void;
+}
+
+const MobilePhoneScreen: React.FC<MobilePhoneScreenProps> = ({ formData, onChange, onNext }) => {
+  const [error, setError] = useState('');
+  const [marketingConsent, setMarketingConsent] = useState(true);
+
+  // Validate phone number
+  const validatePhoneNumber = () => {
+    if (!formData.mobilePhone) {
+      setError('Mobile phone number is required');
+      return false;
+    }
+
+    // Simple US phone number validation (10 digits)
+    const digitsOnly = formData.mobilePhone.replace(/\D/g, '');
+    if (digitsOnly.length !== 10) {
+      setError('Please enter a valid 10-digit phone number');
+      return false;
+    }
+
+    setError('');
+    return true;
+  };
+
+  // Format phone number as user types
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const input = e.target.value.replace(/\D/g, '');
+    let formattedInput = input;
+
+    // Format as (XXX) XXX-XXXX
+    if (input.length > 0) {
+      if (input.length <= 3) {
+        formattedInput = input;
+      } else if (input.length <= 6) {
+        formattedInput = `(${input.substring(0, 3)}) ${input.substring(3)}`;
+      } else {
+        formattedInput = `(${input.substring(0, 3)}) ${input.substring(3, 6)}-${input.substring(6, 10)}`;
+      }
+    }
+
+    onChange('mobilePhone', formattedInput);
+  };
+
+  // Handle next button click
+  const handleNext = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (validatePhoneNumber()) {
+      // Here you could save the marketing consent preference
+      onNext();
+    }
+  };
+
+  // Handle transactional only button click
+  const handleTransactionalOnly = () => {
+    if (validatePhoneNumber()) {
+      setMarketingConsent(false);
+      onNext();
+    }
+  };
+
+  return (
+    <div className="max-w-md mx-auto">
+
+
+      {/* Form title */}
+      <h1 className="text-3xl font-bold mb-4">Your mobile phone</h1>
+      <p className="text-gray-600 mb-6">Your number is used to protect your account and keep in touch.</p>
+
+      {/* Form */}
+      <form onSubmit={handleNext}>
+        <div className="space-y-4">
+          {/* Phone number input */}
+          <div>
+            <label htmlFor="phone-input" className="sr-only">
+              Mobile phone number
+            </label>
+            <input
+              id="phone-input"
+              type="tel"
+              placeholder="Mobile phone number (no VOIP)"
+              value={formData.mobilePhone}
+              onChange={handlePhoneChange}
+              aria-describedby={error ? "phone-error" : undefined}
+              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700"
+            />
+            {error && (
+              <p id="phone-error" className="text-red-500 text-sm mt-1" role="alert">
+                {error}
+              </p>
+            )}
+          </div>
+
+          {/* Marketing consent text */}
+          <p className="text-gray-500 text-sm mt-4">
+            By selecting Next, you agree to receive periodic automated marketing text messages. Consent not required, cancel anytime. Message and data rates may apply. By selecting either option below, you agree to receive transactional updates and to the Telephone Use Agreement and Privacy Notice.
+          </p>
+        </div>
+
+        {/* Next button */}
+        <button
+          type="submit"
+          className="w-full p-4 bg-transparent border-2 border-black text-black uppercase font-medium rounded-lg mt-6 hover:bg-gray-50 transition-colors"
+        >
+          NEXT
+        </button>
+      </form>
+    </div>
+  );
+};
+
+export default MobilePhoneScreen;
+
+
+
+==== File: components\SignupFlow.tsx ====
+'use client';
+
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { X, ArrowLeft } from 'lucide-react';
+import BasicInfoScreen from '@/app/signup/components/BasicInfoScreen';
+import DateOfBirthScreen from '@/app/signup/components/DateOfBirthScreen';
+import MobilePhoneScreen from '@/app/signup/components/MobilePhoneScreen';
+import AddressScreen from '@/app/signup/components/AddressScreen';
+import CreatePasswordScreen from '@/app/signup/components/CreatePasswordScreen';
+
+// Define the steps in the signup flow
+enum SignupStep {
+  BASIC_INFO = 0,
+  DATE_OF_BIRTH = 1,
+  MOBILE_PHONE = 2,
+  ADDRESS = 3,
+  CREATE_PASSWORD = 4
+}
+
+// Define the form data structure
+interface SignupFormData {
+  firstName: string;
+  lastName: string;
+  email: string;
+  dateOfBirth: string;
+  mobilePhone: string;
+  streetAddress: string;
+  aptSuite: string;
+  zipCode: string;
+  city: string;
+  state: string;
+  password: string;
+}
+
+const SignupFlow: React.FC = () => {
+  const router = useRouter();
+  const [currentStep, setCurrentStep] = useState<SignupStep>(SignupStep.BASIC_INFO);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [formData, setFormData] = useState<SignupFormData>({
+    firstName: '',
+    lastName: '',
+    email: '',
+    dateOfBirth: '',
+    mobilePhone: '',
+    streetAddress: '',
+    aptSuite: '',
+    zipCode: '',
+    city: '',
+    state: '',
+    password: ''
+  });
+
+  const totalSteps = Object.keys(SignupStep).length / 2; // Divide by 2 because enum creates both numeric and string keys
+
+  // Handle form data changes
+  const handleChange = (field: string, value: string) => {
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+    
+    // Clear any previous error when user makes changes
+    if (error) setError(null);
+  };
+
+  // Handle next step
+  const handleNext = () => {
+    if (currentStep < SignupStep.CREATE_PASSWORD) {
+      setCurrentStep(prev => prev + 1);
+      // Focus management for accessibility
+      window.scrollTo(0, 0);
+    } else {
+      // Final step - complete signup
+      completeSignup();
+    }
+  };
+
+  // Handle back button
+  const handleBack = () => {
+    if (currentStep > SignupStep.BASIC_INFO) {
+      setCurrentStep(prev => prev - 1);
+      // Focus management for accessibility
+      window.scrollTo(0, 0);
+    } else {
+      // First step - go back to onboarding
+      router.push('/onboarding');
+    }
+  };
+
+  // Handle close button
+  const handleClose = () => {
+    if (window.confirm('Are you sure you want to exit? Your progress will be lost.')) {
+      router.push('/');
+    }
+  };
+
+  // Validate all form data before submission
+  const validateFormData = (): boolean => {
+    // Basic validation - check if required fields are filled
+    const requiredFields: (keyof SignupFormData)[] = [
+      'firstName', 'lastName', 'email', 'dateOfBirth', 
+      'mobilePhone', 'streetAddress', 'zipCode', 'city', 
+      'state', 'password'
+    ];
+    
+    for (const field of requiredFields) {
+      if (!formData[field]) {
+        setError(`Please complete all required fields before submitting.`);
+        return false;
+      }
+    }
+    
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError('Please enter a valid email address.');
+      return false;
+    }
+    
+    return true;
+  };
+
+  // Complete signup and redirect to admin page
+  const completeSignup = async () => {
+    if (!validateFormData()) return;
+    
+    setIsSubmitting(true);
+    setError(null);
+    
+    try {
+      console.log('Signup completed with data:', formData);
+      
+      // In a real app, this would call an API to create the account
+      // For example:
+      // await apiClient.createAccount(formData);
+      
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      localStorage.removeItem('selectedUserId');
+      router.push('/');
+      
+    } catch (err) {
+      console.error('Signup failed:', err);
+      setError('Failed to create account. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // Render the current step
+  const renderStep = () => {
+    switch (currentStep) {
+      case SignupStep.BASIC_INFO:
+        return (
+          <BasicInfoScreen 
+            formData={formData} 
+            onChange={handleChange} 
+            onNext={handleNext} 
+          />
+        );
+      case SignupStep.DATE_OF_BIRTH:
+        return (
+          <DateOfBirthScreen 
+            formData={formData} 
+            onChange={handleChange} 
+            onNext={handleNext} 
+          />
+        );
+      case SignupStep.MOBILE_PHONE:
+        return (
+          <MobilePhoneScreen 
+            formData={formData} 
+            onChange={handleChange} 
+            onNext={handleNext} 
+          />
+        );
+      case SignupStep.ADDRESS:
+        return (
+          <AddressScreen 
+            formData={formData} 
+            onChange={handleChange} 
+            onNext={handleNext} 
+          />
+        );
+      case SignupStep.CREATE_PASSWORD:
+        return (
+          <CreatePasswordScreen 
+            formData={formData} 
+            onChange={handleChange} 
+            onNext={handleNext} 
+            isSubmitting={isSubmitting}
+          />
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Header with navigation buttons */}
+      <div className="h-16 bg-black flex items-center justify-between px-4">
+        {currentStep > SignupStep.BASIC_INFO ? (
+          <button 
+            onClick={handleBack}
+            className="p-2 text-white"
+            aria-label="Go back"
+          >
+            <ArrowLeft size={24} />
+          </button>
+        ) : (
+          <button 
+            onClick={handleClose}
+            className="p-2 text-white"
+            aria-label="Close"
+          >
+            <X size={24} />
+          </button>
+        )}
+        
+        {/* Progress indicator */}
+        <div className="text-white text-sm">
+          Step {currentStep + 1} of {totalSteps}
+        </div>
+      </div>
+
+      {/* Current step content */}
+      <div className="px-4 pb-8">
+        {renderStep()}
+        
+        {/* Global error message */}
+        {error && (
+          <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded">
+            {error}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default SignupFlow;
+
+
+
+

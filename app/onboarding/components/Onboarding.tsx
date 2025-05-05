@@ -107,7 +107,9 @@ const Onboarding: React.FC<OnboardingProps> = () => {
     };
   }, []);
 
+  // Auto-advance timer function remains the same
   const startAutoAdvanceTimer = () => {
+    // Existing implementation
     if (autoAdvanceTimerRef.current) {
       clearTimeout(autoAdvanceTimerRef.current);
     }
@@ -125,16 +127,19 @@ const Onboarding: React.FC<OnboardingProps> = () => {
     }
   };
 
+  // Other functions remain the same
   const goToSlide = (index: number) => {
+    // Existing implementation
     setSlideDirection(index > currentSlide ? 'right' : 'left');
     setCurrentSlide(index);
     startAutoAdvanceTimer();
   };
 
   const nextSlide = () => {
+    // Existing implementation
     if (currentSlide < slides.length - 1) {
       setSlideDirection('right');
-          setCurrentSlide((prev: number) => prev + 1);
+      setCurrentSlide((prev: number) => prev + 1);
     } else {
       setSlideDirection('right');
       setCurrentSlide(0);
@@ -143,9 +148,10 @@ const Onboarding: React.FC<OnboardingProps> = () => {
   };
 
   const prevSlide = () => {
+    // Existing implementation
     if (currentSlide > 0) {
       setSlideDirection('left');
-          setCurrentSlide((prev: number) => prev - 1);
+      setCurrentSlide((prev: number) => prev - 1);
     } else {
       setSlideDirection('left');
       setCurrentSlide(slides.length - 1);
@@ -179,11 +185,13 @@ const Onboarding: React.FC<OnboardingProps> = () => {
 
   // Touch event handlers for swipe gestures
   const handleTouchStart = (e: React.TouchEvent) => {
+    // Existing implementation
     touchStartX.current = e.touches[0].clientX;
     touchStartY.current = e.touches[0].clientY;
   };
 
   const handleTouchEnd = (e: React.TouchEvent) => {
+    // Existing implementation
     const touchEndX = e.changedTouches[0].clientX;
     const touchEndY = e.changedTouches[0].clientY;
     const xDiff = touchStartX.current - touchEndX;
@@ -201,7 +209,7 @@ const Onboarding: React.FC<OnboardingProps> = () => {
 
   return (
     <div 
-      className="flex flex-col w-full overflow-hidden"
+      className="flex flex-col w-full h-full overflow-hidden"
       style={{ 
         backgroundColor: slides[currentSlide].bgColor,
         color: slides[currentSlide].textColor,
@@ -211,8 +219,8 @@ const Onboarding: React.FC<OnboardingProps> = () => {
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Logo */}
-      <div className="flex justify-center pt-12 pb-4">
+      {/* Logo - fixed height */}
+      <div className="flex justify-center py-6 h-16">
         <img 
           src="/images/icons/logo.svg" 
           alt="Members 1st Credit Union" 
@@ -220,64 +228,75 @@ const Onboarding: React.FC<OnboardingProps> = () => {
         />
       </div>
 
-      {/* Main content area */}
-      <div className="relative flex-1 overflow-hidden">
+      {/* Main content area - flex-grow to take available space */}
+      <div className="relative flex-grow flex items-end overflow-hidden">
         <animated.div 
           style={slideAnimation}
-          className="absolute inset-0 flex flex-col items-center justify-center"
+          className="absolute inset-0 flex flex-col items-center justify-end"
         >
-          {/* Image */}
-          <div className="flex-1 w-full flex items-end justify-center">
+          {/* Image container with proper constraints */}
+          <div className="w-full h-full flex items-end justify-center px-4 ">
             <img 
               src={slides[currentSlide].image} 
               alt={slides[currentSlide].imageAlt}
-              className="max-h-[70%] max-w-full object-contain"
+              className="max-h-full max-w-full object-contain object-bottom"
+              style={{ maxHeight: 'calc(100% - 20px)' }} // Ensure some bottom padding
             />
           </div>
         </animated.div>
       </div>
 
-      {/* Dark gray bottom section - height controlled by this style */}
-      <div className="w-full bg-neutral-900 text-white flex flex-col" style={{ height: '45%' }}>
-        {/* Text content - animated with same timing as image */}
-        <animated.div 
-          style={slideAnimation}
-          className="w-full px-6 pt-8 pb-4 text-center flex-1 overflow-y-hidden"
-        >
-          <h1 className="text-3xl font-bold mb-4">{slides[currentSlide].title}</h1>
-          <p className="text-md opacity-90 line-clamp-3">{slides[currentSlide].subtitle}</p>
-        </animated.div>
-        
-        {/* Pagination dots */}
-        <div className="flex justify-center space-x-2 py-4">
-          {slides.map((_, index) => (
-            <button
-              key={index}
-              onClick={() => goToSlide(index)}
-              className={`w-2 h-2 rounded-full transition-all ${
-                index === currentSlide 
-                  ? 'bg-white w-4' 
-                  : 'bg-white/50'
-              }`}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
-        </div>
+   {/* Dark gray bottom section - with flex layout */}
+   <div className="w-full bg-neutral-900 text-white flex flex-col" 
+           style={{ height: '45%' }}>
+        {/* Content container with flex layout */}
+        <div className="flex flex-col h-full">
+          {/* Text content - with fixed height */}
+          <animated.div 
+            style={slideAnimation}
+            className="w-full px-6 pt-8 h-32 overflow-hidden"
+          >
+            <h1 className="text-2xl md:text-3xl font-bold mb-2 md:mb-4">{slides[currentSlide].title}</h1>
+            <p className="text-sm md:text-md opacity-90 line-clamp-3 overflow-ellipsis">{slides[currentSlide].subtitle}</p>
+          </animated.div>
+          
+          {/* Spacer to push content to edges */}
+          <div className="flex-grow"></div>
 
-        {/* Action buttons */}
-        <div className="px-6 pb-8 space-y-4">
-          <button
-            onClick={handleSignUp}
-            className="w-full py-4 bg-gray-200 text-black font-medium rounded-lg hover:bg-gray-300 transition-colors"
-          >
-            Sign up
-          </button>
-          <button
-            onClick={handleLogin}
-            className="w-full py-4 bg-transparent text-white font-medium hover:bg-white/10 transition-colors"
-          >
-            Log in
-          </button>
+          {/* Action buttons with pagination dots - anchored to bottom */}
+          <div className="px-6 mt-auto">
+            {/* Pagination dots */}
+            <div className="flex justify-center space-x-2 py-3 mb-3">
+              {slides.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => goToSlide(index)}
+                  className={`w-2 h-2 rounded-full transition-all ${
+                    index === currentSlide 
+                      ? 'bg-white w-4' 
+                      : 'bg-white/50'
+                  }`}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
+            
+            {/* Buttons */}
+            <div className="space-y-3 pb-3">
+              <button
+                onClick={handleSignUp}
+                className="w-full py-3 bg-gray-200 text-black font-medium rounded-lg hover:bg-gray-300 transition-colors"
+              >
+                Sign up
+              </button>
+              <button
+                onClick={handleLogin}
+                className="w-full py-3 bg-transparent text-white font-medium hover:bg-white/10 transition-colors"
+              >
+                Log in
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

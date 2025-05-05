@@ -4,27 +4,36 @@ import { useEffect } from 'react';
 
 export default function RegisterServiceWorker() {
   useEffect(() => {
+    // Skip service worker registration in development
+    if (process.env.NODE_ENV === 'development') {
+      console.log('Skipping service worker registration in development mode');
+      return;
+    }
+
     const registerSW = async () => {
       if ('serviceWorker' in navigator) {
         try {
-          // Clear any caches that might be causing issues
-          if ('caches' in window) {
-            try {
-              const cacheNames = await caches.keys();
-              await Promise.all(
-                cacheNames.map(cacheName => caches.delete(cacheName))
-              );
-              console.log('All caches cleared successfully');
-            } catch (error) {
-              console.error('Error clearing caches:', error);
+          // Only clear caches and unregister in production
+          if (process.env.NODE_ENV === 'production') {
+            // Clear any caches that might be causing issues
+            if ('caches' in window) {
+              try {
+                const cacheNames = await caches.keys();
+                await Promise.all(
+                  cacheNames.map(cacheName => caches.delete(cacheName))
+                );
+                console.log('All caches cleared successfully');
+              } catch (error) {
+                console.error('Error clearing caches:', error);
+              }
             }
-          }
-          
-          // Unregister any existing service workers first to ensure clean registration
-          const registrations = await navigator.serviceWorker.getRegistrations();
-          for (const registration of registrations) {
-            await registration.unregister();
-            console.log('Unregistered existing service worker');
+            
+            // Unregister any existing service workers first to ensure clean registration
+            const registrations = await navigator.serviceWorker.getRegistrations();
+            for (const registration of registrations) {
+              await registration.unregister();
+              console.log('Unregistered existing service worker');
+            }
           }
           
           // Register the service worker with explicit scope
@@ -77,11 +86,14 @@ export default function RegisterServiceWorker() {
             }
           }
           
-          // Set up interval to check for updates
-          setInterval(() => {
-            registration.update();
-            console.log('Checking for Service Worker updates...');
-          }, 60 * 60 * 1000); // Check every hour
+          // Only set up update interval in production
+          if (process.env.NODE_ENV === 'production') {
+            // Set up interval to check for updates
+            setInterval(() => {
+              registration.update();
+              console.log('Checking for Service Worker updates...');
+            }, 60 * 60 * 1000); // Check every hour
+          }
           
         } catch (error) {
           console.error('❌ Service Worker registration failed:', error);

@@ -91,63 +91,83 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
         <div className="space-y-4">
           {/* Street address */}
           <div>
+            <label htmlFor="street-address" className="sr-only">Street address</label>
             <input
+              id="street-address"
               type="text"
               placeholder="Street address (no P.O. boxes)"
               value={formData.streetAddress}
               onChange={(e) => onChange('streetAddress', e.target.value)}
-              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700"
+              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700 appearance-none"
+              autoComplete="street-address"
+              autoCapitalize="words"
             />
-            {errors.streetAddress && <p className="text-red-500 text-sm mt-1">{errors.streetAddress}</p>}
+            {errors.streetAddress && <p id="street-address-error" className="text-red-500 text-sm mt-1" role="alert">{errors.streetAddress}</p>}
           </div>
 
           {/* Apt/Suite (optional) */}
           <div>
+            <label htmlFor="apt-suite" className="sr-only">Apartment or Suite number</label>
             <input
+              id="apt-suite"
               type="text"
               placeholder="Apt / Suite number (optional)"
               value={formData.aptSuite}
               onChange={(e) => onChange('aptSuite', e.target.value)}
-              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700"
+              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700 appearance-none"
+              autoComplete="address-line2"
             />
           </div>
 
           {/* ZIP Code */}
           <div>
+            <label htmlFor="zip-code" className="sr-only">ZIP Code</label>
             <input
+              id="zip-code"
               type="text"
+              inputMode="numeric"
+              pattern="[0-9]*"
               placeholder="ZIP Code"
               value={formData.zipCode}
               onChange={(e) => onChange('zipCode', e.target.value.replace(/\D/g, '').substring(0, 5))}
-              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700"
+              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700 appearance-none"
+              autoComplete="postal-code"
+              maxLength={5}
             />
-            {errors.zipCode && <p className="text-red-500 text-sm mt-1">{errors.zipCode}</p>}
+            {errors.zipCode && <p id="zip-code-error" className="text-red-500 text-sm mt-1" role="alert">{errors.zipCode}</p>}
           </div>
 
           {/* City and State */}
           <div className="grid grid-cols-2 gap-4">
             <div>
+              <label htmlFor="city" className="sr-only">City</label>
               <input
+                id="city"
                 type="text"
                 placeholder="City"
                 value={formData.city}
                 onChange={(e) => onChange('city', e.target.value)}
-                className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700"
+                className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700 appearance-none"
+                autoComplete="address-level2"
+                autoCapitalize="words"
               />
-              {errors.city && <p className="text-red-500 text-sm mt-1">{errors.city}</p>}
+              {errors.city && <p id="city-error" className="text-red-500 text-sm mt-1" role="alert">{errors.city}</p>}
             </div>
             <div>
+              <label htmlFor="state" className="sr-only">State</label>
               <select
+                id="state"
                 value={formData.state}
                 onChange={(e) => onChange('state', e.target.value)}
                 className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700 appearance-none"
+                autoComplete="address-level1"
               >
                 <option value="">State</option>
                 {states.map(state => (
                   <option key={state} value={state}>{state}</option>
                 ))}
               </select>
-              {errors.state && <p className="text-red-500 text-sm mt-1">{errors.state}</p>}
+              {errors.state && <p id="state-error" className="text-red-500 text-sm mt-1" role="alert">{errors.state}</p>}
             </div>
           </div>
         </div>
@@ -155,7 +175,7 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
         {/* Next button */}
         <button
           type="submit"
-          className="w-full p-4 bg-transparent border-2 border-black text-black uppercase font-medium rounded-lg mt-6 hover:bg-gray-50 transition-colors"
+          className="w-full p-4 bg-transparent border-2 border-black text-black uppercase font-medium rounded-lg mt-6 hover:bg-gray-50 active:bg-gray-100 transition-colors touch-manipulation"
         >
           NEXT
         </button>
