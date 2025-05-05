@@ -87,12 +87,17 @@ const BasicInfoScreen: React.FC<BasicInfoScreenProps> = ({ formData, onChange, o
               type="text"
               placeholder="First name"
               value={formData.firstName}
-              onChange={(e) => onChange('firstName', e.target.value)}
+              onChange={(e) => {
+                console.log('firstName onChange', e.target.value);
+                onChange('firstName', e.target.value);
+              }}
+              onBlur={() => console.log('firstName onBlur')}
               className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700 appearance-none"
               autoComplete="given-name"
               autoCapitalize="words"
               autoCorrect="off"
               spellCheck="false"
+              key="firstName-input"
             />
             {errors.firstName && <p id="firstName-error" className="text-red-500 text-sm mt-1" role="alert">{errors.firstName}</p>}
           </div>
@@ -105,12 +110,17 @@ const BasicInfoScreen: React.FC<BasicInfoScreenProps> = ({ formData, onChange, o
               type="text"
               placeholder="Last name"
               value={formData.lastName}
-              onChange={(e) => onChange('lastName', e.target.value)}
+              onChange={(e) => {
+                console.log('lastName onChange', e.target.value);
+                onChange('lastName', e.target.value);
+              }}
+              onBlur={() => console.log('lastName onBlur')}
               className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700 appearance-none"
               autoComplete="family-name"
               autoCapitalize="words"
               autoCorrect="off"
               spellCheck="false"
+              key="lastName-input"
             />
             {errors.lastName && <p id="lastName-error" className="text-red-500 text-sm mt-1" role="alert">{errors.lastName}</p>}
           </div>
@@ -127,12 +137,17 @@ const BasicInfoScreen: React.FC<BasicInfoScreenProps> = ({ formData, onChange, o
               inputMode="email"
               placeholder="Email"
               value={formData.email}
-              onChange={(e) => onChange('email', e.target.value)}
+              onChange={(e) => {
+                console.log('email onChange', e.target.value);
+                onChange('email', e.target.value);
+              }}
+              onBlur={() => console.log('email onBlur')}
               className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700 appearance-none"
               autoComplete="email"
               autoCapitalize="off"
               autoCorrect="off"
               spellCheck="false"
+              key="email-input"
             />
             {errors.email && <p id="email-error" className="text-red-500 text-sm mt-1" role="alert">{errors.email}</p>}
           </div>
