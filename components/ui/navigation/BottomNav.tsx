@@ -11,12 +11,12 @@ import { NavItemType } from '@/lib/types';
 const BottomNav: React.FC = () => {
   const pathname = usePathname();
   
-  // Define the navigation items with new arrangement
+  // Define the navigation items with the requested arrangement
   const items: NavItemType[] = [
     { name: 'Home', icon: 'home', href: '/home' },
-    { name: 'Cards', icon: 'card', href: '/credit-card' },
-    { name: 'Accounts', icon: 'wallet', href: '/' },
+    { name: 'Deposit', icon: 'deposit', href: '/deposit' },
     { name: 'Transfer', icon: 'transfer', href: '/transfer' },
+    { name: 'Insights', icon: 'insights', href: '/insights' },
     { name: 'More', icon: 'more', href: '/more' },
   ];
   
@@ -31,7 +31,7 @@ const BottomNav: React.FC = () => {
   return (
     <animated.div 
       style={{
-        opacity: 1, // Always visible
+        opacity: 1,
         transform: `translateY(${navbarSpring.y}px)`,
         zIndex: 100
       }}
@@ -41,7 +41,6 @@ const BottomNav: React.FC = () => {
     >
       {items.map((item) => {
         const isActive = pathname === item.href;
-        const isSpecial = item.name === 'Accounts';
 
         return (
           <Link 
@@ -52,11 +51,10 @@ const BottomNav: React.FC = () => {
             <div
               className={`
                 ${isActive ? 'text-white' : 'text-gray-400'} 
-                ${isSpecial ? 'bg-red-600 p-3 rounded-full -mt-8 shadow-lg border border-red-700' : ''}
                 transition-all duration-200
               `}
             >
-              <Icon name={item.icon} className={`${isSpecial ? 'w-6 h-6' : 'w-5 h-5'}`} />
+              <Icon name={item.icon} className="w-5 h-5" />
             </div>
             <span
               className={`text-xs mt-1 ${isActive ? 'text-white' : 'text-gray-400'}`}

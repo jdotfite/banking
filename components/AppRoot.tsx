@@ -29,10 +29,10 @@ const AppContent: React.FC = () => {
 
   // Redirect new users to onboarding
   useEffect(() => {
-    if (selectedUserId === 'new' && typeof window !== 'undefined') {
-      window.location.href = '/onboarding';
+    if (selectedUserId === 'new') {
+      router.push('/onboarding');
     }
-  }, [selectedUserId]);
+  }, [selectedUserId, router]);
 
   // Redirect to home page when user is selected
   useEffect(() => {

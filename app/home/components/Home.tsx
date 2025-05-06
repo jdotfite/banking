@@ -204,7 +204,7 @@ const Home: React.FC = () => {
                 </div>
                 <div className="text-right">
                   <div className="font-medium tracking-tight text-white">
-                    ${account.balance.toFixed(2)}
+                    ${account.balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                   </div>
                   <div className="text-gray-400 text-xs capitalize">
                     {account.type}

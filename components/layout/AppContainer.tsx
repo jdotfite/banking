@@ -2,6 +2,7 @@
 'use client';
 
 import React, { ReactNode } from 'react';
+import { usePathname } from 'next/navigation';
 import BottomNav from '@/components/ui/navigation/BottomNav';
 import { UserProvider } from '@/components/context/UserContext';
 import { EnhancedBankingDataProvider } from '@/components/preloaders/EnhancedBankingDataProvider';
@@ -20,8 +21,8 @@ interface AppContainerProps {
  * This ensures the bottom navigation is only loaded once and is consistent across all pages
  */
 const AppContainer: React.FC<AppContainerProps> = ({ children }) => {
-  const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
-  const showBottomNav = !['/onboarding', '/login', '/signup'].includes(pathname);
+  const pathname = usePathname();
+  const showBottomNav = !['/onboarding', '/login', '/signup'].includes(pathname || '');
 
   return (
     <ThemeContextProvider>

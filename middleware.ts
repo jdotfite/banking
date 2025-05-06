@@ -28,8 +28,8 @@ export function middleware(request: NextRequest) {
   // Create the response
   const response = NextResponse.next();
   
-  // Add cache-busting headers in development mode
-  if (process.env.NODE_ENV === 'development') {
+  // Add cache-busting headers for login page and in development mode
+  if (pathname === '/login' || process.env.NODE_ENV === 'development') {
     response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
     response.headers.set('Pragma', 'no-cache');
     response.headers.set('Expires', '0');

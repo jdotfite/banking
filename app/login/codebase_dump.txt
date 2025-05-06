@@ -1,0 +1,748 @@
+==== File: C:\_websites\banking\app\login\dump-codebase.ps1 ====
+# dump-codebase.ps1
+# This script traverses the codebase recursively and dumps the content of each file
+# into a single text file with headers showing the file path. It excludes:
+#   - Files in the .git directory
+#   - Files in the node_modules directory
+#   - package.json and package-lock.json files
+
+# Name of the final dump file
+$destinationFile = "codebase_dump.txt"
+
+# Remove the destination file if it already exists
+if (Test-Path $destinationFile) {
+    Remove-Item $destinationFile
+}
+
+# Get all files recursively in the current directory, excluding unwanted directories/files.
+$files = Get-ChildItem -Recurse -File | Where-Object {
+    $_.FullName -notmatch '\\.git\\' -and `
+    $_.FullName -notmatch '\\node_modules\\' -and `
+    $_.Name -ne "package.json" -and `
+    $_.Name -ne "package-lock.json"
+}
+
+foreach ($file in $files) {
+    # Write a header with the file's full path
+    Add-Content -Path $destinationFile -Value "==== File: $($file.FullName) ===="
+    # Append the file's content (as a single string)
+    Add-Content -Path $destinationFile -Value (Get-Content $file.FullName -Raw)
+    # Add extra spacing between files
+    Add-Content -Path $destinationFile -Value "`n`n"
+}
+
+Write-Host "Codebase dumped to $destinationFile."
+
+
+
+
+==== File: C:\_websites\banking\app\login\page.tsx ====
+'use client';
+
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { animated, useSpring } from 'react-spring';
+import type { AuthViewType } from './components/types';
+import AuthHeader from './components/AuthHeader';
+import LoginForm from './components/LoginForm';
+import ForgotPasswordForm from './components/ForgotPasswordForm';
+import RecoverUsernameForm from './components/RecoverUsernameForm';
+import HelpCenter from './components/HelpCenter';
+
+export default function AuthPage() {
+  const [currentView, setCurrentView] = useState<AuthViewType>('login');
+  const router = useRouter();
+
+  const handleBack = () => {
+    router.push('/onboarding');
+  };
+
+  const fadeIn = useSpring({
+    opacity: 1,
+    transform: 'translateY(0px)',
+    from: { opacity: 0, transform: 'translateY(20px)' },
+    config: { tension: 280, friction: 60 }
+  });
+
+  const renderView = () => {
+    switch (currentView) {
+      case 'login':
+        return <LoginForm setView={setCurrentView} />;
+      case 'forgotPassword':
+        return <ForgotPasswordForm setView={setCurrentView} />;
+      case 'recoverUsername':
+        return <RecoverUsernameForm setView={setCurrentView} />;
+      case 'helpCenter':
+        return <HelpCenter setView={setCurrentView} />;
+      default:
+        return <LoginForm setView={setCurrentView} />;
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-app-black text-white">
+      <AuthHeader currentView={currentView} onBack={handleBack} />
+      <animated.div style={fadeIn} className="px-5 mx-auto max-w-md">
+        {renderView()}
+      </animated.div>
+    </div>
+  );
+}
+
+
+
+
+==== File: C:\_websites\banking\app\login\components\AuthHeader.d.ts ====
+import { AuthHeaderProps } from './types';
+
+declare const AuthHeader: React.FC<AuthHeaderProps>;
+export default AuthHeader;
+
+
+
+
+==== File: C:\_websites\banking\app\login\components\AuthHeader.tsx ====
+'use client';
+
+import { ArrowLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+
+interface AuthHeaderProps {
+  currentView: 'login' | 'forgotPassword' | 'recoverUsername' | 'helpCenter';
+  onBack: () => void;
+  title?: string; // Optional custom title override
+}
+
+const AuthHeader: React.FC<AuthHeaderProps> = ({ currentView, onBack, title }) => {
+  const router = useRouter();
+  return (
+    <div className="px-5 pt-8 pb-6 mx-auto max-w-md">
+      <div className="flex items-center">
+        <button
+          onClick={onBack}
+          className="p-2 rounded-full hover:bg-white/10 transition-colors"
+          aria-label="Go back"
+        >
+          <ArrowLeft size={24} />
+        </button>
+      <h1 className="text-xl font-medium ml-2">
+        {title || (
+          <>
+            {currentView === 'login' && 'Log in to your account'}
+            {currentView === 'forgotPassword' && 'Reset your password'}
+            {currentView === 'recoverUsername' && 'Recover your username'}
+            {currentView === 'helpCenter' && 'Help Center'}
+          </>
+        )}
+      </h1>
+      </div>
+    </div>
+  );
+};
+
+export default AuthHeader;
+
+
+
+
+==== File: C:\_websites\banking\app\login\components\ForgotPasswordForm.d.ts ====
+import { ViewProps } from './types';
+
+declare const ForgotPasswordForm: React.FC<ViewProps>;
+export default ForgotPasswordForm;
+
+
+
+
+==== File: C:\_websites\banking\app\login\components\ForgotPasswordForm.tsx ====
+'use client';
+
+import React, { useState } from 'react';
+import { Mail, AlertCircle } from 'lucide-react';
+import { animated } from 'react-spring';
+
+interface ForgotPasswordFormProps {
+  setView: (view: 'login' | 'forgotPassword' | 'recoverUsername' | 'helpCenter') => void;
+}
+
+const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ setView }) => {
+  const [email, setEmail] = useState('');
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!email) {
+      setError('Please enter your email address');
+      return;
+    }
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address');
+      return;
+    }
+    
+    console.log('Password reset requested for:', email);
+    setIsSubmitted(true);
+  };
+
+  return (
+    <>
+      {!isSubmitted ? (
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <p className="text-gray-300 mb-4">
+            Enter your email address and we'll send you instructions to reset your password.
+          </p>
+          
+          {error && (
+            <div className="bg-red-500/20 border border-red-500 text-red-200 p-4 rounded-lg flex items-start">
+              <AlertCircle size={20} className="mr-2 mt-0.5 flex-shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
+          
+          <div className="space-y-1">
+            <label htmlFor="reset-email" className="block text-sm font-medium text-gray-300">
+              Email Address
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Mail size={18} className="text-gray-500" />
+              </div>
+              <input
+                type="email"
+                id="reset-email"
+                value={email}
+                onChange={(e) => {
+                  setEmail(e.target.value);
+                  if (error) setError('');
+                }}
+                className="w-full pl-10 pr-3 py-3 bg-[#1a1a1a] border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-transparent"
+                placeholder="you@example.com"
+                required
+              />
+            </div>
+          </div>
+          
+          <div className="flex flex-col gap-3 pt-2">
+            <button
+              type="submit"
+              className="w-full py-3 bg-green-200 text-black font-medium rounded-lg hover:bg-green-300 transition-colors"
+            >
+              Send reset instructions
+            </button>
+            
+            <button
+              type="button"
+              onClick={() => setView('login')}
+              className="w-full py-3 bg-transparent border border-gray-700 text-white font-medium rounded-lg hover:bg-white/5 transition-colors"
+            >
+              Back to login
+            </button>
+          </div>
+          
+          <div className="mt-6 pt-4 border-t border-gray-800 flex justify-between">
+            <button
+              type="button"
+              onClick={() => setView('recoverUsername')}
+              className="text-sm text-gray-400 hover:text-white transition-colors"
+            >
+              Forgot username?
+            </button>
+            
+            <button
+              type="button"
+              onClick={() => setView('helpCenter')}
+              className="text-sm text-gray-400 hover:text-white transition-colors"
+            >
+              Need more help?
+            </button>
+          </div>
+        </form>
+      ) : (
+        <div className="text-center py-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-200/20 mb-4">
+            <Mail size={32} className="text-green-200" />
+          </div>
+          <h2 className="text-xl font-medium mb-2">Check your email</h2>
+          <p className="text-gray-300 mb-6">
+            We've sent instructions to reset your password to {email}
+          </p>
+          <button
+            onClick={() => setView('login')}
+            className="w-full py-3 bg-green-200 text-black font-medium rounded-lg hover:bg-green-300 transition-colors"
+          >
+            Back to login
+          </button>
+          <p className="mt-4 text-sm text-gray-400">
+            Didn't receive the email? Check your spam folder or{' '}
+            <button
+              type="button"
+              onClick={() => setIsSubmitted(false)}
+              className="text-green-200 hover:underline"
+            >
+              try again
+            </button>
+          </p>
+        </div>
+      )}
+    </>
+  );
+};
+
+export default ForgotPasswordForm;
+
+
+
+
+==== File: C:\_websites\banking\app\login\components\HelpCenter.d.ts ====
+import { ViewProps } from './types';
+
+declare const HelpCenter: React.FC<ViewProps>;
+export default HelpCenter;
+
+
+
+
+==== File: C:\_websites\banking\app\login\components\HelpCenter.tsx ====
+'use client';
+
+import React from 'react';
+import { Mail, HelpCircle } from 'lucide-react';
+import { animated } from 'react-spring';
+
+interface HelpCenterProps {
+  setView: (view: 'login' | 'forgotPassword' | 'recoverUsername' | 'helpCenter') => void;
+}
+
+const HelpCenter: React.FC<HelpCenterProps> = ({ setView }) => {
+  const helpOptions = [
+    {
+      title: 'Forgot password?',
+      action: () => setView('forgotPassword'),
+      description: 'Reset your password via email'
+    },
+    {
+      title: 'Unlock account?',
+              action: () => setView('login'),
+      description: 'Unlock an account that has been locked due to too many failed login attempts'
+    },
+    {
+      title: 'Forgot Username?',
+      action: () => setView('recoverUsername'),
+      description: 'Recover your username via email'
+    },
+    {
+      title: 'Frequently Asked Questions',
+              action: () => setView('login'), 
+      description: 'Find answers to common questions'
+    }
+  ];
+
+  return (
+    <div className="pb-8">
+      <h2 className="text-xl font-semibold text-center mb-6">How can we help?</h2>
+      
+      <div className="space-y-3">
+        {helpOptions.map((option, index) => (
+          <button
+            key={index}
+            onClick={option.action}
+            className="w-full text-left p-4 bg-[#1a1a1a] border border-gray-700 rounded-lg hover:bg-[#252525] transition-colors"
+          >
+            <h3 className="font-medium mb-1">{option.title}</h3>
+            <p className="text-sm text-gray-400">{option.description}</p>
+          </button>
+        ))}
+      </div>
+      
+      <div className="mt-8 text-center">
+        <button
+          onClick={() => setView('login')}
+          className="text-green-200 hover:text-green-100 transition-colors"
+        >
+          Back to login
+        </button>
+      </div>
+      
+      <div className="mt-8 pt-6 border-t border-gray-800 text-center">
+        <p className="text-sm text-gray-400 mb-2">Need additional support?</p>
+        <a href="tel:18002377288" className="text-green-200 hover:text-green-100 transition-colors">
+          Call 1-800-237-7288
+        </a>
+      </div>
+    </div>
+  );
+};
+
+export default HelpCenter;
+
+
+
+
+==== File: C:\_websites\banking\app\login\components\LoginForm.tsx ====
+'use client';
+
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { animated } from 'react-spring';
+import { Eye, EyeOff, HelpCircle, Lock, Mail, AlertCircle } from 'lucide-react';
+
+interface LoginFormProps {
+  setView: (view: 'login' | 'forgotPassword' | 'recoverUsername' | 'helpCenter') => void;
+}
+
+const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
+  const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    rememberMe: false
+  });
+  const [error, setError] = useState('');
+  const router = useRouter();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value
+    }));
+    
+    if (error) setError('');
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.email || !formData.password) {
+      setError('Please enter both email and password');
+      return;
+    }
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setError('Please enter a valid email address');
+      return;
+    }
+    
+    console.log('Login attempt:', formData);
+    
+    setTimeout(() => {
+      document.cookie = `auth_token=dummy_token; path=/; max-age=${60 * 60 * 24 * 7}`;
+      localStorage.removeItem('selectedUserId');
+      localStorage.setItem('selectedUserId', 'user1');
+      document.cookie = `selectedUserId=user1; path=/; max-age=${60 * 60 * 24 * 7}`;
+      router.push('/login');
+    }, 1000);
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="space-y-5">
+      {error && (
+        <div className="bg-red-500/20 border border-red-500 text-red-200 p-4 rounded-lg flex items-start">
+          <AlertCircle size={20} className="mr-2 mt-0.5 flex-shrink-0" />
+          <span>{error}</span>
+        </div>
+      )}
+      
+      <div className="space-y-1">
+        <label htmlFor="email" className="block text-sm font-medium text-gray-300">
+          Email Address
+        </label>
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Mail size={18} className="text-gray-500" />
+          </div>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            className="w-full pl-10 pr-3 py-3 bg-[#1a1a1a] border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-transparent"
+            placeholder="you@example.com"
+            required
+          />
+        </div>
+      </div>
+      
+      <div className="space-y-1">
+        <label htmlFor="password" className="block text-sm font-medium text-gray-300">
+          Password
+        </label>
+        <div className="relative">
+          <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <Lock size={18} className="text-gray-500" />
+          </div>
+          <input
+            type={showPassword ? 'text' : 'password'}
+            id="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            className="w-full pl-10 pr-10 py-3 bg-[#1a1a1a] border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-transparent"
+            placeholder="••••••••"
+            required
+          />
+          <button
+            type="button"
+            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-200"
+            onClick={() => setShowPassword(!showPassword)}
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+          >
+            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          </button>
+        </div>
+      </div>
+      
+      <div className="flex justify-between items-center">
+        <div className="flex items-center">
+          <input
+            type="checkbox"
+            id="rememberMe"
+            name="rememberMe"
+            checked={formData.rememberMe}
+            onChange={handleChange}
+            className="h-4 w-4 bg-gray-700 border-gray-600 rounded focus:ring-green-200"
+          />
+          <label htmlFor="rememberMe" className="ml-2 text-sm text-gray-300">
+            Remember me
+          </label>
+        </div>
+        <button
+          type="button"
+          className="text-sm text-green-200 hover:text-green-100 transition-colors"
+          onClick={() => setView('forgotPassword')}
+        >
+          Forgot password?
+        </button>
+      </div>
+
+      <button
+        type="submit"
+        className="w-full py-3 bg-green-200 text-black font-medium rounded-lg hover:bg-green-300 transition-colors"
+      >
+        Log in
+      </button>
+      
+      <div className="text-center pt-2">
+        <p className="text-gray-400">
+          Don't have an account?{' '}
+          <button
+            type="button"
+            onClick={() => router.push('/signup')}
+            className="text-white hover:text-green-200 transition-colors"
+          >
+            Sign up
+          </button>
+        </p>
+      </div>
+      
+      <div className="mt-8 pt-6 border-t border-gray-800 text-center">
+        <button
+          type="button"
+          onClick={() => setView('helpCenter')}
+          className="text-sm text-gray-400 hover:text-white inline-flex items-center gap-1 transition-colors"
+        >
+          <HelpCircle size={16} />
+          <span>Need help?</span>
+        </button>
+      </div>
+    </form>
+  );
+};
+
+export default LoginForm;
+
+
+
+
+==== File: C:\_websites\banking\app\login\components\RecoverUsernameForm.d.ts ====
+import { ViewProps } from './types';
+
+declare const RecoverUsernameForm: React.FC<ViewProps>;
+export default RecoverUsernameForm;
+
+
+
+
+==== File: C:\_websites\banking\app\login\components\RecoverUsernameForm.tsx ====
+'use client';
+
+import React, { useState } from 'react';
+import { Mail, AlertCircle } from 'lucide-react';
+import { animated } from 'react-spring';
+
+interface RecoverUsernameFormProps {
+  setView: (view: 'login' | 'forgotPassword' | 'recoverUsername' | 'helpCenter') => void;
+}
+
+const RecoverUsernameForm: React.FC<RecoverUsernameFormProps> = ({ setView }) => {
+  const [formData, setFormData] = useState({
+    memberId: '',
+    lastFourSSN: ''
+  });
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    
+    if (name === 'lastFourSSN') {
+      const numbersOnly = value.replace(/[^0-9]/g, '');
+      if (numbersOnly.length <= 4) {
+        setFormData(prev => ({ ...prev, [name]: numbersOnly }));
+      }
+      return;
+    }
+    
+    setFormData(prev => ({ ...prev, [name]: value }));
+    if (error) setError('');
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!formData.memberId) {
+      setError('Please enter your Member ID');
+      return;
+    }
+    
+    if (!formData.lastFourSSN || formData.lastFourSSN.length !== 4) {
+      setError('Please enter the last 4 digits of your Social Security Number');
+      return;
+    }
+    
+    console.log('Username recovery requested:', formData);
+    setIsSubmitted(true);
+  };
+
+  return (
+    <>
+      {!isSubmitted ? (
+        <form onSubmit={handleSubmit} className="space-y-5">
+          <p className="text-gray-300 mb-4">
+            To recover your username, please provide the following information:
+          </p>
+          
+          {error && (
+            <div className="bg-red-500/20 border border-red-500 text-red-200 p-4 rounded-lg flex items-start">
+              <AlertCircle size={20} className="mr-2 mt-0.5 flex-shrink-0" />
+              <span>{error}</span>
+            </div>
+          )}
+          
+          <div className="space-y-1">
+            <label htmlFor="memberId" className="block text-sm font-medium text-gray-300">
+              Member ID
+            </label>
+            <input
+              type="text"
+              id="memberId"
+              name="memberId"
+              value={formData.memberId}
+              onChange={handleChange}
+              className="w-full px-3 py-3 bg-[#1a1a1a] border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-transparent"
+              placeholder="Enter your Member ID"
+              required
+            />
+          </div>
+          
+          <div className="space-y-1">
+            <label htmlFor="lastFourSSN" className="block text-sm font-medium text-gray-300">
+              Last 4 of your Social Security Number (SSN)
+            </label>
+            <input
+              type="password"
+              id="lastFourSSN"
+              name="lastFourSSN"
+              value={formData.lastFourSSN}
+              onChange={handleChange}
+              className="w-full px-3 py-3 bg-[#1a1a1a] border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-transparent"
+              placeholder="••••"
+              maxLength={4}
+              required
+            />
+          </div>
+          
+          <div className="flex flex-col gap-3 pt-2">
+            <button
+              type="submit"
+              className="w-full py-3 bg-green-200 text-black font-medium rounded-lg hover:bg-green-300 transition-colors"
+            >
+              Continue
+            </button>
+            
+            <button
+              type="button"
+              onClick={() => setView('login')}
+              className="w-full py-3 bg-transparent border border-gray-700 text-white font-medium rounded-lg hover:bg-white/5 transition-colors"
+            >
+              Back to login
+            </button>
+          </div>
+          
+          <div className="mt-6 pt-4 border-t border-gray-800 text-center">
+            <p className="text-sm text-gray-400">
+              If your contact information is out-of-date, please call us at
+            </p>
+            <p className="text-white font-medium mt-1">800-237-7288</p>
+          </div>
+        </form>
+      ) : (
+        <div className="text-center py-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-200/20 mb-4">
+            <Mail size={32} className="text-green-200" />
+          </div>
+          <h2 className="text-xl font-medium mb-2">Username sent</h2>
+          <p className="text-gray-300 mb-6">
+            We've sent your username to your registered email address.
+          </p>
+          <button
+            onClick={() => setView('login')}
+            className="w-full py-3 bg-green-200 text-black font-medium rounded-lg hover:bg-green-300 transition-colors"
+          >
+            Back to login
+          </button>
+          <p className="mt-4 text-sm text-gray-400">
+            Didn't receive the email? Check your spam folder or{' '}
+            <button
+              type="button"
+              onClick={() => setIsSubmitted(false)}
+              className="text-green-200 hover:underline"
+            >
+              try again
+            </button>
+          </p>
+        </div>
+      )}
+    </>
+  );
+};
+
+export default RecoverUsernameForm;
+
+
+
+
+==== File: C:\_websites\banking\app\login\components\types.ts ====
+import { ReactNode } from 'react';
+
+export type AuthViewType = 'login' | 'forgotPassword' | 'recoverUsername' | 'helpCenter';
+
+export interface ViewProps {
+  setView: (view: AuthViewType) => void;
+}
+
+export interface AuthHeaderProps {
+  currentView: AuthViewType;
+  onBack: () => void;
+  title?: string;
+}
+
+
+
+

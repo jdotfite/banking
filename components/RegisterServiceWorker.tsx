@@ -9,6 +9,12 @@ export default function RegisterServiceWorker() {
       console.log('Skipping service worker registration in development mode');
       return;
     }
+    
+    // Skip service worker registration on login page to prevent caching issues
+    if (typeof window !== 'undefined' && window.location.pathname === '/login') {
+      console.log('Skipping service worker registration on login page');
+      return;
+    }
 
     const registerSW = async () => {
       if ('serviceWorker' in navigator) {

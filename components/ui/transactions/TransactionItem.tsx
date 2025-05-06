@@ -44,7 +44,7 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
       </div>
       <div className="text-right">
         <div className={`font-medium tracking-tight ${transaction.isIncoming ? 'text-green-500' : 'text-white'}`}>
-          {transaction.isIncoming ? '+' : ''}${transaction.amount.toFixed(2)}
+          {transaction.isIncoming ? '+' : ''}${transaction.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
         </div>
         <div className="text-gray-400 text-sm">{transaction.timestamp}</div>
       </div>

@@ -39,32 +39,47 @@ export const UserProvider: React.FC<UserProviderProps> = ({
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
   // State for admin mode
   const [isAdminMode, setIsAdminMode] = useState<boolean>(initialAdminMode);
+  // State for client-side initialization
+  const [isInitialized, setIsInitialized] = useState<boolean>(false);
   // Derived state for new user
   const isNewUser = selectedUserId === 'new';
 
-  // Load selected user from localStorage on mount
+  // Load selected user from localStorage on mount (client-side only)
   useEffect(() => {
-    const storedUserId = localStorage.getItem('selectedUserId');
-    if (storedUserId) {
-      setSelectedUserId(storedUserId === 'new' ? 'new' : storedUserId);
-      // If a user is already selected, exit admin mode
-      if (isAdminMode) {
-        setIsAdminMode(false);
+    // Only run on the client side
+    if (typeof window !== 'undefined') {
+      const storedUserId = localStorage.getItem('selectedUserId');
+      if (storedUserId) {
+        setSelectedUserId(storedUserId === 'new' ? 'new' : storedUserId);
+        // If a user is already selected, exit admin mode
+        if (isAdminMode) {
+          setIsAdminMode(false);
+        }
       }
+      setIsInitialized(true);
     }
   }, [isAdminMode]);
 
   // Handle user selection
   const handleSetSelectedUserId = (userId: string | null) => {
+    // Update state
     if (userId === 'new') {
-      localStorage.setItem('selectedUserId', 'new');
       setSelectedUserId('new');
     } else if (userId) {
-      localStorage.setItem('selectedUserId', userId);
       setSelectedUserId(userId);
     } else {
-      localStorage.removeItem('selectedUserId');
       setSelectedUserId(null);
+    }
+    
+    // Update localStorage (client-side only)
+    if (typeof window !== 'undefined') {
+      if (userId === 'new') {
+        localStorage.setItem('selectedUserId', 'new');
+      } else if (userId) {
+        localStorage.setItem('selectedUserId', userId);
+      } else {
+        localStorage.removeItem('selectedUserId');
+      }
     }
     
     // Exit admin mode when a user is selected
@@ -80,9 +95,13 @@ export const UserProvider: React.FC<UserProviderProps> = ({
 
   // Reset user selection and go back to admin mode
   const resetUserSelection = () => {
-    localStorage.removeItem('selectedUserId');
     setSelectedUserId(null);
     setIsAdminMode(true);
+    
+    // Update localStorage (client-side only)
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('selectedUserId');
+    }
   };
 
   // Context value
