@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import Home from './components/Home';
+import Card from './components/Card';
 import BottomNav from '@/components/ui/navigation/BottomNav';
 import { UserProvider } from '@/components/context/UserContext';
 import { EnhancedBankingDataProvider } from '@/components/preloaders/EnhancedBankingDataProvider';
@@ -9,7 +9,7 @@ import { BankingDataProvider } from '@/components/preloaders/BankingDataPreloade
 import ThemeContextProvider from '@/lib/context/ThemeContextProvider';
 import IOSFullScreenProvider from '@/lib/utils/IOSFullScreenProvider';
 
-export default function HomePage() {
+export default function CreditCardPage() {
   return (
     <ThemeContextProvider>
       <IOSFullScreenProvider>
@@ -17,7 +17,7 @@ export default function HomePage() {
           <BankingDataProvider>
             <EnhancedBankingDataProvider>
               <div className="relative min-h-screen">
-                <Home />
+                <Card />
                 <BottomNav />
               </div>
             </EnhancedBankingDataProvider>
@@ -26,4 +26,3 @@ export default function HomePage() {
       </IOSFullScreenProvider>
     </ThemeContextProvider>
   );
-}

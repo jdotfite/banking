@@ -13,8 +13,8 @@ const BottomNav: React.FC = () => {
   
   // Define the navigation items with new arrangement
   const items: NavItemType[] = [
-    { name: 'Deposit', icon: 'deposit', href: '/deposit' },
-    { name: 'Insights', icon: 'insights', href: '/insights' },
+    { name: 'Home', icon: 'home', href: '/home' },
+    { name: 'Cards', icon: 'card', href: '/credit-card' },
     { name: 'Accounts', icon: 'wallet', href: '/' },
     { name: 'Transfer', icon: 'transfer', href: '/transfer' },
     { name: 'More', icon: 'more', href: '/more' },

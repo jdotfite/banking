@@ -165,13 +165,7 @@ const nextConfig = {
   },
   
   async redirects() {
-    return [
-      {
-        source: '/home',
-        destination: '/',
-        permanent: true,
-      },
-    ];
+    return [];
   },
   
   async headers() {

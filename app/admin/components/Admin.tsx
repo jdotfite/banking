@@ -1,4 +1,3 @@
-// components/screens/AdminProfileSelector.tsx
 'use client';
 
 import * as React from 'react';
@@ -7,11 +6,11 @@ import { useRouter } from 'next/navigation';
 import { bankingData } from '@/lib/data/fakeBankingData';
 import { animated, useSpring } from 'react-spring';
 
-interface AdminProfileSelectorProps {
+interface AdminProps {
   onSelectUser: (userId: string | null) => void;
 }
 
-const AdminProfileSelector: React.FC<AdminProfileSelectorProps> = ({ onSelectUser }) => {
+const Admin: React.FC<AdminProps> = ({ onSelectUser }) => {
   const router = useRouter();
   const [users, setUsers] = useState(bankingData.users);
   const [isLoading, setIsLoading] = useState(true);
@@ -183,4 +182,4 @@ const AdminProfileSelector: React.FC<AdminProfileSelectorProps> = ({ onSelectUse
   );
 };
 
-export default AdminProfileSelector;
+export default Admin;

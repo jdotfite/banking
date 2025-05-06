@@ -1,6 +1,6 @@
 'use client';
 
-import AdminProfileSelector from '@/components/screens/AdminProfileSelector';
+import Admin from './components/Admin';
 import { useRouter } from 'next/navigation';
 
 export default function AdminPage() {
@@ -16,7 +16,7 @@ export default function AdminPage() {
 
   return (
     <div className="min-h-screen bg-gray-900">
-      <AdminProfileSelector onSelectUser={handleSelectUser} />
+      <Admin onSelectUser={handleSelectUser} />
     </div>
   );
 }

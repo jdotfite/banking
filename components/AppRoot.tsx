@@ -6,13 +6,14 @@ import { UserProvider, useUser } from '@/components/context/UserContext';
 import { EnhancedBankingDataProvider } from '@/components/preloaders/EnhancedBankingDataProvider';
 import { BankingDataProvider } from '@/components/preloaders/BankingDataPreloader';
 import AppContainer from '@/components/layout/AppContainer';
-import AdminProfileSelector from '@/components/screens/AdminProfileSelector';
-import Home from '@/app/home/page';
+import Admin from '@/app/admin/components/Admin';
+import { useRouter } from 'next/navigation';
 import LoadingSpinner from '@/components/ui/common/LoadingSpinner';
 
 // Inner component that uses the context
 const AppContent: React.FC = () => {
   const { selectedUserId, isAdminMode, setSelectedUserId, resetUserSelection } = useUser();
+  const router = useRouter();
 
   // Reset to admin screen when app is closed
   useEffect(() => {
@@ -33,6 +34,13 @@ const AppContent: React.FC = () => {
     }
   }, [selectedUserId]);
 
+  // Redirect to home page when user is selected
+  useEffect(() => {
+    if (selectedUserId && selectedUserId !== 'new') {
+      router.push('/home');
+    }
+  }, [selectedUserId, router]);
+
   // Handle user selection from admin screen
   const handleSelectUser = (userId: string | null) => {
     setSelectedUserId(userId);
@@ -40,7 +48,7 @@ const AppContent: React.FC = () => {
 
   // Show admin screen if in admin mode
   if (isAdminMode) {
-    return <AdminProfileSelector onSelectUser={handleSelectUser} />;
+    return <Admin onSelectUser={handleSelectUser} />;
   }
 
   // Show main app if user is selected
@@ -49,11 +57,13 @@ const AppContent: React.FC = () => {
     if (selectedUserId === 'new') {
       return <LoadingSpinner size="large" fullScreen={true} />;
     }
-    return <Home />;
+    
+    // Show loading spinner while redirecting to home page
+    return <LoadingSpinner size="large" fullScreen={true} />;
   }
 
   // Fallback to admin screen if no user is selected
-  return <AdminProfileSelector onSelectUser={handleSelectUser} />;
+  return <Admin onSelectUser={handleSelectUser} />;
 };
 
 // Root component that provides context

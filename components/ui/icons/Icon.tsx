@@ -23,6 +23,9 @@ const Icon: React.FC<IconProps> = ({ name, className = 'w-6 h-6' }) => {
     entertainment: LucideIcons.Music,
     notificationBell: LucideIcons.Bell,
     repeat: LucideIcons.Repeat, // For pay button
+    card: LucideIcons.CreditCard, // For credit card navigation
+    withdraw: LucideIcons.MinusCircle, // For withdraw action
+    settings: LucideIcons.Settings, // For settings
   };
 
   // Map for merchant-specific icons
