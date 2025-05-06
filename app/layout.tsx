@@ -5,6 +5,7 @@ import './globals.css';
 import React from 'react';
 import RegisterServiceWorker from '@/components/RegisterServiceWorker';
 import ClientProviders from '@/components/ClientProviders';
+import PWAInstallPrompt from '@/components/ui/common/PWAInstallPrompt';
 
 // Font setup
 const outfit = Outfit({ 
@@ -36,6 +37,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
           <main className="min-h-screen">
             {children}
           </main>
+          <PWAInstallPrompt />
         </ClientProviders>
       </body>
     </html>

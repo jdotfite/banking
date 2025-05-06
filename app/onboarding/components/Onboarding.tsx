@@ -261,7 +261,7 @@ const Onboarding: React.FC<OnboardingProps> = () => {
           {/* Text content - with fixed height */}
           <animated.div 
             style={slideAnimation}
-            className="w-full px-6 pt-5 h-32 overflow-hidden"
+            className="w-full px-8 pt-5 h-32 overflow-hidden"
           >
             <h1 className="text-3xl md:text-4xl font-bold mb-2 md:mb-4">{slides[currentSlide].title}</h1>
             <p className={`md:text-md opacity-90 ${isSmallDevice ? 'line-clamp-2 overflow-ellipsis' : ''}`}>
