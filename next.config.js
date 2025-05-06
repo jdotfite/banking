@@ -165,7 +165,13 @@ const nextConfig = {
   },
   
   async redirects() {
-    return [];
+    return [
+      {
+        source: '/reset',
+        destination: '/reset-user-state.html',
+        permanent: false,
+      },
+    ];
   },
   
   async headers() {

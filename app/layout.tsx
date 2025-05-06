@@ -2,44 +2,41 @@
 import type { Metadata } from 'next';
 import { Outfit } from 'next/font/google';
 import './globals.css';
+import React from 'react';
 import RegisterServiceWorker from '@/components/RegisterServiceWorker';
-import PWAInstallPrompt from '@/components/ui/common/PWAInstallPrompt';
-import AppContainer from '@/components/layout/AppContainer';
+import ClientProviders from '@/components/ClientProviders';
 
-const outfit = Outfit({
+// Font setup
+const outfit = Outfit({ 
   subsets: ['latin'],
-  weight: ['300', '400', '500', '600'],
   display: 'swap',
   variable: '--font-outfit',
 });
 
+// Metadata
 export const metadata: Metadata = {
   title: 'Banking App',
-  description: 'A modern banking app UI',
+  description: 'Modern online banking application',
+  viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
+  themeColor: '#1d1d1d',
 };
 
-export default function RootLayout({
-  children,
-}: {
+interface RootLayoutProps {
   children: React.ReactNode;
-}) {
+}
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="en" className={outfit.variable}>
-      <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
-        <meta name="theme-color" content="#121212" />
-        <link rel="manifest" href="/manifest.json" />
-        <link rel="apple-touch-icon" href="/images/icons/icon-192x192.png" />
-        <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="Banking App" />
-      </head>
-      <body className={`${outfit.className} bg-gray-900 min-h-screen font-outfit`}>
+    <html lang="en" className={`${outfit.variable} dark`}>
+      <body className="font-sans bg-[#1d1d1d] text-white overflow-x-hidden">
         <RegisterServiceWorker />
-        <AppContainer>
-          {children}
-        </AppContainer>
+        
+        <ClientProviders>
+          {/* ONLY main element in the entire app */}
+          <main className="min-h-screen">
+            {children}
+          </main>
+        </ClientProviders>
       </body>
     </html>
   );

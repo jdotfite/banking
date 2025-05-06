@@ -21,7 +21,7 @@ const slides = [
   {
     id: 'milestones',
     title: 'Celebrating Your Milestones',
-    subtitle: 'From your first account to life\'s biggest milestones, we\'re here with tailored guidance, rewards, and a community cheering you on.',
+    subtitle: 'From your first account to life\'s biggest milestones, we\'re here with tailored guidance and a community cheering you on.',
     bgColor: '#fec20f',
     textColor: 'black',
     image: '/images/onboarding/balloons.png',
@@ -29,7 +29,7 @@ const slides = [
   },
   {
     id: 'fees',
-    title: 'Say goodbye to fees',
+    title: 'Say Goodbye to Fees',
     subtitle: 'No monthly fees, no minimum balances, and access to over 30,000 fee-free ATMs nationwide.',
     bgColor: '#f36919',
     textColor: 'white',
@@ -38,7 +38,7 @@ const slides = [
   },
   {
     id: 'credit',
-    title: 'Build your credit score',
+    title: 'Build Your Credit Score',
     subtitle: 'Start building credit with our Signature Rewards card and track your FICO score for free.',
     bgColor: '#213d70',
     textColor: 'white',
@@ -47,7 +47,7 @@ const slides = [
   },
   {
     id: 'security',
-    title: 'Bank securely anywhere',
+    title: 'Bank Securely',
     subtitle: 'Enjoy peace of mind with our advanced security features and 24/7 fraud monitoring.',
     bgColor: '#d90981',
     textColor: 'white',
@@ -56,7 +56,7 @@ const slides = [
   },
   {
     id: 'banking',
-    title: 'Banking that puts you first',
+    title: 'Banking that Puts You First',
     subtitle: 'Start building credit, say goodbye to monthly fees, and enjoy personalized service from a credit union that cares.',
     bgColor: '#7c2984',
     textColor: 'white',
@@ -65,8 +65,8 @@ const slides = [
   },
   {
     id: 'CIO',
-    title: 'CIO-Engineered Cyber Shield',
-    subtitle: 'With quantum-resistant encryption and a zero-trust battle plan, we’re ensuring your Members 1st funds rest safer than a superhero’s secret identity.',
+    title: 'Cyber Shield',
+    subtitle: 'With quantum-resistant encryption and a zero-trust battle plan, we\'re ensuring your Members 1st funds rest safer than a superhero\'s secret identity.',
     bgColor: '#5ea63a',
     textColor: 'white',
     image: '/images/onboarding/garth-m1st.png',
@@ -81,6 +81,8 @@ const Onboarding: React.FC<OnboardingProps> = () => {
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right');
   const [initialLoad, setInitialLoad] = useState(true);
   const [autoAdvance, setAutoAdvance] = useState(true);
+  // Added state for detecting small devices
+  const [isSmallDevice, setIsSmallDevice] = useState(false);
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
   const autoAdvanceTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -88,10 +90,15 @@ const Onboarding: React.FC<OnboardingProps> = () => {
   
   useEffect(() => {
     const setViewportHeight = () => {
+      const viewportHeight = window.innerHeight;
       document.documentElement.style.setProperty(
         '--vh', 
-        `${window.innerHeight * 0.01}px`
+        `${viewportHeight * 0.01}px`
       );
+      
+      // Check if device is small (iPhone SE is around 568px height)
+      // You can adjust this threshold as needed
+      setIsSmallDevice(viewportHeight < 700);
     };
 
     setViewportHeight();
@@ -254,10 +261,12 @@ const Onboarding: React.FC<OnboardingProps> = () => {
           {/* Text content - with fixed height */}
           <animated.div 
             style={slideAnimation}
-            className="w-full px-6 pt-8 h-32 overflow-hidden"
+            className="w-full px-6 pt-5 h-32 overflow-hidden"
           >
             <h1 className="text-3xl md:text-4xl font-bold mb-2 md:mb-4">{slides[currentSlide].title}</h1>
-            <p className="md:text-md opacity-90 line-clamp-3 overflow-ellipsis">{slides[currentSlide].subtitle}</p>
+            <p className={`md:text-md opacity-90 ${isSmallDevice ? 'line-clamp-2 overflow-ellipsis' : ''}`}>
+              {slides[currentSlide].subtitle}
+            </p>
           </animated.div>
           
           {/* Spacer to push content to edges */}

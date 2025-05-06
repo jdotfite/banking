@@ -33,7 +33,7 @@ const BottomNav: React.FC = () => {
       style={{
         opacity: 1,
         transform: `translateY(${navbarSpring.y}px)`,
-        zIndex: 100
+        zIndex: 40
       }}
       className="fixed bottom-0 left-0 right-0 bg-[#212121] py-3 px-4 flex justify-between items-center
         md:left-1/2 md:transform md:-translate-x-1/2 md:max-w-sm

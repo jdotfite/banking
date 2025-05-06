@@ -172,7 +172,7 @@ const Home: React.FC = () => {
   ];
   
   return (
-    <div className="relative min-h-screen bg-app-black text-white pb-20">
+    <div className="relative min-h-screen bg-[#121212] text-white pb-20">
       {/* Header */}
       <Header userName={userName} />
       

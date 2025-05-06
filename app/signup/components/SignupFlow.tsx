@@ -202,7 +202,7 @@ const SignupFlow: React.FC = () => {
   return (
     <div className="min-h-screen bg-white">
       {/* Header with navigation buttons */}
-      <div className="h-16 bg-black flex items-center justify-between px-4">
+      <div className="h-10 bg-black flex items-center justify-between px-4">
         {currentStep > SignupStep.BASIC_INFO ? (
           <button 
             onClick={handleBack}

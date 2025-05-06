@@ -4,11 +4,15 @@ import { useEffect } from 'react';
 
 export default function RegisterServiceWorker() {
   useEffect(() => {
-    // Skip service worker registration in development
-    if (process.env.NODE_ENV === 'development') {
-      console.log('Skipping service worker registration in development mode');
-      return;
-    }
+    // Force skip service worker registration to prevent navigation caching issues
+    console.log('Skipping service worker registration to prevent navigation caching issues');
+    return;
+    
+    // Original development mode check (commented out)
+    // if (process.env.NODE_ENV === 'development') {
+    //   console.log('Skipping service worker registration in development mode');
+    //   return;
+    // }
     
     // Skip service worker registration on login page to prevent caching issues
     if (typeof window !== 'undefined' && window.location.pathname === '/login') {

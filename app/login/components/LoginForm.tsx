@@ -45,13 +45,14 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
     
     console.log('Login attempt:', formData);
     
-    setTimeout(() => {
-      document.cookie = `auth_token=dummy_token; path=/; max-age=${60 * 60 * 24 * 7}`;
-      localStorage.removeItem('selectedUserId');
-      localStorage.setItem('selectedUserId', 'user1');
-      document.cookie = `selectedUserId=user1; path=/; max-age=${60 * 60 * 24 * 7}`;
-      router.push('/home');
-    }, 1000);
+      setTimeout(() => {
+        document.cookie = `auth_token=dummy_token; path=/; max-age=${60 * 60 * 24 * 7}`;
+        localStorage.removeItem('selectedUserId');
+        localStorage.setItem('selectedUserId', 'user1');
+        document.cookie = `selectedUserId=user1; path=/; max-age=${60 * 60 * 24 * 7}`;
+        router.push('/admin');
+        window.location.href = '/admin'; // Force full page reload
+      }, 1000);
   };
 
   return (

@@ -1,3 +1,4 @@
+// app/admin/page.tsx
 'use client';
 
 import Admin from './components/Admin';
@@ -14,9 +15,6 @@ export default function AdminPage() {
     }
   };
 
-  return (
-    <div className="min-h-screen bg-gray-900">
-      <Admin onSelectUser={handleSelectUser} />
-    </div>
-  );
+  // Remove the redundant wrapper div
+  return <Admin onSelectUser={handleSelectUser} />;
 }

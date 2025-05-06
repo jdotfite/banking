@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Service Worker Cleanup</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    h1 {
+      color: #333;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+    }
+    .card {
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    button {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+      font-size: 16px;
+      margin: 10px 0;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    pre {
+      background-color: #f1f1f1;
+      padding: 10px;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+    #log {
+      margin-top: 20px;
+      height: 200px;
+      overflow-y: auto;
+      background-color: #f1f1f1;
+      padding: 10px;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body>
+  <h1>Service Worker Cleanup Tool</h1>
+  
+  <div class="card">
+    <h2>Fix Navigation Redirection Issues</h2>
+    <p>This tool will unregister all service workers and clear browser caches to fix the issue where visiting localhost redirects you back to the last visited page.</p>
+    <button id="cleanupBtn">Unregister Service Workers & Clear Caches</button>
+  </div>
+  
+  <div class="card">
+    <h2>Log Output</h2>
+    <div id="log"></div>
+  </div>
+  
+  <div class="card">
+    <h2>Next Steps</h2>
+    <p>After running the cleanup:</p>
+    <ol>
+      <li>Close this page</li>
+      <li>Try navigating to <a href="http://localhost:3002" target="_blank">http://localhost:3002</a> directly</li>
+      <li>You should now be able to navigate freely without being redirected to your last visited page</li>
+    </ol>
+  </div>
+
+  <script>
+    const logElement = document.getElementById('log');
+    const cleanupBtn = document.getElementById('cleanupBtn');
+    
+    // Override console.log to also display in our log element
+    const originalConsoleLog = console.log;
+    console.log = function() {
+      // Call the original console.log
+      originalConsoleLog.apply(console, arguments);
+      
+      // Add to our log element
+      const message = Array.from(arguments).join(' ');
+      logElement.innerHTML += `<div>${message}</div>`;
+      logElement.scrollTop = logElement.scrollHeight;
+    };
+    
+    // Override console.error to also display in our log element
+    const originalConsoleError = console.error;
+    console.error = function() {
+      // Call the original console.error
+      originalConsoleError.apply(console, arguments);
+      
+      // Add to our log element
+      const message = Array.from(arguments).join(' ');
+      logElement.innerHTML += `<div style="color: red;">${message}</div>`;
+      logElement.scrollTop = logElement.scrollHeight;
+    };
+    
+    async function unregisterAllServiceWorkers() {
+      console.log('🔧 Starting service worker cleanup...');
+      
+      // Unregister all service workers
+      if ('serviceWorker' in navigator) {
+        console.log('Unregistering service workers...');
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        
+        if (registrations.length === 0) {
+          console.log('No service workers found to unregister.');
+        } else {
+          for (const registration of registrations) {
+            await registration.unregister();
+            console.log(`Service worker at ${registration.scope} unregistered.`);
+          }
+        }
+      } else {
+        console.log('Service Worker API not supported in this browser.');
+      }
+      
+      // Clear caches
+      if ('caches' in window) {
+        console.log('Clearing caches...');
+        try {
+          const cacheNames = await caches.keys();
+          
+          if (cacheNames.length === 0) {
+            console.log('No caches found to clear.');
+          } else {
+            await Promise.all(
+              cacheNames.map(cacheName => {
+                console.log(`Deleting cache: ${cacheName}`);
+                return caches.delete(cacheName);
+              })
+            );
+            console.log('All caches cleared successfully.');
+          }
+        } catch (error) {
+          console.error('Error clearing caches:', error);
+        }
+      } else {
+        console.log('Cache API not supported in this browser.');
+      }
+      
+      console.log('✅ Service worker cleanup completed!');
+      console.log('🔄 You can now navigate to localhost:3002 without redirection issues');
+    }
+    
+    cleanupBtn.addEventListener('click', async () => {
+      cleanupBtn.disabled = true;
+      cleanupBtn.textContent = 'Cleaning up...';
+      
+      try {
+        await unregisterAllServiceWorkers();
+        cleanupBtn.textContent = 'Cleanup Completed ✓';
+      } catch (error) {
+        console.error('Error during cleanup:', error);
+        cleanupBtn.textContent = 'Cleanup Failed ✗';
+      }
+    });
+  </script>
+</body>
+</html>

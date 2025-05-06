@@ -34,10 +34,10 @@ const AppContent: React.FC = () => {
     }
   }, [selectedUserId, router]);
 
-  // Redirect to home page when user is selected
+  // Redirect to onboarding page when user is selected
   useEffect(() => {
     if (selectedUserId && selectedUserId !== 'new') {
-      router.push('/home');
+      router.push('/onboarding');
     }
   }, [selectedUserId, router]);
 

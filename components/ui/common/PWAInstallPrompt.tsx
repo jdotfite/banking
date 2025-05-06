@@ -131,7 +131,7 @@ const PWAInstallPrompt: React.FC = () => {
   if (!showPrompt) return null;
 
   return (
-    <div className="fixed top-0 left-0 right-0 bg-white text-gray-800 p-3 shadow-md z-50 border-b border-gray-200">
+    <div className="fixed top-0 left-0 right-0 bg-white text-gray-800 p-3 shadow-md z-[150] border-b border-gray-200">
       <div className="max-w-6xl mx-auto flex items-center justify-between">
         <div className="flex items-center">
           <img 

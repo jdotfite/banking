@@ -21,15 +21,27 @@ export function middleware(request: NextRequest) {
   // If the user is authenticated and trying to access onboarding/login/signup
   if (isAuthenticated && publicPaths.includes(pathname)) {
     const url = request.nextUrl.clone();
-    url.pathname = '/';
+    url.pathname = '/admin';
+    return NextResponse.redirect(url);
+  }
+
+  // Disable all redirects in development mode for testing
+  if (process.env.NODE_ENV !== 'production') {
+    return NextResponse.next();
+  }
+
+  // Production behavior - redirect root to onboarding
+  if (pathname === '/') {
+    const url = request.nextUrl.clone();
+    url.pathname = '/onboarding';
     return NextResponse.redirect(url);
   }
   
   // Create the response
   const response = NextResponse.next();
   
-  // Add cache-busting headers for login page and in development mode
-  if (pathname === '/login' || process.env.NODE_ENV === 'development') {
+  // Add cache-busting headers for login page and in non-production environments
+  if (pathname === '/login' || process.env.NODE_ENV !== 'production') {
     response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
     response.headers.set('Pragma', 'no-cache');
     response.headers.set('Expires', '0');
