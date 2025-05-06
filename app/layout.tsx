@@ -20,6 +20,21 @@ export const metadata: Metadata = {
   description: 'Modern online banking application',
   viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
   themeColor: '#1d1d1d',
+  manifest: '/manifest.json',
+  icons: {
+    icon: '/images/icons/icon-192x192.png',
+    apple: '/images/icons/icon-192x192.png'
+  },
+  openGraph: {
+    type: 'website',
+    url: 'https://banking.example.com',
+    title: 'Banking App',
+    description: 'Modern online banking application',
+    siteName: 'Banking App',
+    images: [{
+      url: '/images/marketing/og-image.png',
+    }],
+  },
 };
 
 interface RootLayoutProps {

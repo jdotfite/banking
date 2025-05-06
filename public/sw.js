@@ -72,15 +72,17 @@ define(['./workbox-e43f5367'], (function (workbox) { 'use strict';
   importScripts();
   self.skipWaiting();
   workbox.clientsClaim();
+  // Cache manifest and other critical assets
+  workbox.precaching.precacheAndRoute([
+    {url: '/manifest.json', revision: '1'},
+    {url: '/images/icons/icon-192x192.png', revision: '1'},
+    {url: '/images/icons/icon-512x512.png', revision: '1'}
+  ]);
+
   workbox.registerRoute("/", new workbox.NetworkFirst({
     "cacheName": "start-url",
     plugins: [{
-      cacheWillUpdate: async ({
-        request,
-        response,
-        event,
-        state
-      }) => {
+      cacheWillUpdate: async ({response}) => {
         if (response && response.type === 'opaqueredirect') {
           return new Response(response.body, {
             status: 200,
@@ -92,6 +94,16 @@ define(['./workbox-e43f5367'], (function (workbox) { 'use strict';
       }
     }]
   }), 'GET');
+
+  // Special route for manifest
+  workbox.registerRoute(
+    /manifest\.json$/,
+    new workbox.StaleWhileRevalidate({
+      cacheName: 'manifest-cache'
+    })
+  );
+
+  // Default to network only for other requests
   workbox.registerRoute(/.*/i, new workbox.NetworkOnly({
     "cacheName": "dev",
     plugins: []
