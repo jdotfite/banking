@@ -149,7 +149,7 @@ const PWAInstallPrompt: React.FC = () => {
           {!isIOS && (
             <button
               onClick={handleInstall}
-              className="bg-neutral-800 text-white px-3 py-1 rounded text-sm font-medium hover:bg-blue-700 transition-colors"
+              className="bg-neutral-800 text-white px-3 py-1 rounded text-sm font-medium hover:bg-neutral-700 transition-colors"
             >
               Install
             </button>

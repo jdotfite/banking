@@ -14,11 +14,6 @@ const DevToolsOverlay: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { resetUserSelection } = useUser();
 
-  // Only show in development mode
-  if (process.env.NODE_ENV !== 'development') {
-    return null;
-  }
-
   // Animation configs for buttons only
   const buttonAnimations = [
     useSpring({
@@ -165,12 +160,19 @@ const DevToolsOverlay: React.FC = () => {
                 Test Users
               </animated.button>
               
-              {/* Placeholder Button */}
+              {/* PWA Install Button */}
               <animated.button
+                onClick={() => {
+                  const event = new Event('beforeinstallprompt');
+                  window.dispatchEvent(event);
+                }}
                 className="bg-neutral-700 hover:bg-neutral-600 text-white py-2 px-4 rounded flex items-center justify-center"
                 style={buttonAnimations[5]}
               >
-                {/* Placeholder for future feature */}
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Install PWA
               </animated.button>
             </div>
             

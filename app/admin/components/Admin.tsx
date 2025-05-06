@@ -56,12 +56,15 @@ const Admin: React.FC<AdminProps> = ({ onSelectUser }) => {
     if (userId === 'new') {
       localStorage.setItem('selectedUserId', 'new');
       onSelectUser('new');
+      router.push('/onboarding');
     } else if (userId) {
       localStorage.setItem('selectedUserId', userId);
       onSelectUser(userId);
+      router.push('/home');
     } else {
       localStorage.removeItem('selectedUserId');
       onSelectUser(null);
+      router.push('/');
     }
   };
 
@@ -90,8 +93,6 @@ const Admin: React.FC<AdminProps> = ({ onSelectUser }) => {
           <div className="text-center mb-8 pt-6">
             {/* Title and subtitle removed as requested */}
           </div>
-
-          {/* New User Option removed as requested */}
 
           <h3 className="text-lg font-medium mb-3 text-neutral-300">Existing Profiles</h3>
           
