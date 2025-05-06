@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   title: 'Banking App',
   description: 'Modern online banking application',
   viewport: 'width=device-width, initial-scale=1, maximum-scale=1',
-  themeColor: '#1d1d1d',
+  themeColor: '#121212', // This matches the manifest theme_color
   manifest: '/manifest.json',
   icons: {
     icon: '/images/icons/icon-192x192.png',
