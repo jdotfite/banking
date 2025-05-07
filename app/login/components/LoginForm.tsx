@@ -102,8 +102,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
                       className="h-8 w-8 md:h-10 md:w-10 object-contain"
                     />
                   </div>
-                  <div className="h-0.5 w-0.5 rounded-full bg-neutral-500"></div>
-                  <div className="text-xs text-neutral-400 tracking-widest font-light">SECURE ACCESS</div>
+                  
                 </div>
                 <h2 className="text-2xl md:text-3xl font-extralight text-white mb-2 tracking-tight">
                   Welcome <span className="font-normal">back</span>
