@@ -119,7 +119,7 @@ const MobilePhoneScreen: React.FC<MobilePhoneScreenProps> = ({ formData, onChang
                   onFocus={() => setIsFocused(true)}
                   onBlur={() => setIsFocused(false)}
                   aria-describedby={error ? "phone-error" : undefined}
-                  className="w-full pt-4 pb-2 px-0 bg-transparent border-b border-neutral-700 outline-none focus:border-neutral-700 text-white transition-all duration-200"
+                  className="w-full pt-4 pb-2 px-0 bg-transparent border-b border-neutral-700 outline-none focus:border-neutral-700 text-white transition-all duration-200 [&:-webkit-autofill]:bg-transparent [&:-webkit-autofill]:text-white [&:-webkit-autofill]:shadow-[0_0_0_1000px_#121212_inset]"
                   autoComplete="tel"
                 />
                 <div className={`h-px w-0 bg-white absolute bottom-0 left-0 transition-all duration-700 ${isFocused ? 'w-full' : ''}`}></div>

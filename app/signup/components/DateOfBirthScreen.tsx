@@ -119,7 +119,7 @@ const DateOfBirthScreen: React.FC<DateOfBirthScreenProps> = ({ formData, onChang
                 value={dobValue}
                 onChange={handleDobChange}
                 maxLength={10}
-                className="w-full pt-4 pb-2 px-0 bg-transparent border-b border-neutral-700 outline-none focus:border-neutral-700 text-white transition-all duration-200"
+                  className="w-full pt-4 pb-2 px-0 bg-transparent border-b border-neutral-700 outline-none focus:border-neutral-700 text-white transition-all duration-200 [&:-webkit-autofill]:bg-transparent [&:-webkit-autofill]:text-white [&:-webkit-autofill]:shadow-[0_0_0_1000px_#121212_inset]"
                 autoComplete="bday"
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}

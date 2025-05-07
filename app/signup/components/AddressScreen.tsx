@@ -230,7 +230,7 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
                   id="state"
                   value={formData.state}
                   onChange={(e) => onChange('state', e.target.value)}
-                  className="w-full py-2 px-0 bg-transparent border-b border-neutral-700 outline-none focus:border-neutral-700 text-white transition-all duration-200"
+                  className="w-full py-2 px-0 bg-transparent border-b border-neutral-700 outline-none focus:border-neutral-700 text-white transition-all duration-200 [&:-webkit-autofill]:bg-transparent [&:-webkit-autofill]:text-white [&:-webkit-autofill]:shadow-[0_0_0_1000px_#121212_inset]"
                   autoComplete="address-level1"
                 >
                   <option value="">State</option>
