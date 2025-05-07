@@ -98,71 +98,92 @@ const CreatePasswordScreen: React.FC<CreatePasswordScreenProps> = ({
   };
 
   return (
-    <div className="max-w-md mx-auto">
-      {/* Form title */}
-      <h1 className="text-3xl font-bold mb-4">Create password</h1>
-      <p className="text-gray-600 mb-6">Strong passwords keep your account safer.</p>
-
-      {/* Form */}
-      <form onSubmit={handleNext}>
-        <div className="space-y-4">
-          {/* Password input */}
-          <div className="relative">
-            <label htmlFor="password" className="sr-only">Password</label>
-            <input
-              id="password"
-              type={showPassword ? 'text' : 'password'}
-              placeholder="Password"
-              value={formData.password}
-              onChange={(e) => onChange('password', e.target.value)}
-              className="w-full p-4 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-800 text-gray-700 appearance-none"
-              autoComplete="new-password"
-              disabled={isSubmitting}
-            />
-            <button
-              type="button"
-              onClick={togglePasswordVisibility}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 p-2 touch-manipulation"
-              disabled={isSubmitting}
-              aria-label={showPassword ? "Hide password" : "Show password"}
-            >
-              {showPassword ? 'Hide' : 'Show'}
-            </button>
-            {error && <p id="password-error" className="text-red-500 text-sm mt-1" role="alert">{error}</p>}
+    <div className="flex flex-col min-h-[calc(100vh-48px)] w-full bg-[#121212] pb-14">
+      {/* Form content */}
+      <div className="flex-grow overflow-auto px-6 flex flex-col justify-center">
+        <div className="w-full max-w-md mx-auto">
+          {/* Header */}
+          <div className="mb-8">
+            <h1 className="text-4xl font-extralight text-white mb-2">
+              Create <span className="font-normal">password</span>
+            </h1>
+            <p className="text-neutral-400 text-sm">
+              Strong passwords keep your account safer
+            </p>
           </div>
 
-          {/* Password strength indicator */}
-          <div className="w-full bg-gray-200 h-2 rounded-full overflow-hidden">
-            <div 
-              className={`h-full ${
-                passwordStrength === 0 ? 'w-0' :
-                passwordStrength === 1 ? 'w-1/5 bg-red-500' :
-                passwordStrength === 2 ? 'w-2/5 bg-orange-500' :
-                passwordStrength === 3 ? 'w-3/5 bg-yellow-500' :
-                passwordStrength === 4 ? 'w-4/5 bg-blue-500' :
-                'w-full bg-green-500'
-              }`}
-              aria-hidden="true"
-            ></div>
-          </div>
+          {/* Form */}
+          <form onSubmit={handleNext} className="space-y-8">
+            {/* Password input */}
+            <div className="relative">
+              <label htmlFor="password" className="sr-only">Password</label>
+              <input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                value={formData.password}
+                onChange={(e) => onChange('password', e.target.value)}
+                className="w-full py-2 px-0 bg-transparent border-b border-neutral-700 outline-none focus:border-neutral-700 text-white transition-all duration-200"
+                autoComplete="new-password"
+                disabled={isSubmitting}
+                placeholder=""
+              />
+              <div className="h-px w-0 bg-white absolute bottom-0 left-0 transition-all duration-700"></div>
+              <button
+                type="button"
+                onClick={togglePasswordVisibility}
+                className="absolute right-0 top-0 text-neutral-400 p-2 touch-manipulation"
+                disabled={isSubmitting}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+              >
+                {showPassword ? 'Hide' : 'Show'}
+              </button>
+              {error && <p id="password-error" className="text-red-500 text-sm mt-1" role="alert">{error}</p>}
+            </div>
 
-          {/* Password requirements */}
-          <p className="text-gray-500 text-sm">
-            Use 8+ characters with uppercase, lowercase, and numbers
+            {/* Password strength indicator */}
+            <div className="w-full bg-neutral-700 h-2 rounded-full overflow-hidden">
+              <div 
+                className={`h-full ${
+                  passwordStrength === 0 ? 'w-0' :
+                  passwordStrength === 1 ? 'w-1/5 bg-red-500' :
+                  passwordStrength === 2 ? 'w-2/5 bg-orange-500' :
+                  passwordStrength === 3 ? 'w-3/5 bg-yellow-500' :
+                  passwordStrength === 4 ? 'w-4/5 bg-blue-500' :
+                  'w-full bg-green-500'
+                }`}
+                aria-hidden="true"
+              ></div>
+            </div>
+
+            {/* Password requirements */}
+            <p className="text-neutral-500 text-sm">
+              Use 8+ characters with uppercase, lowercase, and numbers
+            </p>
+
+            {/* Next button */}
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className={`w-full py-4 px-6 rounded-lg bg-white text-black font-medium ${
+                  isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
+                }`}
+              >
+                {isSubmitting ? 'CREATING ACCOUNT...' : 'NEXT'}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+      
+      {/* Footer - Fixed at bottom */}
+      <div className="w-full border-t border-neutral-800/50 fixed bottom-0 left-0 bg-[#121212]">
+        <div className="max-w-md mx-auto w-full py-4 px-6">
+          <p className="text-center text-neutral-500 text-sm">
+            See legal disclosures
           </p>
         </div>
-
-        {/* Next button with loading state */}
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className={`w-full p-4 bg-transparent border-2 border-black text-black uppercase font-medium rounded-lg mt-6 ${
-            isSubmitting ? 'opacity-70 cursor-not-allowed' : 'hover:bg-gray-50 active:bg-gray-100'
-          } transition-colors touch-manipulation`}
-        >
-          {isSubmitting ? 'CREATING ACCOUNT...' : 'NEXT'}
-        </button>
-      </form>
+      </div>
     </div>
   );
 };

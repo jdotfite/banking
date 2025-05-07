@@ -159,7 +159,7 @@ const Home: React.FC = () => {
       title: 'Boost Your Savings',
       description: 'Open a high-yield savings account today',
       buttonText: 'Get started',
-      image: '/images/marketing/refer-friend.png',
+      image: '/images/marketing/go-paperless.png',
       color: 'from-blue-800 to-blue-900'
     },
     {
@@ -243,17 +243,17 @@ const Home: React.FC = () => {
               {promotions.map((promo, index) => (
                 <div 
                   key={index}
-                  className="min-w-[90%] mr-4 snap-center first:pl-0 last:pr-5"
+                  className="min-w-[90%] mr-4 snap-center first:pl-0 last:pr-5 flex"
                   onClick={() => setActivePromotionIndex(index)}
                 >
-                  <div className={`rounded-xl p-4 bg-gradient-to-br ${promo.color} relative overflow-hidden`}>
-                    <div className="flex justify-between">
-                      <div className="max-w-[65%]">
+                  <div className={`rounded-xl p-4 bg-gradient-to-br ${promo.color} relative overflow-hidden flex-1 flex flex-col`}>
+                    <div className="flex justify-between flex-1">
+                      <div className="max-w-[65%] flex flex-col">
                         <h3 className="text-white font-medium mb-1">{promo.title}</h3>
-                        <p className="text-white/80 text-xs mb-3">
+                        <p className="text-white/80 text-xs mb-3 flex-1">
                           {promo.description}
                         </p>
-                        <button className="text-xs text-white bg-white/20 px-3 py-1 rounded-full hover:bg-white/30 transition-colors">
+                        <button className="text-xs text-white bg-white/20 px-3 py-1 rounded-full hover:bg-white/30 transition-colors self-start">
                           {promo.buttonText}
                         </button>
                       </div>
