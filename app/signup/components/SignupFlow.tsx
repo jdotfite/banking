@@ -140,7 +140,7 @@ const SignupFlow: React.FC = () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       localStorage.removeItem('selectedUserId');
-      router.push('/');
+      router.push('/admin');
       
     } catch (err) {
       console.error('Signup failed:', err);
