@@ -95,9 +95,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
             <div className="flex items-start mb-8 relative">
               <div className="flex-1">
                 <div className="flex items-center gap-4 mb-3">
-                  <div className="h-12 w-12 md:h-14 md:w-14 bg-white rounded-xl flex items-center justify-center">
+                  <div className="h-12 w-12 md:h-14 md:w-14 bg-white rounded-lg flex items-center justify-center">
                     <img 
-                      src="/images/icons/logo-m1st-square.svg" 
+                      src="/images/icons/logo-light.svg" 
                       alt="Logo" 
                       className="h-8 w-8 md:h-10 md:w-10 object-contain"
                     />

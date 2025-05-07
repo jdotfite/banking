@@ -93,8 +93,7 @@ const DevToolsOverlay: React.FC = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 z-[160] flex items-center justify-center">
           <div className="bg-neutral-900 text-white rounded-lg shadow-xl w-96 overflow-hidden">
             <div className="flex justify-between items-center p-4 border-b border-neutral-700">
-              <h2 className="text-lg font-semibold flex items-center">
-                <Sparkles size={18} className="mr-2 text-amber-400" />
+              <h2 className="text-lg font-semibold">
                 Admin Toolkit
               </h2>
               <button 
@@ -113,50 +112,50 @@ const DevToolsOverlay: React.FC = () => {
               {/* Clear Storage Button */}
               <animated.button
                 onClick={handleClearStorage}
-                className="bg-red-600 hover:bg-red-700 text-white py-2 px-4 rounded flex items-center justify-center"
+                className="bg-neutral-700 hover:bg-neutral-600 text-white py-2 px-4 rounded flex items-start"
                 style={buttonAnimations[0]}
               >
-                <Trash2 size={16} className="mr-2" />
+                <Trash2 size={16} className="mr-2 mt-0.5" />
                 Clear Storage
               </animated.button>
               
               {/* Onboarding Button */}
               <animated.button
                 onClick={() => { window.location.href = '/onboarding'; }}
-                className="bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-4 rounded flex items-center justify-center"
+                className="bg-neutral-700 hover:bg-neutral-600 text-white py-2 px-4 rounded flex items-start"
                 style={buttonAnimations[1]}
               >
-                <Sparkles size={16} className="mr-2" />
+                <Sparkles size={16} className="mr-2 mt-0.5" />
                 Onboarding
               </animated.button>
               
               {/* Sign Up Button */}
               <animated.button
                 onClick={() => { window.location.href = '/signup'; }}
-                className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded flex items-center justify-center"
+                className="bg-neutral-700 hover:bg-neutral-600 text-white py-2 px-4 rounded flex items-start"
                 style={buttonAnimations[2]}
               >
-                <UserPlus size={16} className="mr-2" />
+                <UserPlus size={16} className="mr-2 mt-0.5" />
                 Sign Up
               </animated.button>
               
               {/* Login Button */}
               <animated.button
                 onClick={() => { window.location.href = '/login'; }}
-                className="bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded flex items-center justify-center"
+                className="bg-neutral-700 hover:bg-neutral-600 text-white py-2 px-4 rounded flex items-start"
                 style={buttonAnimations[3]}
               >
-                <LogIn size={16} className="mr-2" />
+                <LogIn size={16} className="mr-2 mt-0.5" />
                 Login
               </animated.button>
               
               {/* Test Users Button */}
               <animated.button
                 onClick={() => { window.location.href = '/admin'; }}
-                className="bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded flex items-center justify-center"
+                className="bg-neutral-700 hover:bg-neutral-600 text-white py-2 px-4 rounded flex items-start"
                 style={buttonAnimations[4]}
               >
-                <Users size={16} className="mr-2" />
+                <Users size={16} className="mr-2 mt-0.5" />
                 Test Users
               </animated.button>
               
@@ -166,7 +165,7 @@ const DevToolsOverlay: React.FC = () => {
                   const event = new Event('beforeinstallprompt');
                   window.dispatchEvent(event);
                 }}
-                className="bg-neutral-700 hover:bg-neutral-600 text-white py-2 px-4 rounded flex items-center justify-center"
+                className="bg-neutral-700 hover:bg-neutral-600 text-white py-2 px-4 rounded flex items-start"
                 style={buttonAnimations[5]}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
