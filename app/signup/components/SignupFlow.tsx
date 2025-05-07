@@ -200,9 +200,9 @@ const SignupFlow: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="flex flex-col h-screen w-full overflow-hidden bg-black">
       {/* Header with navigation buttons */}
-      <div className="h-10 bg-black flex items-center justify-between px-4">
+      <div className="h-12 flex items-center justify-between px-3  z-10">
         {currentStep > SignupStep.BASIC_INFO ? (
           <button 
             onClick={handleBack}
@@ -226,18 +226,18 @@ const SignupFlow: React.FC = () => {
           Step {currentStep + 1} of {totalSteps}
         </div>
       </div>
-
+      
       {/* Current step content */}
-      <div className="px-4 pb-8">
+      <div className="flex-1 overflow-hidden">
         {renderStep()}
-        
-        {/* Global error message */}
-        {error && (
-          <div className="mt-4 p-3 bg-red-50 border border-red-200 text-red-600 rounded">
-            {error}
-          </div>
-        )}
       </div>
+      
+      {/* Global error message */}
+      {error && (
+        <div className="absolute bottom-4 left-0 right-0 mx-auto w-max p-3 bg-red-500/20 border border-red-500/40 text-red-200 rounded-lg flex items-start">
+          {error}
+        </div>
+      )}
     </div>
   );
 };

@@ -2,9 +2,7 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { animated, useSpring } from 'react-spring';
 import type { AuthViewType } from './components/types';
-import AuthHeader from './components/AuthHeader';
 import LoginForm from './components/LoginForm';
 import ForgotPasswordForm from './components/ForgotPasswordForm';
 import RecoverUsernameForm from './components/RecoverUsernameForm';
@@ -17,13 +15,6 @@ export default function AuthPage() {
   const handleBack = () => {
     router.push('/onboarding');
   };
-
-  const fadeIn = useSpring({
-    opacity: 1,
-    transform: 'translateY(0px)',
-    from: { opacity: 0, transform: 'translateY(20px)' },
-    config: { tension: 280, friction: 60 }
-  });
 
   const renderView = () => {
     switch (currentView) {
@@ -42,10 +33,9 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen bg-app-black text-white">
-      <AuthHeader currentView={currentView} onBack={handleBack} />
-      <animated.div style={fadeIn} className="px-5 mx-auto max-w-md">
+      <div className="px-5 mx-auto max-w-md">
         {renderView()}
-      </animated.div>
+      </div>
     </div>
   );
 }

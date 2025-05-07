@@ -71,7 +71,7 @@ const DevToolsOverlay: React.FC = () => {
       {/* Floating button */}
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-48 right-0 z-[160] bg-white text-black p-2 rounded-l-full shadow-lg hover:bg-neutral-100 transition-colors"
+        className="fixed bottom-32 right-0 z-[160] bg-white text-black p-2 rounded-l-full shadow-lg hover:bg-neutral-100 transition-colors"
         aria-label="Developer Tools"
       >
         <Settings size={20} className="gear-spin" />

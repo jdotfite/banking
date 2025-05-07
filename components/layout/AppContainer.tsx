@@ -15,15 +15,15 @@ const AppContainer: React.FC<AppContainerProps> = ({ children }) => {
 
   return (
     <div className="mx-auto max-w-md">
-      <div className="pb-20">
-        {children}
-      </div>
-      
-      {/* Bottom navigation - fixed at the bottom */}
+      {children}
+
       {showBottomNav && (
-        <div className="fixed bottom-0 left-0 right-0 z-[40]">
-          <BottomNav />
-        </div>
+        <>
+          <div className="h-20" /> {/* spacer only when nav is visible */}
+          <div className="fixed bottom-0 left-0 right-0 z-[40]">
+            <BottomNav />
+          </div>
+        </>
       )}
     </div>
   );
