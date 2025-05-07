@@ -200,7 +200,7 @@ const SignupFlow: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen w-full overflow-hidden bg-black">
+    <div className="flex flex-col h-screen w-full overflow-hidden bg-neutral-900">
       {/* Header with navigation buttons */}
       <div className="h-12 flex items-center justify-between px-3  z-10">
         {currentStep > SignupStep.BASIC_INFO ? (
