@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import confetti from 'canvas-confetti';
 
 interface CreatePasswordScreenProps {
   formData: {
@@ -20,11 +21,47 @@ const CreatePasswordScreen: React.FC<CreatePasswordScreenProps> = ({
   const [error, setError] = useState('');
   const [passwordStrength, setPasswordStrength] = useState(0);
   const [showPassword, setShowPassword] = useState(false);
+  const [showCheckmark, setShowCheckmark] = useState(false);
+  const prevStrengthRef = useRef(0);
+  const confettiRef = useRef<HTMLDivElement>(null);
 
   // Update password strength when password changes
   useEffect(() => {
     calculatePasswordStrength(formData.password);
   }, [formData.password]);
+
+  // Monitor password strength for changes
+  useEffect(() => {
+    // Check if strength just reached maximum (5)
+    if (passwordStrength === 5 && prevStrengthRef.current < 5) {
+      setShowCheckmark(true);
+      triggerConfetti();
+    } else if (passwordStrength < 5) {
+      setShowCheckmark(false);
+    }
+    
+    prevStrengthRef.current = passwordStrength;
+  }, [passwordStrength]);
+
+  // Confetti animation function
+  const triggerConfetti = () => {
+    if (confettiRef.current) {
+      const rect = confettiRef.current.getBoundingClientRect();
+      const x = rect.x + rect.width / 2;
+      const y = rect.y + rect.height / 2;
+      
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { 
+          x: x / window.innerWidth, 
+          y: y / window.innerHeight 
+        },
+        colors: ['#4ade80', '#22c55e', '#16a34a'],
+        disableForReducedMotion: true
+      });
+    }
+  };
 
   // Calculate password strength
   const calculatePasswordStrength = (password: string) => {
@@ -140,34 +177,64 @@ const CreatePasswordScreen: React.FC<CreatePasswordScreenProps> = ({
               {error && <p id="password-error" className="text-red-500 text-sm mt-1" role="alert">{error}</p>}
             </div>
 
-            {/* Password strength indicator */}
-            <div className="w-full bg-neutral-700 h-2 rounded-full overflow-hidden">
-              <div 
-                className={`h-full ${
-                  passwordStrength === 0 ? 'w-0' :
-                  passwordStrength === 1 ? 'w-1/5 bg-red-500' :
-                  passwordStrength === 2 ? 'w-2/5 bg-orange-500' :
-                  passwordStrength === 3 ? 'w-3/5 bg-yellow-500' :
-                  passwordStrength === 4 ? 'w-4/5 bg-blue-500' :
-                  'w-full bg-green-500'
-                }`}
-                aria-hidden="true"
-              ></div>
+            {/* Password strength indicator with checkmark */}
+            <div className="relative w-full" ref={confettiRef}>
+              <div className="w-full bg-neutral-700 h-2 rounded-full overflow-hidden">
+                <div 
+                  className={`h-full ${
+                    passwordStrength === 0 ? 'w-0' :
+                    passwordStrength === 1 ? 'w-1/5 bg-red-500' :
+                    passwordStrength === 2 ? 'w-2/5 bg-orange-500' :
+                    passwordStrength === 3 ? 'w-3/5 bg-yellow-500' :
+                    passwordStrength === 4 ? 'w-4/5 bg-blue-500' :
+                    'w-full bg-green-500'
+                  } transition-all duration-300`}
+                  aria-hidden="true"
+                ></div>
+              </div>
+              
+              {/* Checkmark icon */}
+              {showCheckmark && (
+                <div className="absolute -right-6 -top-1 flex items-center">
+                  <div className="w-5 h-5 rounded-full bg-green-500 flex items-center justify-center">
+                    <svg 
+                      xmlns="http://www.w3.org/2000/svg" 
+                      viewBox="0 0 24 24" 
+                      fill="white" 
+                      className="w-4 h-4"
+                    >
+                      <path 
+                        fillRule="evenodd" 
+                        d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z" 
+                        clipRule="evenodd" 
+                      />
+                    </svg>
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* Password requirements */}
-            <p className="text-neutral-500 text-sm">
-              Use 8+ characters with uppercase, lowercase, and numbers
-            </p>
+            {/* Feedback message */}
+            {passwordStrength === 5 ? (
+              <p className="text-green-500 text-sm">
+                Nice work! That would take a long time to crack 🔒
+              </p>
+            ) : (
+              <p className="text-neutral-500 text-sm">
+                Use 8+ characters with uppercase, lowercase, and numbers
+              </p>
+            )}
 
             {/* Next button */}
             <div className="pt-2">
               <button
                 type="submit"
                 disabled={isSubmitting}
-                className={`w-full py-4 px-6 rounded-lg bg-white text-black font-medium ${
+                className={`w-full py-4 px-6 rounded-lg ${
+                  passwordStrength === 5 ? 'bg-green-700' : 'bg-white'
+                } text-black font-medium ${
                   isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
-                }`}
+                } transition-colors duration-300`}
               >
                 {isSubmitting ? 'CREATING ACCOUNT...' : 'NEXT'}
               </button>
