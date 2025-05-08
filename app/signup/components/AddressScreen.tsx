@@ -128,6 +128,7 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
                   autoCapitalize="words"
                   onFocus={() => setFocusedFields({...focusedFields, streetAddress: true})}
                   onBlur={() => setFocusedFields({...focusedFields, streetAddress: false})}
+                  autoFocus
                 />
                 <div className={`h-px w-0 bg-white absolute bottom-0 left-0 transition-all duration-700 ${focusedFields.streetAddress ? 'w-full' : ''}`}></div>
               </div>

@@ -123,6 +123,7 @@ const DateOfBirthScreen: React.FC<DateOfBirthScreenProps> = ({ formData, onChang
                 autoComplete="bday"
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
+                autoFocus
               />
               <div className={`h-px w-0 bg-white absolute bottom-0 left-0 transition-all duration-700 ${isFocused ? 'w-full' : ''}`}></div>
             </div>
