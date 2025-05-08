@@ -8,7 +8,7 @@ import { BankingDataProvider } from '@/components/preloaders/BankingDataPreloade
 import ThemeContextProvider from '@/lib/context/ThemeContextProvider';
 import IOSFullScreenProvider from '@/lib/utils/IOSFullScreenProvider';
 import PWAInstallPrompt from '@/components/ui/common/PWAInstallPrompt';
-import DevToolsOverlay from '@/components/ui/common/DevToolsOverlay';
+import TestingToolkit from '@/components/ui/common/TestingToolkit';
 
 interface ClientProvidersProps {
   children: React.ReactNode;
@@ -24,8 +24,10 @@ export default function ClientProviders({ children }: ClientProvidersProps) {
               {/* PWA Install Prompt */}
               <PWAInstallPrompt />
               
-              {/* Developer Tools Overlay */}
-              <DevToolsOverlay />
+              {/* Developer Tools */}
+              {process.env.NODE_ENV === 'development' && (
+                <TestingToolkit />
+              )}
               
               {/* Loading Spinner Container */}
               <div className="fixed inset-0 z-[200] pointer-events-none">

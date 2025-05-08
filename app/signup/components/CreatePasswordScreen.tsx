@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import confetti from 'canvas-confetti';
+import { PasswordInput, Button, FormContainer } from '../../../components/ui/form';
 
 interface CreatePasswordScreenProps {
   formData: {
@@ -20,10 +21,9 @@ const CreatePasswordScreen: React.FC<CreatePasswordScreenProps> = ({
 }) => {
   const [error, setError] = useState('');
   const [passwordStrength, setPasswordStrength] = useState(0);
-  const [showPassword, setShowPassword] = useState(false);
   const [showCheckmark, setShowCheckmark] = useState(false);
   const prevStrengthRef = useRef(0);
-  const confettiRef = useRef<HTMLDivElement>(null);
+  const confettiRef = useRef<HTMLDivElement | null>(null);
 
   // Update password strength when password changes
   useEffect(() => {
@@ -129,126 +129,86 @@ const CreatePasswordScreen: React.FC<CreatePasswordScreenProps> = ({
     }
   };
 
-  // Toggle password visibility
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
+  const handlePasswordChange = (value: string) => {
+    onChange('password', value);
   };
 
   return (
-    <div className="flex flex-col min-h-[calc(100vh-48px)] w-full bg-[#121212] pb-14">
-      {/* Form content */}
-      <div className="flex-grow overflow-auto px-6 flex flex-col justify-center">
-        <div className="w-full max-w-md mx-auto">
-          {/* Header */}
-          <div className="mb-8">
-            <h1 className="text-4xl font-extralight text-white mb-2">
-              Create <span className="font-normal">password</span>
-            </h1>
-            <p className="text-neutral-400 text-sm">
-              Strong passwords keep your account safer
-            </p>
+    <FormContainer 
+      title="Create password"
+      subtitle="Strong passwords keep your account safer"
+    >
+      {/* Form */}
+      <form onSubmit={handleNext} className="space-y-8">
+        {/* Password input */}
+        <PasswordInput
+          id="password"
+          label="Password"
+          value={formData.password}
+          onChange={handlePasswordChange}
+          error={error}
+          autoComplete="new-password"
+          autoFocus
+        />
+
+        {/* Password strength indicator with checkmark */}
+        <div className="relative w-full" ref={confettiRef}>
+          <div className="w-full bg-neutral-700 h-2 rounded-full overflow-hidden relative z-0">
+            <div 
+              className={`h-full ${
+                passwordStrength === 0 ? 'w-0' :
+                passwordStrength === 1 ? 'w-1/5 bg-red-500' :
+                passwordStrength === 2 ? 'w-2/5 bg-orange-500' :
+                passwordStrength === 3 ? 'w-3/5 bg-yellow-500' :
+                passwordStrength === 4 ? 'w-4/5 bg-blue-500' :
+                'w-full bg-green-500'
+              } transition-all duration-300`}
+              aria-hidden="true"
+            ></div>
           </div>
-
-          {/* Form */}
-          <form onSubmit={handleNext} className="space-y-8">
-            {/* Password input */}
-            <div className="relative">
-              <label htmlFor="password" className="sr-only">Password</label>
-              <input
-                id="password"
-                type={showPassword ? 'text' : 'password'}
-                value={formData.password}
-                onChange={(e) => onChange('password', e.target.value)}
-                className="w-full py-2 px-0 bg-transparent border-b border-neutral-700 outline-none focus:border-neutral-700 text-white transition-all duration-200 [&:-webkit-autofill]:bg-transparent [&:-webkit-autofill]:text-white [&:-webkit-autofill]:shadow-[0_0_0_1000px_#121212_inset]"
-                autoComplete="new-password"
-                disabled={isSubmitting}
-                placeholder=""
-                autoFocus
-              />
-              <div className="h-px w-0 bg-white absolute bottom-0 left-0 transition-all duration-700"></div>
-              <button
-                type="button"
-                onClick={togglePasswordVisibility}
-                className="absolute right-0 top-0 text-neutral-400 p-2 touch-manipulation"
-                disabled={isSubmitting}
-                aria-label={showPassword ? "Hide password" : "Show password"}
+          
+          {/* Checkmark icon */}
+          <div className="absolute right-0 top-1/2 transform -translate-y-1/2 flex items-center z-10">
+            <div className={`w-6 h-6 rounded-full flex items-center justify-center ${showCheckmark ? 'bg-green-500' : 'bg-neutral-700'} border-2 border-[#121212]`}>
+              <svg 
+                xmlns="http://www.w3.org/2000/svg" 
+                viewBox="0 0 24 24" 
+                fill="white" 
+                className="w-4 h-4"
               >
-                {showPassword ? 'Hide' : 'Show'}
-              </button>
-              {error && <p id="password-error" className="text-red-500 text-sm mt-1" role="alert">{error}</p>}
+                <path 
+                  fillRule="evenodd" 
+                  d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z" 
+                  clipRule="evenodd" 
+                />
+              </svg>
             </div>
-
-            {/* Password strength indicator with checkmark */}
-            <div className="relative w-full" ref={confettiRef}>
-              <div className="w-full bg-neutral-700 h-2 rounded-full overflow-hidden relative z-0">
-                <div 
-                  className={`h-full ${
-                    passwordStrength === 0 ? 'w-0' :
-                    passwordStrength === 1 ? 'w-1/5 bg-red-500' :
-                    passwordStrength === 2 ? 'w-2/5 bg-orange-500' :
-                    passwordStrength === 3 ? 'w-3/5 bg-yellow-500' :
-                    passwordStrength === 4 ? 'w-4/5 bg-blue-500' :
-                    'w-full bg-green-500'
-                  } transition-all duration-300`}
-                  aria-hidden="true"
-                ></div>
-              </div>
-              
-              {/* Checkmark icon */}
-              <div className={`absolute right-0 top-1/2 transform -translate-y-1/2 flex items-center ${showCheckmark ? '' : 'opacity-30'}`}>
-                <div className={`w-6 h-6 rounded-full flex items-center justify-center ${showCheckmark ? 'bg-green-500' : 'bg-neutral-500'}`}>
-                  <svg 
-                    xmlns="http://www.w3.org/2000/svg" 
-                    viewBox="0 0 24 24" 
-                    fill="white" 
-                    className="w-4 h-4"
-                  >
-                    <path 
-                      fillRule="evenodd" 
-                      d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z" 
-                      clipRule="evenodd" 
-                    />
-                  </svg>
-                </div>
-              </div>
-            </div>
-
-            {/* Feedback message */}
-            {passwordStrength === 5 ? (
-              <p className="text-white text-sm">
-                <span className="font-medium">Nice work!</span> That would take a long time to crack 🔒
-              </p>
-            ) : (
-              <p className="text-neutral-500 text-sm">
-                Use 8+ characters with uppercase, lowercase, and numbers
-              </p>
-            )}
-
-            {/* Next button */}
-            <div className="pt-2">
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className={`w-full py-4 px-6 rounded-lg bg-white text-black font-medium ${
-                  isSubmitting ? 'opacity-70 cursor-not-allowed' : ''
-                } transition-colors duration-300`}
-              >
-                {isSubmitting ? 'CREATING ACCOUNT...' : 'NEXT'}
-              </button>
-            </div>
-          </form>
+          </div>
         </div>
-      </div>
-      
-      {/* Footer - Fixed at bottom */}
-      <div className="w-full border-t border-neutral-800/50 fixed bottom-0 left-0 bg-[#121212]">
-        <div className="max-w-md mx-auto w-full py-4 px-6">
-          <p className="text-center text-neutral-500 text-sm">
-            See legal disclosures
+
+        {/* Feedback message */}
+        {passwordStrength === 5 ? (
+          <p className="text-white text-sm">
+            <span className="font-medium">Nice work!</span> That would take a long time to crack 🔒
           </p>
+        ) : (
+          <p className="text-neutral-500 text-sm">
+            Use 8+ characters with uppercase, lowercase, and numbers
+          </p>
+        )}
+
+        {/* Next button */}
+        <div className="pt-2">
+          <Button 
+            type="submit" 
+            disabled={isSubmitting}
+            isLoading={isSubmitting}
+          >
+            {isSubmitting ? 'CREATING ACCOUNT...' : 'NEXT'}
+          </Button>
         </div>
-      </div>
-    </div>
+      </form>
+    </FormContainer>
   );
 };
 

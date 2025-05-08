@@ -13,20 +13,12 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Autofill styling */
 input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus,
+input:-webkit-autofill:hover, 
+input:-webkit-autofill:focus, 
 input:-webkit-autofill:active {
-  /* Reset appearance */
-  appearance: none;
-  
-  /* Override the background color with transparent box-shadow */
-  -webkit-box-shadow: 0 0 0 100px transparent inset !important;
-  
-  /* Override text color to use your theme's text color */
-  -webkit-text-fill-color: inherit !important;
-  
-  /* Prevent Chrome from refreshing the autofill style */
-  transition: background-color 5000s ease-in-out 0s;
+    -webkit-box-shadow: 0 0 0 30px transparent inset !important;
+    -webkit-text-fill-color: white !important;
+    color: white !important;
+    transition: background-color 5000s ease-in-out 0s;
 }

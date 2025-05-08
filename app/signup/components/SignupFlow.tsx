@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { X, ArrowLeft } from 'lucide-react';
 import BasicInfoScreen from '@/app/signup/components/BasicInfoScreen';
@@ -8,6 +8,7 @@ import DateOfBirthScreen from '@/app/signup/components/DateOfBirthScreen';
 import MobilePhoneScreen from '@/app/signup/components/MobilePhoneScreen';
 import AddressScreen from '@/app/signup/components/AddressScreen';
 import CreatePasswordScreen from '@/app/signup/components/CreatePasswordScreen';
+import { checkAndSubmitAfterLoad, createAutoFillIndicator } from '@/lib/utils/signupTestUtils';
 
 // Define the steps in the signup flow
 enum SignupStep {
@@ -24,6 +25,7 @@ interface SignupFormData {
   lastName: string;
   email: string;
   dateOfBirth: string;
+  dobValue?: string;
   mobilePhone: string;
   streetAddress: string;
   aptSuite: string;
@@ -51,6 +53,59 @@ const SignupFlow: React.FC = () => {
     state: '',
     password: ''
   });
+
+  // Load form data from localStorage if it exists (for testing purposes)
+  useEffect(() => {
+    console.log('SignupFlow mounted, checking for saved form data');
+    
+    const savedFormData = localStorage.getItem('signupFormData');
+    if (savedFormData) {
+      try {
+        const parsedData = JSON.parse(savedFormData);
+        console.log('Found saved form data:', parsedData);
+        
+        setFormData(prevData => ({
+          ...prevData,
+          ...parsedData
+        }));
+        
+        // Remove the data from localStorage to prevent it from being used again
+        localStorage.removeItem('signupFormData');
+        
+      } catch (error) {
+        console.error('Error parsing saved form data:', error);
+      }
+    }
+
+    // Check if auto-fill is active and recreate the indicator if needed
+    const isAutoFillActive = localStorage.getItem('autoFillActive') === 'true';
+    if (isAutoFillActive) {
+      // Import dynamically to avoid SSR issues
+      import('@/lib/utils/signupTestUtils').then(({ createAutoFillIndicator }) => {
+        // Use setTimeout to ensure the DOM is fully loaded
+        setTimeout(() => {
+          createAutoFillIndicator();
+        }, 100);
+      });
+    }
+    
+    // Check if we should submit the form after page load
+    checkAndSubmitAfterLoad();
+  }, []);
+
+  // Also check for auto-fill when the step changes
+  useEffect(() => {
+    const isAutoFillActive = localStorage.getItem('autoFillActive') === 'true';
+    if (isAutoFillActive) {
+      // Import dynamically to avoid SSR issues
+      import('@/lib/utils/signupTestUtils').then(({ createAutoFillIndicator }) => {
+        // Use setTimeout to ensure the DOM is fully loaded after step change
+        setTimeout(() => {
+          createAutoFillIndicator();
+        }, 100);
+      });
+    }
+  }, [currentStep]);
 
   const totalSteps = Object.keys(SignupStep).length / 2; // Divide by 2 because enum creates both numeric and string keys
 
@@ -140,7 +195,7 @@ const SignupFlow: React.FC = () => {
       await new Promise(resolve => setTimeout(resolve, 1000));
       
       localStorage.removeItem('selectedUserId');
-      router.push('/admin');
+      router.push('/signup/complete');
       
     } catch (err) {
       console.error('Signup failed:', err);

@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { User, Shield, Heart, AlertCircle } from 'lucide-react';
+import { User, Shield, Heart } from 'lucide-react';
+import { FormInput, Button, FormContainer } from '../../../components/ui/form';
 
 const ProgressIndicator = () => (
   <div className="w-full py-6 relative">
@@ -47,8 +48,6 @@ const BasicInfoScreen: React.FC<BasicInfoScreenProps> = ({ formData, onChange, o
     lastName: '',
     email: ''
   });
-  
-  const [focusedInput, setFocusedInput] = useState<string | null>(null);
 
   const validateForm = () => {
     let isValid = true;
@@ -87,12 +86,8 @@ const BasicInfoScreen: React.FC<BasicInfoScreenProps> = ({ formData, onChange, o
     }
   };
 
-  const handleFocus = (field: string) => {
-    setFocusedInput(field);
-  };
-
-  const handleBlur = () => {
-    setFocusedInput(null);
+  const handleInputChange = (field: string) => (value: string) => {
+    onChange(field, value);
   };
 
   return (
@@ -117,112 +112,38 @@ const BasicInfoScreen: React.FC<BasicInfoScreenProps> = ({ formData, onChange, o
 
           {/* Form */}
           <form onSubmit={handleNext} className="space-y-8">
-            {/* First Name */}
-            <div className="relative">
-              <label 
-                htmlFor="firstName" 
-                className={`absolute transition-all duration-200 ${
-                  focusedInput === 'firstName' || formData.firstName
-                    ? '-top-3 text-xs text-neutral-400'
-                    : 'top-2 text-base text-neutral-500'
-                }`}
-              >
-                First Name
-              </label>
-              <div className="relative">
-                <input
-                  id="firstName"
-                  type="text"
-                  value={formData.firstName}
-                  onChange={(e) => onChange('firstName', e.target.value)}
-                  onFocus={() => handleFocus('firstName')}
-                  onBlur={handleBlur}
-                  className="w-full py-2 px-0 bg-transparent border-b border-neutral-700 outline-none focus:border-neutral-700 text-white transition-all duration-200"
-                  autoComplete="given-name"
-                  autoCapitalize="words"
-                  placeholder=""
-                  autoFocus
-                />
-                {/* Underline animation - stays in place */}
-                <div className={`h-px w-0 bg-white absolute bottom-0 left-0 transition-all duration-700 ${focusedInput === 'firstName' ? 'w-full' : ''}`}></div>
-              </div>
-              {errors.firstName && (
-                <p className="text-red-500 text-sm mt-1" role="alert">
-                  {errors.firstName}
-                </p>
-              )}
-            </div>
+            <FormInput
+              id="firstName"
+              label="First Name"
+              value={formData.firstName}
+              onChange={handleInputChange('firstName')}
+              error={errors.firstName}
+              autoComplete="given-name"
+              autoCapitalize="words"
+              autoFocus
+            />
 
-            {/* Last Name */}
-            <div className="relative">
-              <label 
-                htmlFor="lastName" 
-                className={`absolute transition-all duration-200 ${
-                  focusedInput === 'lastName' || formData.lastName
-                    ? '-top-3 text-xs text-neutral-400'
-                    : 'top-2 text-base text-neutral-500'
-                }`}
-              >
-                Last Name
-              </label>
-              <div className="relative">
-                <input
-                  id="lastName"
-                  type="text"
-                  value={formData.lastName}
-                  onChange={(e) => onChange('lastName', e.target.value)}
-                  onFocus={() => handleFocus('lastName')}
-                  onBlur={handleBlur}
-                  className="w-full py-2 px-0 bg-transparent border-b border-neutral-700 outline-none focus:border-neutral-700 text-white transition-all duration-200"
-                  autoComplete="family-name"
-                  autoCapitalize="words"
-                  placeholder=""
-                />
-                {/* Underline animation - stays in place */}
-                <div className={`h-px w-0 bg-white absolute bottom-0 left-0 transition-all duration-700 ${focusedInput === 'lastName' ? 'w-full' : ''}`}></div>
-              </div>
-              {errors.lastName && (
-                <p className="text-red-500 text-sm mt-1" role="alert">
-                  {errors.lastName}
-                </p>
-              )}
-            </div>
+            <FormInput
+              id="lastName"
+              label="Last Name"
+              value={formData.lastName}
+              onChange={handleInputChange('lastName')}
+              error={errors.lastName}
+              autoComplete="family-name"
+              autoCapitalize="words"
+            />
 
-            {/* Email */}
-            <div className="relative">
-              <label 
-                htmlFor="email" 
-                className={`absolute transition-all duration-200 ${
-                  focusedInput === 'email' || formData.email
-                    ? '-top-3 text-xs text-neutral-400'
-                    : 'top-2 text-base text-neutral-500'
-                }`}
-              >
-                Email
-              </label>
-              <div className="relative">
-                <input
-                  id="email"
-                  type="email"
-                  inputMode="email"
-                  value={formData.email}
-                  onChange={(e) => onChange('email', e.target.value)}
-                  onFocus={() => handleFocus('email')}
-                  onBlur={handleBlur}
-                  className="w-full py-2 px-0 bg-transparent border-b border-neutral-700 outline-none focus:border-neutral-700 text-white transition-all duration-200"
-                  autoComplete="email"
-                  autoCapitalize="off"
-                  placeholder=""
-                />
-                {/* Underline animation - stays in place */}
-                <div className={`h-px w-0 bg-white absolute bottom-0 left-0 transition-all duration-700 ${focusedInput === 'email' ? 'w-full' : ''}`}></div>
-              </div>
-              {errors.email && (
-                <p className="text-red-500 text-sm mt-1" role="alert">
-                  {errors.email}
-                </p>
-              )}
-            </div>
+            <FormInput
+              id="email"
+              type="email"
+              label="Email"
+              value={formData.email}
+              onChange={handleInputChange('email')}
+              error={errors.email}
+              autoComplete="email"
+              autoCapitalize="off"
+              inputMode="email"
+            />
 
             <p className="text-neutral-500 text-sm pt-1">
               Use your legal name. You can add a preferred name later.
@@ -230,12 +151,9 @@ const BasicInfoScreen: React.FC<BasicInfoScreenProps> = ({ formData, onChange, o
 
             {/* Next button */}
             <div className="pt-2">
-              <button
-                type="submit"
-                className="w-full py-4 px-6 rounded-lg bg-white text-black font-medium"
-              >
+              <Button type="submit">
                 NEXT
-              </button>
+              </Button>
             </div>
           </form>
         </div>

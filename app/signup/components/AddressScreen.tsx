@@ -70,7 +70,7 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
     }
 
     // Validate state
-    if (!formData.state) {
+    if (formData.state === '') {
       newErrors.state = 'State is required';
       isValid = false;
     }
@@ -107,7 +107,7 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
             {/* Street address */}
             <div className="relative">
               <label htmlFor="street-address" className="sr-only">Street address</label>
-              <div className="relative pt-4">
+              <div className="relative">
                 <label 
                   htmlFor="street-address"
                   className={`absolute left-0 transition-all duration-200 pointer-events-none ${
@@ -123,7 +123,7 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
                   type="text"
                   value={formData.streetAddress}
                   onChange={(e) => onChange('streetAddress', e.target.value)}
-                  className="w-full pt-4 pb-2 px-0 bg-transparent border-b border-neutral-700 outline-none focus:border-neutral-700 text-white transition-all duration-200"
+                  className="w-full pt-5 pb-1 px-0 bg-transparent border-b border-neutral-700 outline-none focus:border-neutral-700 text-white transition-all duration-200"
                   autoComplete="street-address"
                   autoCapitalize="words"
                   onFocus={() => setFocusedFields({...focusedFields, streetAddress: true})}
@@ -138,7 +138,7 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
             {/* Apt/Suite (optional) */}
             <div className="relative">
               <label htmlFor="apt-suite" className="sr-only">Apartment or Suite number</label>
-              <div className="relative pt-4">
+              <div className="relative">
                 <label 
                   htmlFor="apt-suite"
                   className={`absolute left-0 transition-all duration-200 pointer-events-none ${
@@ -154,7 +154,7 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
                   type="text"
                   value={formData.aptSuite}
                   onChange={(e) => onChange('aptSuite', e.target.value)}
-                  className="w-full pt-4 pb-2 px-0 bg-transparent border-b border-neutral-700 outline-none focus:border-neutral-700 text-white transition-all duration-200"
+                  className="w-full pt-5 pb-1 px-0 bg-transparent border-b border-neutral-700 outline-none focus:border-neutral-700 text-white transition-all duration-200"
                   autoComplete="address-line2"
                   onFocus={() => setFocusedFields({...focusedFields, aptSuite: true})}
                   onBlur={() => setFocusedFields({...focusedFields, aptSuite: false})}
@@ -166,7 +166,7 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
             {/* ZIP Code */}
             <div className="relative">
               <label htmlFor="zip-code" className="sr-only">ZIP Code</label>
-              <div className="relative pt-4">
+              <div className="relative">
                 <label 
                   htmlFor="zip-code"
                   className={`absolute left-0 transition-all duration-200 pointer-events-none ${
@@ -184,7 +184,7 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
                   pattern="[0-9]*"
                   value={formData.zipCode}
                   onChange={(e) => onChange('zipCode', e.target.value.replace(/\D/g, '').substring(0, 5))}
-                  className="w-full pt-4 pb-2 px-0 bg-transparent border-b border-neutral-700 outline-none focus:border-neutral-700 text-white transition-all duration-200"
+                  className="w-full pt-5 pb-1 px-0 bg-transparent border-b border-neutral-700 outline-none focus:border-neutral-700 text-white transition-all duration-200"
                   autoComplete="postal-code"
                   maxLength={5}
                   onFocus={() => setFocusedFields({...focusedFields, zipCode: true})}
@@ -199,7 +199,7 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
             <div className="grid grid-cols-2 gap-4">
               <div className="relative">
                 <label htmlFor="city" className="sr-only">City</label>
-                <div className="relative pt-4">
+              <div className="relative">
                   <label 
                     htmlFor="city"
                     className={`absolute left-0 transition-all duration-200 pointer-events-none ${
@@ -215,7 +215,7 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
                     type="text"
                     value={formData.city}
                     onChange={(e) => onChange('city', e.target.value)}
-                    className="w-full pt-4 pb-2 px-0 bg-transparent border-b border-neutral-700 outline-none focus:border-neutral-700 text-white transition-all duration-200"
+                  className="w-full pt-5 pb-1 px-0 bg-transparent border-b border-neutral-700 outline-none focus:border-neutral-700 text-white transition-all duration-200"
                     autoComplete="address-level2"
                     autoCapitalize="words"
                     onFocus={() => setFocusedFields({...focusedFields, city: true})}
@@ -225,14 +225,16 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
                 </div>
                 {errors.city && <p id="city-error" className="text-red-500 text-sm mt-1" role="alert">{errors.city}</p>}
               </div>
-              <div className="relative">
+              <div className="relative pb-[3px]">
                 <label htmlFor="state" className="sr-only">State</label>
                 <select
                   id="state"
-                  value={formData.state}
+                  value={formData.state || 'PA'}
                   onChange={(e) => onChange('state', e.target.value)}
-                  className="w-full py-2 px-0 bg-transparent border-b border-neutral-700 outline-none focus:border-neutral-700 text-white transition-all duration-200 [&:-webkit-autofill]:bg-transparent [&:-webkit-autofill]:text-white [&:-webkit-autofill]:shadow-[0_0_0_1000px_#121212_inset]"
+                  className="w-full absolute bottom-0 pt-5 pb-1 px-0 bg-transparent border-b border-neutral-700 outline-none focus:border-neutral-700 text-white transition-all duration-200 [&:-webkit-autofill]:bg-transparent [&:-webkit-autofill]:text-white [&:-webkit-autofill]:shadow-[0_0_0_1000px_#121212_inset]"
                   autoComplete="address-level1"
+                  onFocus={() => setFocusedFields({...focusedFields, state: true})}
+                  onBlur={() => setFocusedFields({...focusedFields, state: false})}
                 >
                   <option value="">State</option>
                   {states.map(state => (

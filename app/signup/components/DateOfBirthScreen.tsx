@@ -4,7 +4,8 @@ import React, { useState, useEffect } from 'react';
 
 interface DateOfBirthScreenProps {
   formData: {
-    dateOfBirth: string;
+    dateOfBirth?: string;
+    dobValue?: string;
   };
   onChange: (field: string, value: string) => void;
   onNext: () => void;
@@ -12,18 +13,25 @@ interface DateOfBirthScreenProps {
 
 const DateOfBirthScreen: React.FC<DateOfBirthScreenProps> = ({ formData, onChange, onNext }) => {
   const [error, setError] = useState('');
-  const [dobValue, setDobValue] = useState('');
+  const [dobValue, setDobValue] = useState(formData.dobValue || '');
   const [isFocused, setIsFocused] = useState(false);
 
   // Format date as MM/DD/YYYY while typing
   const handleDobChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let value = e.target.value.replace(/\D/g, '');
+    let value = e.target.value;
     
-    // Auto-format as user types
-    if (value.length > 4) {
-      value = `${value.slice(0, 2)}/${value.slice(2, 4)}/${value.slice(4, 8)}`;
-    } else if (value.length > 2) {
-      value = `${value.slice(0, 2)}/${value.slice(2)}`;
+    // Handle autofill in YYYY-MM-DD format
+    if (value.includes('-')) {
+      const [year, month, day] = value.split('-');
+      value = `${month}/${day}/${year}`;
+    } else {
+      // Handle manual input in MM/DD/YYYY format
+      value = value.replace(/\D/g, '');
+      if (value.length > 4) {
+        value = `${value.slice(0, 2)}/${value.slice(2, 4)}/${value.slice(4, 8)}`;
+      } else if (value.length > 2) {
+        value = `${value.slice(0, 2)}/${value.slice(2)}`;
+      }
     }
     
     setDobValue(value);
@@ -103,7 +111,7 @@ const DateOfBirthScreen: React.FC<DateOfBirthScreenProps> = ({ formData, onChang
             {/* Date of birth field */}
             <div className="relative pt-4">
               <label 
-                htmlFor="dob-input"
+                htmlFor="dob"
                 className={`absolute left-0 transition-all duration-200 pointer-events-none ${
                   isFocused || dobValue 
                     ? 'text-xs top-0 text-neutral-400'
@@ -113,16 +121,24 @@ const DateOfBirthScreen: React.FC<DateOfBirthScreenProps> = ({ formData, onChang
                 Date of birth (MM/DD/YYYY)
               </label>
               <input
-                id="dob-input"
+                id="dob"
+                name="dob"
                 type="text"
                 inputMode="numeric"
                 value={dobValue}
                 onChange={handleDobChange}
                 maxLength={10}
-                  className="w-full pt-4 pb-2 px-0 bg-transparent border-b border-neutral-700 outline-none focus:border-neutral-700 text-white transition-all duration-200 [&:-webkit-autofill]:bg-transparent [&:-webkit-autofill]:text-white [&:-webkit-autofill]:shadow-[0_0_0_1000px_#121212_inset]"
+                className="w-full pt-4 pb-2 px-0 bg-transparent border-b border-neutral-700 outline-none focus:border-neutral-700 text-white transition-all duration-200 [&:-webkit-autofill]:bg-transparent [&:-webkit-autofill]:text-white [&:-webkit-autofill]:shadow-[0_0_0_1000px_#121212_inset]"
                 autoComplete="bday"
                 onFocus={() => setIsFocused(true)}
-                onBlur={() => setIsFocused(false)}
+                onBlur={() => {
+                  setIsFocused(false);
+                  // Convert autofilled YYYY-MM-DD to MM/DD/YYYY if needed
+                  if (dobValue.includes('-')) {
+                    const [year, month, day] = dobValue.split('-');
+                    setDobValue(`${month}/${day}/${year}`);
+                  }
+                }}
                 autoFocus
               />
               <div className={`h-px w-0 bg-white absolute bottom-0 left-0 transition-all duration-700 ${isFocused ? 'w-full' : ''}`}></div>

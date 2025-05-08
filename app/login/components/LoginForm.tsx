@@ -2,22 +2,18 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Eye, EyeOff, ChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
+import { FormInput, PasswordInput, Button } from '../../../components/ui/form';
 
 interface LoginFormProps {
   setView: (view: 'login' | 'forgotPassword' | 'recoverUsername' | 'helpCenter') => void;
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
-  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: '',
     password: '',
     rememberMe: false
-  });
-  const [focused, setFocused] = useState({
-    email: false,
-    password: false
   });
   const [mounted, setMounted] = useState(false);
   const [error, setError] = useState('');
@@ -29,30 +25,18 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
     return () => setMounted(false);
   }, []);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value
-    }));
-    
+  const handleEmailChange = (value: string) => {
+    setFormData(prev => ({ ...prev, email: value }));
     if (error) setError('');
   };
 
-  const handleFocus = (field: 'email' | 'password') => {
-    setFocused(prev => ({
-      ...prev,
-      [field]: true
-    }));
+  const handlePasswordChange = (value: string) => {
+    setFormData(prev => ({ ...prev, password: value }));
+    if (error) setError('');
   };
 
-  const handleBlur = (field: 'email' | 'password') => {
-    if (!formData[field]) {
-      setFocused(prev => ({
-        ...prev,
-        [field]: false
-      }));
-    }
+  const handleRememberMeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({ ...prev, rememberMe: e.target.checked }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -119,75 +103,25 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
               
               {/* Login form with enhanced animations */}
               <form onSubmit={handleSubmit} className="space-y-5">
-                {/* Email field with floating label and corrected animations */}
-                <div className="relative group">
-                  <label 
-                    htmlFor="email" 
-                    className={`absolute transition-all duration-300 pointer-events-none ${
-                      focused.email || formData.email 
-                        ? 'text-xs top-0 text-neutral-400 font-light' 
-                        : 'text-base top-3 text-neutral-500 font-light'
-                    } left-0`}
-                  >
-                    Email Address
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="email"
-                      id="email"
-                      name="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      onFocus={() => handleFocus('email')}
-                      onBlur={() => handleBlur('email')}
-                      className="w-full pt-6 pb-2 px-0 bg-transparent border-b border-neutral-700 outline-none focus:outline-none focus:ring-0 focus:border-neutral-700 transition-none text-white"
-                    />
-                    {/* Underline animation - stays in place */}
-                    <div className={`h-px w-0 bg-white absolute bottom-0 left-0 transition-all duration-700 ${focused.email ? 'w-full' : ''}`}></div>
-                  </div>
-                </div>
+                {/* Email field */}
+                <FormInput
+                  id="email"
+                  type="email"
+                  label="Email Address"
+                  value={formData.email}
+                  onChange={handleEmailChange}
+                  autoComplete="email"
+                  inputMode="email"
+                />
                 
-                {/* Password field with floating label */}
-                <div className="relative group">
-                  <label 
-                    htmlFor="password" 
-                    className={`absolute transition-all duration-300 pointer-events-none ${
-                      focused.password || formData.password 
-                        ? 'text-xs top-0 text-neutral-400 font-light' 
-                        : 'text-base top-3 text-neutral-500 font-light'
-                    } left-0`}
-                  >
-                    Password
-                  </label>
-                  <div className="flex items-end">
-                    {/* Password input */}
-                    <div className="relative flex-1">
-                      <div className="relative">
-                        <input
-                          type={showPassword ? 'text' : 'password'}
-                          id="password"
-                          name="password"
-                          value={formData.password}
-                          onChange={handleChange}
-                          onFocus={() => handleFocus('password')}
-                          onBlur={() => handleBlur('password')}
-                          className="w-full pt-6 pb-2 px-0 bg-transparent border-b border-neutral-700 outline-none focus:outline-none focus:ring-0 focus:border-neutral-700 transition-none text-white"
-                        />
-                        {/* Password visibility toggle positioned at the end of the input */}
-                        <button
-                          type="button"
-                          className="absolute right-0 bottom-2 text-neutral-500 hover:text-white transition-colors"
-                          onClick={() => setShowPassword(!showPassword)}
-                          aria-label={showPassword ? 'Hide password' : 'Show password'}
-                        >
-                          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                        </button>
-                        {/* Underline animation for password */}
-                        <div className={`h-px w-0 bg-white absolute bottom-0 left-0 transition-all duration-700 ${focused.password ? 'w-full' : ''}`}></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                {/* Password field */}
+                <PasswordInput
+                  id="password"
+                  label="Password"
+                  value={formData.password}
+                  onChange={handlePasswordChange}
+                  autoComplete="current-password"
+                />
                 
                 {/* Remember me and forgot password */}
                 <div className="flex justify-between items-center pt-1">
@@ -197,7 +131,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
                       id="rememberMe"
                       name="rememberMe"
                       checked={formData.rememberMe}
-                      onChange={handleChange}
+                      onChange={handleRememberMeChange}
                       className="h-4 w-4 bg-neutral-800 border-neutral-700 rounded focus:ring-white"
                     />
                     <label htmlFor="rememberMe" className="ml-2 text-sm text-neutral-400">
@@ -213,34 +147,15 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
                   </button>
                 </div>
 
-                {/* Login button with animation */}
+                {/* Login button */}
                 <div className="pt-4">
-                  <button
-                    type="submit"
+                  <Button 
+                    type="submit" 
                     disabled={isSubmitting}
-                    className={`
-                      w-full relative overflow-hidden py-3 md:py-4 px-6 rounded-lg font-medium tracking-wide
-                      transition-all duration-300 transform 
-                      ${isSubmitting
-                        ? 'bg-white text-neutral-900 cursor-default' 
-                        : 'bg-neutral-200 text-neutral-900 hover:bg-white'
-                      }
-                    `}
+                    isLoading={isSubmitting}
                   >
-                    <div className="relative z-10 flex items-center justify-center">
-                      {isSubmitting ? (
-                        <div className="flex items-center justify-center">
-                          <div className="flex space-x-2">
-                            <span className="h-2 w-2 bg-neutral-900 rounded-full animate-pulse"></span>
-                            <span className="h-2 w-2 bg-neutral-900 rounded-full animate-pulse [animation-delay:0.2s]"></span>
-                            <span className="h-2 w-2 bg-neutral-900 rounded-full animate-pulse [animation-delay:0.4s]"></span>
-                          </div>
-                        </div>
-                      ) : (
-                        <span>SIGN IN</span>
-                      )}
-                    </div>
-                  </button>
+                    SIGN IN
+                  </Button>
                 </div>
                 
                 {/* Sign up option */}
