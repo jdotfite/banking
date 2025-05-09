@@ -89,7 +89,7 @@ const SimpleDraggableSheet: React.FC<SimpleDraggableSheetProps> = ({
         onTouchStart={handleTouchStart}
         onMouseDown={handleTouchStart}
       >
-        <div className="w-10 h-1 bg-gray-600 rounded-full"></div>
+        <div className="w-10 h-1 bg-neutral-600 rounded-full"></div>
       </div>
       
       {/* Content */}

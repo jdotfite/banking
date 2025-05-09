@@ -50,14 +50,14 @@ const BottomNav: React.FC = () => {
           >
             <div
               className={`
-                ${isActive ? 'text-white' : 'text-gray-400'} 
+                ${isActive ? 'text-white' : 'text-neutral-400'} 
                 transition-all duration-200
               `}
             >
               <Icon name={item.icon} className="w-5 h-5" />
             </div>
             <span
-              className={`text-xs mt-1 ${isActive ? 'text-white' : 'text-gray-400'}`}
+              className={`text-xs mt-1 ${isActive ? 'text-white' : 'text-neutral-400'}`}
             >
               {item.name}
             </span>

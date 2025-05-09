@@ -111,7 +111,7 @@ const Admin: React.FC<AdminProps> = ({ onSelectUser }) => {
                   <img 
                     src={user.avatar || '/images/avatar/placeholder.svg'} 
                     alt={user.name} 
-                    className="w-12 h-12 rounded-full mr-4 object-cover border border-gray-700"
+                    className="w-12 h-12 rounded-full mr-4 object-cover border border-neutral-700"
                   />
                   <div className="flex-1">
                     <div className="flex justify-between items-start">

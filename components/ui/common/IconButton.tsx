@@ -62,20 +62,20 @@ export const IconButton: React.FC<IconButtonProps> = ({
     primary: {
       button: 'bg-[#212121] hover:bg-neutral-700',
       iconContainer: 'bg-neutral-700',
-      icon: 'text-gray-200',
-      label: 'text-gray-300'
+      icon: 'text-neutral-200',
+      label: 'text-neutral-300'
     },
     secondary: {
       button: 'bg-neutral-800 hover:bg-neutral-700',
       iconContainer: 'bg-neutral-700',
-      icon: 'text-gray-300',
-      label: 'text-gray-400'
+      icon: 'text-neutral-300',
+      label: 'text-neutral-400'
     },
     ghost: {
       button: 'bg-transparent hover:bg-neutral-800',
       iconContainer: 'bg-neutral-800',
-      icon: 'text-gray-300',
-      label: 'text-gray-400'
+      icon: 'text-neutral-300',
+      label: 'text-neutral-400'
     }
   };
   

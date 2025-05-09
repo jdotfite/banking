@@ -267,7 +267,7 @@ const TransactionContainer: React.FC<TransactionContainerProps> = ({
         
         {viewMode === 'fullscreen' && (
           <button 
-            className="text-gray-400 text-sm hover:text-white transition-colors"
+            className="text-neutral-400 text-sm hover:text-white transition-colors"
             onClick={() => {
               // Direct collapse
               setViewMode('collapsed');
@@ -282,7 +282,7 @@ const TransactionContainer: React.FC<TransactionContainerProps> = ({
         
         {viewMode === 'collapsed' && (
           <button 
-            className="text-gray-400 text-sm hover:text-white transition-colors"
+            className="text-neutral-400 text-sm hover:text-white transition-colors"
             onClick={handleExpandClick}
           >
             Expand
@@ -310,7 +310,7 @@ const TransactionContainer: React.FC<TransactionContainerProps> = ({
                 className={`flex-1 py-3 text-center text-sm font-medium transition-colors ${
                   selectedPeriod === option.id
                     ? 'bg-[#333333] text-white'
-                    : 'text-gray-400 hover:text-white'
+                    : 'text-neutral-400 hover:text-white'
                 }`}
                 onClick={() => handlePeriodChange(option.id)}
               >

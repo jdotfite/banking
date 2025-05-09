@@ -8,7 +8,7 @@ import DateOfBirthScreen from '@/app/signup/components/DateOfBirthScreen';
 import MobilePhoneScreen from '@/app/signup/components/MobilePhoneScreen';
 import AddressScreen from '@/app/signup/components/AddressScreen';
 import CreatePasswordScreen from '@/app/signup/components/CreatePasswordScreen';
-import { checkAndSubmitAfterLoad, createAutoFillIndicator } from '@/lib/utils/signupTestUtils';
+import { checkAndSubmitAfterLoad } from '@/lib/utils/signupTestUtils';
 
 // Define the steps in the signup flow
 enum SignupStep {
@@ -77,33 +77,21 @@ const SignupFlow: React.FC = () => {
       }
     }
 
-    // Check if auto-fill is active and recreate the indicator if needed
+    // Check if auto-fill is active
     const isAutoFillActive = localStorage.getItem('autoFillActive') === 'true';
     if (isAutoFillActive) {
-      // Import dynamically to avoid SSR issues
-      import('@/lib/utils/signupTestUtils').then(({ createAutoFillIndicator }) => {
-        // Use setTimeout to ensure the DOM is fully loaded
-        setTimeout(() => {
-          createAutoFillIndicator();
-        }, 100);
-      });
+      console.log('Auto-fill is active');
     }
     
     // Check if we should submit the form after page load
     checkAndSubmitAfterLoad();
   }, []);
 
-  // Also check for auto-fill when the step changes
+  // Check for auto-fill when the step changes
   useEffect(() => {
     const isAutoFillActive = localStorage.getItem('autoFillActive') === 'true';
     if (isAutoFillActive) {
-      // Import dynamically to avoid SSR issues
-      import('@/lib/utils/signupTestUtils').then(({ createAutoFillIndicator }) => {
-        // Use setTimeout to ensure the DOM is fully loaded after step change
-        setTimeout(() => {
-          createAutoFillIndicator();
-        }, 100);
-      });
+      console.log('Auto-fill is active - step changed');
     }
   }, [currentStep]);
 
@@ -255,7 +243,7 @@ const SignupFlow: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col h-screen w-full overflow-hidden bg-[#090909]">
+    <div className="flex flex-col h-screen w-full overflow-hidden bg-[#0a0a0a]">
       {/* Header with navigation buttons */}
       <div className="h-12 flex items-center justify-between px-3  z-10">
         {currentStep > SignupStep.BASIC_INFO ? (

@@ -1,68 +1,30 @@
-// public/fix-service-worker.js
-/**
- * This script helps fix service worker issues by:
- * 1. Unregistering any existing service workers
- * 2. Clearing caches that might contain stale service worker data
- */
+// This script unregisters all service workers and clears caches
+// to resolve service worker related issues
 
-async function fixServiceWorker() {
-  console.log('🔧 Starting service worker fix...');
-  
-  // Unregister all service workers
-  if ('serviceWorker' in navigator) {
-    console.log('Unregistering service workers...');
-    const registrations = await navigator.serviceWorker.getRegistrations();
-    
-    if (registrations.length === 0) {
-      console.log('No service workers found to unregister.');
-    } else {
+(async function() {
+  try {
+    // Unregister all service workers
+    if ('serviceWorker' in navigator) {
+      const registrations = await navigator.serviceWorker.getRegistrations();
       for (const registration of registrations) {
         await registration.unregister();
-        console.log(`Service worker at ${registration.scope} unregistered.`);
+        console.log('Service worker unregistered successfully');
       }
     }
-  } else {
-    console.log('Service Worker API not supported in this browser.');
-  }
-  
-  // Clear caches
-  if ('caches' in window) {
-    console.log('Clearing caches...');
-    try {
+    
+    // Clear all caches
+    if ('caches' in window) {
       const cacheNames = await caches.keys();
-      
-      if (cacheNames.length === 0) {
-        console.log('No caches found to clear.');
-      } else {
-        await Promise.all(
-          cacheNames.map(cacheName => {
-            console.log(`Deleting cache: ${cacheName}`);
-            return caches.delete(cacheName);
-          })
-        );
-        console.log('All caches cleared successfully.');
-      }
-    } catch (error) {
-      console.error('Error clearing caches:', error);
+      await Promise.all(
+        cacheNames.map(cacheName => caches.delete(cacheName))
+      );
+      console.log('All caches cleared successfully');
     }
-  } else {
-    console.log('Cache API not supported in this browser.');
+    
+    console.log('Service worker cleanup completed successfully');
+    alert('Service worker has been reset. Please reload the page.');
+  } catch (error) {
+    console.error('Error cleaning up service worker:', error);
+    alert('Error cleaning up service worker: ' + error.message);
   }
-  
-  console.log('✅ Service worker fix completed!');
-  console.log('🔄 Forcing service worker update...');
-  
-  // Force a fresh service worker registration
-  if ('serviceWorker' in navigator) {
-    const registration = await navigator.serviceWorker.register('/sw.js');
-    await registration.update();
-    console.log('Service worker forcefully updated');
-  }
-  
-  console.log('🔄 Please manually refresh the page to complete the update');
-}
-
-// Run the fix
-fixServiceWorker().catch(error => {
-  console.error('Error during service worker fix:', error);
-});
+})();

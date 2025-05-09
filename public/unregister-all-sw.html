@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Service Worker Reset</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+      line-height: 1.6;
+      color: #333;
+    }
+    h1, h2 {
+      color: #0070f3;
+    }
+    .card {
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    button {
+      background-color: #0070f3;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+    button:hover {
+      background-color: #0051a8;
+    }
+    .danger {
+      background-color: #e53e3e;
+    }
+    .danger:hover {
+      background-color: #c53030;
+    }
+    .success {
+      background-color: #38a169;
+    }
+    .success:hover {
+      background-color: #2f855a;
+    }
+    .warning {
+      background-color: #dd6b20;
+    }
+    .warning:hover {
+      background-color: #c05621;
+    }
+    .status {
+      margin-top: 20px;
+      padding: 10px;
+      border-radius: 4px;
+    }
+    .success-msg {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    .error-msg {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    .log {
+      background-color: #f8f9fa;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 10px;
+      margin-top: 20px;
+      max-height: 300px;
+      overflow-y: auto;
+      font-family: monospace;
+      white-space: pre-wrap;
+    }
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Service Worker Reset Tool</h1>
+  <p>This tool helps resolve issues with service workers by completely unregistering them and clearing all caches.</p>
+  
+  <div class="card">
+    <h2>Current Service Worker Status</h2>
+    <div id="swStatus">Checking service worker status...</div>
+    
+    <div class="actions">
+      <button id="checkStatusBtn" class="success">Check Status</button>
+    </div>
+  </div>
+  
+  <div class="card">
+    <h2>Reset Service Workers</h2>
+    <p>Use these options to fix service worker issues:</p>
+    
+    <div class="actions">
+      <button id="unregisterAllBtn" class="danger">Unregister All Service Workers</button>
+      <button id="clearCachesBtn" class="warning">Clear All Caches</button>
+      <button id="resetAllBtn" class="danger">Reset Everything</button>
+      <button id="reloadBtn">Reload Page</button>
+      <button id="homeBtn" class="success">Go to Home Page</button>
+    </div>
+    
+    <div id="status" class="status" style="display: none;"></div>
+    <div id="log" class="log" style="display: none;"></div>
+  </div>
+  
+  <div class="card">
+    <h2>Additional Options</h2>
+    <p>These options can help with specific issues:</p>
+    
+    <div class="actions">
+      <button id="useFixedSWBtn">Use Fixed Service Worker</button>
+      <button id="disableSWBtn">Disable Service Workers</button>
+    </div>
+  </div>
+
+  <script>
+    // Helper function to update the log
+    function log(message, isError = false) {
+      const logElement = document.getElementById('log');
+      logElement.style.display = 'block';
+      
+      const line = document.createElement('div');
+      line.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+      if (isError) {
+        line.style.color = '#e53e3e';
+      }
+      
+      logElement.appendChild(line);
+      logElement.scrollTop = logElement.scrollHeight;
+    }
+    
+    // Helper function to update status
+    function updateStatus(message, isError = false) {
+      const statusElement = document.getElementById('status');
+      statusElement.style.display = 'block';
+      statusElement.textContent = message;
+      statusElement.className = isError ? 'status error-msg' : 'status success-msg';
+    }
+    
+    // Check service worker status
+    async function checkServiceWorkerStatus() {
+      const statusElement = document.getElementById('swStatus');
+      
+      try {
+        if ('serviceWorker' in navigator) {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          
+          if (registrations.length === 0) {
+            statusElement.innerHTML = '<span style="color: green;">✓ No service workers registered</span>';
+          } else {
+            let html = '<span style="color: orange;">⚠ Service workers found:</span><ul>';
+            for (const registration of registrations) {
+              html += `<li>Scope: ${registration.scope}, State: ${registration.active ? registration.active.state : 'no active worker'}</li>`;
+            }
+            html += '</ul>';
+            statusElement.innerHTML = html;
+          }
+        } else {
+          statusElement.innerHTML = '<span style="color: gray;">Service workers not supported in this browser</span>';
+        }
+      } catch (error) {
+        statusElement.innerHTML = `<span style="color: red;">Error checking service worker status: ${error.message}</span>`;
+      }
+    }
+    
+    // Unregister all service workers
+    async function unregisterAllServiceWorkers() {
+      log('Starting to unregister all service workers...');
+      updateStatus('Unregistering service workers...');
+      
+      try {
+        if ('serviceWorker' in navigator) {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          
+          if (registrations.length === 0) {
+            log('No service workers found to unregister.');
+            updateStatus('No service workers found to unregister.');
+            return;
+          }
+          
+          log(`Found ${registrations.length} service worker(s) to unregister.`);
+          
+          for (const registration of registrations) {
+            try {
+              const result = await registration.unregister();
+              if (result) {
+                log(`Successfully unregistered service worker for scope: ${registration.scope}`);
+              } else {
+                log(`Failed to unregister service worker for scope: ${registration.scope}`, true);
+              }
+            } catch (err) {
+              log(`Error unregistering service worker for scope ${registration.scope}: ${err.message}`, true);
+            }
+          }
+          
+          updateStatus('Service workers unregistered successfully.');
+          checkServiceWorkerStatus();
+        } else {
+          log('Service workers not supported in this browser.');
+          updateStatus('Service workers not supported in this browser.', true);
+        }
+      } catch (err) {
+        log(`Unexpected error unregistering service workers: ${err.message}`, true);
+        updateStatus('Error unregistering service workers.', true);
+      }
+    }
+    
+    // Clear all caches
+    async function clearAllCaches() {
+      log('Starting to clear all caches...');
+      updateStatus('Clearing caches...');
+      
+      try {
+        if ('caches' in window) {
+          const cacheNames = await caches.keys();
+          
+          if (cacheNames.length === 0) {
+            log('No caches found to clear.');
+            updateStatus('No caches found to clear.');
+            return;
+          }
+          
+          log(`Found ${cacheNames.length} cache(s) to clear.`);
+          
+          await Promise.all(
+            cacheNames.map(async cacheName => {
+              try {
+                await caches.delete(cacheName);
+                log(`Successfully cleared cache: ${cacheName}`);
+              } catch (err) {
+                log(`Error clearing cache ${cacheName}: ${err.message}`, true);
+              }
+            })
+          );
+          
+          updateStatus('Caches cleared successfully.');
+        } else {
+          log('Cache API not supported in this browser.');
+          updateStatus('Cache API not supported in this browser.', true);
+        }
+      } catch (err) {
+        log(`Unexpected error clearing caches: ${err.message}`, true);
+        updateStatus('Error clearing caches.', true);
+      }
+    }
+    
+    // Reset everything
+    async function resetEverything() {
+      log('Starting complete reset...');
+      updateStatus('Performing complete reset...');
+      
+      try {
+        await unregisterAllServiceWorkers();
+        await clearAllCaches();
+        
+        log('Complete reset finished. Please reload the page.');
+        updateStatus('Complete reset finished. Please reload the page.');
+      } catch (err) {
+        log(`Unexpected error during complete reset: ${err.message}`, true);
+        updateStatus('Error during complete reset.', true);
+      }
+    }
+    
+    // Use fixed service worker
+    function useFixedServiceWorker() {
+      log('Setting up to use fixed service worker...');
+      updateStatus('Setting up to use fixed service worker...');
+      
+      try {
+        // Set a flag in localStorage to use the fixed service worker
+        localStorage.setItem('use_fixed_sw', 'true');
+        
+        log('Fixed service worker will be used after page reload.');
+        updateStatus('Fixed service worker will be used after page reload. Please reload the page.');
+      } catch (err) {
+        log(`Error setting up fixed service worker: ${err.message}`, true);
+        updateStatus('Error setting up fixed service worker.', true);
+      }
+    }
+    
+    // Disable service workers
+    function disableServiceWorkers() {
+      log('Disabling service workers...');
+      updateStatus('Disabling service workers...');
+      
+      try {
+        // Set a flag in localStorage to disable service workers
+        localStorage.setItem('disable_sw', 'true');
+        
+        log('Service workers will be disabled after page reload.');
+        updateStatus('Service workers will be disabled after page reload. Please reload the page.');
+      } catch (err) {
+        log(`Error disabling service workers: ${err.message}`, true);
+        updateStatus('Error disabling service workers.', true);
+      }
+    }
+    
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      // Check initial status
+      checkServiceWorkerStatus();
+      
+      // Set up event listeners
+      document.getElementById('checkStatusBtn').addEventListener('click', checkServiceWorkerStatus);
+      document.getElementById('unregisterAllBtn').addEventListener('click', unregisterAllServiceWorkers);
+      document.getElementById('clearCachesBtn').addEventListener('click', clearAllCaches);
+      document.getElementById('resetAllBtn').addEventListener('click', resetEverything);
+      document.getElementById('reloadBtn').addEventListener('click', () => window.location.reload());
+      document.getElementById('homeBtn').addEventListener('click', () => window.location.href = '/');
+      document.getElementById('useFixedSWBtn').addEventListener('click', useFixedServiceWorker);
+      document.getElementById('disableSWBtn').addEventListener('click', disableServiceWorkers);
+    });
+  </script>
+</body>
+</html>

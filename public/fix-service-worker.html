@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fix Service Worker</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+      line-height: 1.6;
+    }
+    h1 {
+      color: #333;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+    }
+    .card {
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      padding: 20px;
+      margin: 20px 0;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    button {
+      background-color: #0070f3;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-right: 10px;
+      margin-bottom: 10px;
+    }
+    button:hover {
+      background-color: #0051a8;
+    }
+    .status {
+      margin-top: 20px;
+      padding: 10px;
+      border-radius: 4px;
+    }
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    .log {
+      background-color: #f8f9fa;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 10px;
+      margin-top: 20px;
+      max-height: 200px;
+      overflow-y: auto;
+      font-family: monospace;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <h1>Service Worker Troubleshooter</h1>
+  
+  <div class="card">
+    <h2>Fix Service Worker Issues</h2>
+    <p>This tool will help resolve service worker related issues by:</p>
+    <ul>
+      <li>Unregistering all service workers</li>
+      <li>Clearing all caches</li>
+      <li>Resetting the application state</li>
+    </ul>
+    
+    <button id="fixButton">Fix Service Worker</button>
+    <button id="reloadButton">Reload Application</button>
+    
+    <div id="status" class="status" style="display: none;"></div>
+    <div id="log" class="log" style="display: none;"></div>
+  </div>
+  
+  <div class="card">
+    <h2>Service Worker Status</h2>
+    <div id="swStatus">Checking service worker status...</div>
+  </div>
+
+  <script>
+    // Function to check service worker status
+    async function checkServiceWorkerStatus() {
+      const statusElement = document.getElementById('swStatus');
+      
+      try {
+        if ('serviceWorker' in navigator) {
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          
+          if (registrations.length === 0) {
+            statusElement.innerHTML = '<span style="color: green;">✓ No service workers registered</span>';
+          } else {
+            let html = '<span style="color: orange;">⚠ Service workers found:</span><ul>';
+            for (const registration of registrations) {
+              html += `<li>Scope: ${registration.scope}, State: ${registration.active ? registration.active.state : 'no active worker'}</li>`;
+            }
+            html += '</ul>';
+            statusElement.innerHTML = html;
+          }
+        } else {
+          statusElement.innerHTML = '<span style="color: gray;">Service workers not supported in this browser</span>';
+        }
+      } catch (error) {
+        statusElement.innerHTML = `<span style="color: red;">Error checking service worker status: ${error.message}</span>`;
+      }
+    }
+
+    // Function to fix service worker issues
+    async function fixServiceWorker() {
+      const statusElement = document.getElementById('status');
+      const logElement = document.getElementById('log');
+      
+      statusElement.style.display = 'block';
+      logElement.style.display = 'block';
+      statusElement.className = 'status';
+      statusElement.textContent = 'Working...';
+      
+      try {
+        // Load and execute the fix script
+        const script = document.createElement('script');
+        script.src = '/fix-service-worker.js';
+        
+        // Capture console logs
+        const originalConsoleLog = console.log;
+        const originalConsoleError = console.error;
+        
+        console.log = function() {
+          logElement.textContent += Array.from(arguments).join(' ') + '\n';
+          originalConsoleLog.apply(console, arguments);
+        };
+        
+        console.error = function() {
+          logElement.textContent += 'ERROR: ' + Array.from(arguments).join(' ') + '\n';
+          originalConsoleError.apply(console, arguments);
+        };
+        
+        // Execute the script
+        document.head.appendChild(script);
+        
+        // Update status
+        statusElement.className = 'status success';
+        statusElement.textContent = 'Service worker cleanup completed. Please reload the application.';
+        
+        // Restore console functions after a delay
+        setTimeout(() => {
+          console.log = originalConsoleLog;
+          console.error = originalConsoleError;
+        }, 1000);
+        
+        // Update service worker status
+        setTimeout(checkServiceWorkerStatus, 1000);
+        
+      } catch (error) {
+        statusElement.className = 'status error';
+        statusElement.textContent = `Error: ${error.message}`;
+        console.error('Error fixing service worker:', error);
+      }
+    }
+
+    // Initialize
+    document.addEventListener('DOMContentLoaded', () => {
+      checkServiceWorkerStatus();
+      
+      document.getElementById('fixButton').addEventListener('click', fixServiceWorker);
+      document.getElementById('reloadButton').addEventListener('click', () => {
+        window.location.href = '/';
+      });
+    });
+  </script>
+</body>
+</html>

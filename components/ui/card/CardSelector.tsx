@@ -36,7 +36,7 @@ const CardSelector: React.FC<CardSelectorProps> = ({ cards, activeCardId, onCard
               <button
                 key={card.id}
                 className={`w-2 h-2 rounded-full transition-all ${
-                  index === currentIndex ? 'bg-white scale-125' : 'bg-gray-600'
+                  index === currentIndex ? 'bg-white scale-125' : 'bg-neutral-600'
                 }`}
                 onClick={() => handleCardChange(index)}
                 aria-label={`Select card ${index + 1}`}

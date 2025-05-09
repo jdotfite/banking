@@ -141,7 +141,7 @@ const withPWA = require('next-pwa')({
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
+  // swcMinify is now enabled by default in Next.js 14+
   
   // Optimize compilation
   compiler: {

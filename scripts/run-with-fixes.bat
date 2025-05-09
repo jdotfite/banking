@@ -1,0 +1,3 @@
+@echo off
+echo Running Banking App with fixes...
+node scripts/run-with-fixes.js

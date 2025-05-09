@@ -162,7 +162,7 @@ const CreditCardView: React.FC = () => {
             onClick={handleTransactionsClick}
           >
             <h3 className="text-sm font-medium mb-1">Transactions</h3>
-            <p className="text-xs text-gray-400 mb-2">Spent in April</p>
+            <p className="text-xs text-neutral-400 mb-2">Spent in April</p>
             <div className="flex space-x-1 mb-1">
               <div className="h-4 w-1/4 rounded-full bg-purple-500"></div>
               <div className="h-4 w-1/4 rounded-full bg-red-500"></div>
@@ -174,7 +174,7 @@ const CreditCardView: React.FC = () => {
           {/* Rewards section */}
           <div className="bg-[#212121] rounded-xl p-4">
             <h3 className="text-sm font-medium mb-1">Rewards</h3>
-            <p className="text-xs text-gray-400 mb-2">Cash back earned</p>
+            <p className="text-xs text-neutral-400 mb-2">Cash back earned</p>
             <p className="text-green-500 font-semibold">${rewardsBalance.toFixed(2)}</p>
           </div>
         </animated.div>
@@ -186,16 +186,16 @@ const CreditCardView: React.FC = () => {
             onClick={handleTransactionsClick}
           >
             <div className="w-10 h-10 rounded-full bg-neutral-700 flex items-center justify-center mr-2">
-              <Icon name="repeat" className="w-5 h-5 text-gray-200" />
+              <Icon name="repeat" className="w-5 h-5 text-neutral-200" />
             </div>
-            <span className="text-sm text-gray-300">Pay</span>
+            <span className="text-sm text-neutral-300">Pay</span>
           </button>
           
           <button className="bg-[#212121] rounded-xl p-4 flex items-center justify-center hover:bg-neutral-700 transition-colors">
             <div className="w-10 h-10 rounded-full bg-neutral-700 flex items-center justify-center mr-2">
-              <Icon name="settings" className="w-5 h-5 text-gray-200" />
+              <Icon name="settings" className="w-5 h-5 text-neutral-200" />
             </div>
-            <span className="text-sm text-gray-300">Manage</span>
+            <span className="text-sm text-neutral-300">Manage</span>
           </button>
         </animated.div>
         
@@ -204,7 +204,7 @@ const CreditCardView: React.FC = () => {
           <div className="flex justify-between">
             <div>
               <h3 className="text-sm font-medium mb-1">Refer and Earn</h3>
-              <p className="text-xs text-gray-400 max-w-[70%]">
+              <p className="text-xs text-neutral-400 max-w-[70%]">
                 Share a referral link to your friend and get rewarded
               </p>
               <button className="mt-2 text-xs text-white bg-neutral-700 px-3 py-1 rounded-full hover:bg-neutral-600 transition-colors">
@@ -221,16 +221,16 @@ const CreditCardView: React.FC = () => {
         <animated.div style={actionsSpring} className="grid grid-cols-2 gap-4 mb-4">
           <button className="bg-[#212121] rounded-xl p-4 flex items-center justify-center hover:bg-neutral-700 transition-colors">
             <div className="w-10 h-10 rounded-full bg-neutral-700 flex items-center justify-center mr-2">
-              <Icon name="transfer" className="w-5 h-5 text-gray-200" />
+              <Icon name="transfer" className="w-5 h-5 text-neutral-200" />
             </div>
-            <span className="text-sm text-gray-300">Balance Transfer</span>
+            <span className="text-sm text-neutral-300">Balance Transfer</span>
           </button>
           
           <button className="bg-[#212121] rounded-xl p-4 flex items-center justify-center hover:bg-neutral-700 transition-colors">
             <div className="w-10 h-10 rounded-full bg-neutral-700 flex items-center justify-center mr-2">
-              <Lock className="w-5 h-5 text-gray-200" />
+              <Lock className="w-5 h-5 text-neutral-200" />
             </div>
-            <span className="text-sm text-gray-300">Lock/Unlock</span>
+            <span className="text-sm text-neutral-300">Lock/Unlock</span>
           </button>
         </animated.div>
         
@@ -238,7 +238,7 @@ const CreditCardView: React.FC = () => {
         <animated.div style={actionsSpring} className="bg-[#212121] rounded-xl p-4 mb-4">
           <div className="flex justify-between items-center">
             <h3 className="text-sm font-medium">Statements and Documents</h3>
-            <button className="text-xs text-gray-400 hover:text-white transition-colors">
+            <button className="text-xs text-neutral-400 hover:text-white transition-colors">
               View All
             </button>
           </div>

@@ -35,7 +35,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ setView }) => {
     <>
       {!isSubmitted ? (
         <form onSubmit={handleSubmit} className="space-y-5">
-          <p className="text-gray-300 mb-4">
+          <p className="text-neutral-300 mb-4">
             Enter your email address and we'll send you instructions to reset your password.
           </p>
           
@@ -47,12 +47,12 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ setView }) => {
           )}
           
           <div className="space-y-1">
-            <label htmlFor="reset-email" className="block text-sm font-medium text-gray-300">
+            <label htmlFor="reset-email" className="block text-sm font-medium text-neutral-300">
               Email Address
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Mail size={18} className="text-gray-500" />
+                <Mail size={18} className="text-neutral-500" />
               </div>
               <input
                 type="email"
@@ -62,7 +62,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ setView }) => {
                   setEmail(e.target.value);
                   if (error) setError('');
                 }}
-                className="w-full pl-10 pr-3 py-3 bg-[#1a1a1a] border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-transparent"
+                className="w-full pl-10 pr-3 py-3 bg-[#1a1a1a] border border-neutral-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-transparent"
                 placeholder="you@example.com"
                 required
               />
@@ -80,17 +80,17 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ setView }) => {
             <button
               type="button"
               onClick={() => setView('login')}
-              className="w-full py-3 bg-transparent border border-gray-700 text-white font-medium rounded-lg hover:bg-white/5 transition-colors"
+              className="w-full py-3 bg-transparent border border-neutral-700 text-white font-medium rounded-lg hover:bg-white/5 transition-colors"
             >
               Back to login
             </button>
           </div>
           
-          <div className="mt-6 pt-4 border-t border-gray-800 flex justify-between">
+          <div className="mt-6 pt-4 border-t border-neutral-800 flex justify-between">
             <button
               type="button"
               onClick={() => setView('recoverUsername')}
-              className="text-sm text-gray-400 hover:text-white transition-colors"
+              className="text-sm text-neutral-400 hover:text-white transition-colors"
             >
               Forgot username?
             </button>
@@ -98,7 +98,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ setView }) => {
             <button
               type="button"
               onClick={() => setView('helpCenter')}
-              className="text-sm text-gray-400 hover:text-white transition-colors"
+              className="text-sm text-neutral-400 hover:text-white transition-colors"
             >
               Need more help?
             </button>
@@ -110,7 +110,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ setView }) => {
             <Mail size={32} className="text-green-200" />
           </div>
           <h2 className="text-xl font-medium mb-2">Check your email</h2>
-          <p className="text-gray-300 mb-6">
+          <p className="text-neutral-300 mb-6">
             We've sent instructions to reset your password to {email}
           </p>
           <button
@@ -119,7 +119,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ setView }) => {
           >
             Back to login
           </button>
-          <p className="mt-4 text-sm text-gray-400">
+          <p className="mt-4 text-sm text-neutral-400">
             Didn't receive the email? Check your spam folder or{' '}
             <button
               type="button"

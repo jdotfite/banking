@@ -52,7 +52,7 @@ const RecoverUsernameForm: React.FC<RecoverUsernameFormProps> = ({ setView }) =>
     <>
       {!isSubmitted ? (
         <form onSubmit={handleSubmit} className="space-y-5">
-          <p className="text-gray-300 mb-4">
+          <p className="text-neutral-300 mb-4">
             To recover your username, please provide the following information:
           </p>
           
@@ -64,7 +64,7 @@ const RecoverUsernameForm: React.FC<RecoverUsernameFormProps> = ({ setView }) =>
           )}
           
           <div className="space-y-1">
-            <label htmlFor="memberId" className="block text-sm font-medium text-gray-300">
+            <label htmlFor="memberId" className="block text-sm font-medium text-neutral-300">
               Member ID
             </label>
             <input
@@ -73,14 +73,14 @@ const RecoverUsernameForm: React.FC<RecoverUsernameFormProps> = ({ setView }) =>
               name="memberId"
               value={formData.memberId}
               onChange={handleChange}
-              className="w-full px-3 py-3 bg-[#1a1a1a] border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-transparent"
+              className="w-full px-3 py-3 bg-[#1a1a1a] border border-neutral-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-transparent"
               placeholder="Enter your Member ID"
               required
             />
           </div>
           
           <div className="space-y-1">
-            <label htmlFor="lastFourSSN" className="block text-sm font-medium text-gray-300">
+            <label htmlFor="lastFourSSN" className="block text-sm font-medium text-neutral-300">
               Last 4 of your Social Security Number (SSN)
             </label>
             <input
@@ -89,7 +89,7 @@ const RecoverUsernameForm: React.FC<RecoverUsernameFormProps> = ({ setView }) =>
               name="lastFourSSN"
               value={formData.lastFourSSN}
               onChange={handleChange}
-              className="w-full px-3 py-3 bg-[#1a1a1a] border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-transparent"
+              className="w-full px-3 py-3 bg-[#1a1a1a] border border-neutral-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-transparent"
               placeholder="••••"
               maxLength={4}
               required
@@ -107,14 +107,14 @@ const RecoverUsernameForm: React.FC<RecoverUsernameFormProps> = ({ setView }) =>
             <button
               type="button"
               onClick={() => setView('login')}
-              className="w-full py-3 bg-transparent border border-gray-700 text-white font-medium rounded-lg hover:bg-white/5 transition-colors"
+              className="w-full py-3 bg-transparent border border-neutral-700 text-white font-medium rounded-lg hover:bg-white/5 transition-colors"
             >
               Back to login
             </button>
           </div>
           
-          <div className="mt-6 pt-4 border-t border-gray-800 text-center">
-            <p className="text-sm text-gray-400">
+          <div className="mt-6 pt-4 border-t border-neutral-800 text-center">
+            <p className="text-sm text-neutral-400">
               If your contact information is out-of-date, please call us at
             </p>
             <p className="text-white font-medium mt-1">800-237-7288</p>
@@ -126,7 +126,7 @@ const RecoverUsernameForm: React.FC<RecoverUsernameFormProps> = ({ setView }) =>
             <Mail size={32} className="text-green-200" />
           </div>
           <h2 className="text-xl font-medium mb-2">Username sent</h2>
-          <p className="text-gray-300 mb-6">
+          <p className="text-neutral-300 mb-6">
             We've sent your username to your registered email address.
           </p>
           <button
@@ -135,7 +135,7 @@ const RecoverUsernameForm: React.FC<RecoverUsernameFormProps> = ({ setView }) =>
           >
             Back to login
           </button>
-          <p className="mt-4 text-sm text-gray-400">
+          <p className="mt-4 text-sm text-neutral-400">
             Didn't receive the email? Check your spam folder or{' '}
             <button
               type="button"

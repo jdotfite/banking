@@ -71,11 +71,11 @@ export default function ForgotPasswordPage() {
               <Check size={32} className="text-white" />
             </div>
             <h2 className="text-xl font-semibold mb-4">Check your email</h2>
-            <p className="text-gray-300 mb-6">
+            <p className="text-neutral-300 mb-6">
               We've sent a password reset link to <strong>{email}</strong>. 
               Please check your inbox and follow the instructions to reset your password.
             </p>
-            <p className="text-gray-400 text-sm mb-8">
+            <p className="text-neutral-400 text-sm mb-8">
               Didn't receive the email? Check your spam folder or try again.
             </p>
             <button
@@ -94,13 +94,13 @@ export default function ForgotPasswordPage() {
               </div>
             )}
             
-            <p className="text-gray-300">
+            <p className="text-neutral-300">
               Enter the email address associated with your account, and we'll send you a link to reset your password.
             </p>
             
             {/* Email field */}
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-1">
+              <label htmlFor="email" className="block text-sm font-medium text-neutral-300 mb-1">
                 Email Address
               </label>
               <input
@@ -108,7 +108,7 @@ export default function ForgotPasswordPage() {
                 id="email"
                 value={email}
                 onChange={handleChange}
-                className="w-full p-3 bg-[#1a1a1a] border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-main"
+                className="w-full p-3 bg-[#1a1a1a] border border-neutral-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-main"
                 required
               />
             </div>
@@ -123,7 +123,7 @@ export default function ForgotPasswordPage() {
             
             {/* Back to login link */}
             <div className="text-center mt-4">
-              <p className="text-gray-400">
+              <p className="text-neutral-400">
                 Remember your password?{' '}
                 <button
                   type="button"

@@ -2,8 +2,8 @@
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', async function() {
     try {
-      // Register the service worker
-      const registration = await navigator.serviceWorker.register('/sw.js', {
+      // Register the fixed service worker
+      const registration = await navigator.serviceWorker.register('/sw-fixed.js', {
         scope: '/'
       });
       console.log('✅ Service Worker registered successfully:', registration.scope);

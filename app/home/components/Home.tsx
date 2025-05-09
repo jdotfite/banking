@@ -153,7 +153,7 @@ const Home: React.FC = () => {
       description: 'Share a referral link to your friend and get rewarded',
       buttonText: 'Learn more',
       image: '/images/marketing/refer-friend.png',
-      color: 'from-gray-800 to-gray-900'
+      color: 'from-neutral-800 to-neutral-900'
     },
     {
       title: 'Boost Your Savings',
@@ -197,7 +197,7 @@ const Home: React.FC = () => {
                   </div>
                   <div>
                     <div className="font-medium tracking-tight text-white">{account.name}</div>
-                    <div className="text-gray-400 text-xs">
+                    <div className="text-neutral-400 text-xs">
                       {account.accountNumber}
                     </div>
                   </div>
@@ -206,7 +206,7 @@ const Home: React.FC = () => {
                   <div className="font-medium tracking-tight text-white">
                     ${account.balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                   </div>
-                  <div className="text-gray-400 text-xs capitalize">
+                  <div className="text-neutral-400 text-xs capitalize">
                     {account.type}
                   </div>
                 </div>
@@ -271,7 +271,7 @@ const Home: React.FC = () => {
               {promotions.map((_, index) => (
                 <div 
                   key={index}
-                  className={`w-2 h-2 rounded-full mx-1 ${index === activePromotionIndex ? 'bg-white' : 'bg-gray-600'}`}
+                  className={`w-2 h-2 rounded-full mx-1 ${index === activePromotionIndex ? 'bg-white' : 'bg-neutral-600'}`}
                   onClick={() => setActivePromotionIndex(index)}
                 />
               ))}
@@ -284,7 +284,7 @@ const Home: React.FC = () => {
           <div className="flex justify-between items-center mb-3">
             <h2 className="text-lg font-medium">Recent Transactions</h2>
             <button 
-              className="text-sm text-gray-400 flex items-center"
+              className="text-sm text-neutral-400 flex items-center"
               onClick={handleTransactionsClick}
             >
               See all <ChevronRight className="w-4 h-4 ml-1" />
@@ -305,7 +305,7 @@ const Home: React.FC = () => {
                   </div>
                   <div>
                     <div className="font-medium tracking-tight text-white">{transaction.merchant}</div>
-                    <div className="text-gray-400 text-xs">
+                    <div className="text-neutral-400 text-xs">
                       {transaction.location || transaction.message || transaction.timestamp}
                     </div>
                   </div>
@@ -321,7 +321,7 @@ const Home: React.FC = () => {
             {/* Show a message if no transactions */}
             {(!bankingTransactions.length || !bankingTransactions[0].transactions.length) && (
               <div className="bg-[#212121] rounded-xl p-4 text-center">
-                <p className="text-gray-400">No recent transactions</p>
+                <p className="text-neutral-400">No recent transactions</p>
               </div>
             )}
           </div>

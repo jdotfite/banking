@@ -164,7 +164,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
                 
                 {/* Sign up option */}
                 <div className="text-center pt-1">
-                  <p className="text-gray-400 text-sm">
+                  <p className="text-neutral-400 text-sm">
                     Don't have an account?{' '}
                     <button
                       type="button"

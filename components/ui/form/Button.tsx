@@ -22,16 +22,10 @@ const Button: React.FC<ButtonProps> = ({
   isLoading = false
 }) => {
   const baseClasses = `
-    w-full py-3 px-5 rounded-lg font-medium 
-    transition-all duration-300
-    active:scale-[0.98]
-    active:shadow-sm
+    w-full py-3 px-5 font-medium 
+    border border-[#aaa] text-[#eee]
+    btn-ripple
   `;
-  
-  const variantClasses = {
-    primary: 'bg-white text-black hover:bg-neutral-200',
-    secondary: 'bg-neutral-800 text-white hover:bg-neutral-700'
-  };
   
   const loadingIndicator = (
     <div className="flex items-center justify-center">
@@ -50,12 +44,11 @@ const Button: React.FC<ButtonProps> = ({
       disabled={disabled || isLoading}
       className={`
         ${baseClasses}
-        ${variantClasses[variant]}
         ${disabled || isLoading ? 'opacity-70 cursor-not-allowed' : ''}
         ${className}
       `}
     >
-      {isLoading ? loadingIndicator : children}
+      {isLoading ? loadingIndicator : <span className="relative block">{children}</span>}
     </button>
   );
 };

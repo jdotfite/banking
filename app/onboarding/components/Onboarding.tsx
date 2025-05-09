@@ -294,7 +294,7 @@ const Onboarding: React.FC<OnboardingProps> = () => {
             <div className="space-y-3 pb-3">
               <button
                 onClick={handleSignUp}
-                className="w-full py-3 bg-gray-200 text-black font-medium rounded-lg hover:bg-gray-300 transition-colors"
+                className="w-full py-3 bg-neutral-200 text-black font-medium rounded-lg hover:bg-neutral-300 transition-colors"
               >
                 Sign up
               </button>

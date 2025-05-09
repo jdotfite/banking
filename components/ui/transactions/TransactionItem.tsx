@@ -29,7 +29,7 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
   return (
     <animated.div 
       style={springs}
-      className={`flex items-center justify-between py-3 hover:bg-neutral-700/30 px-4 rounded-lg transition-colors ${!isLastInGroup ? 'border-b border-gray-700/30' : ''}`}
+      className={`flex items-center justify-between py-3 hover:bg-neutral-700/30 px-4 rounded-lg transition-colors ${!isLastInGroup ? 'border-b border-neutral-700/30' : ''}`}
     >
       <div className="flex items-center">
         <div className={`${iconBgColor} w-10 h-10 rounded-full flex items-center justify-center mr-3`}>
@@ -37,7 +37,7 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
         </div>
         <div>
           <div className="font-medium tracking-tight text-white">{transaction.merchant}</div>
-          <div className="text-gray-400 text-sm">
+          <div className="text-neutral-400 text-sm">
             {transaction.location || transaction.message}
           </div>
         </div>
@@ -46,7 +46,7 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
         <div className={`font-medium tracking-tight ${transaction.isIncoming ? 'text-green-500' : 'text-white'}`}>
           {transaction.isIncoming ? '+' : ''}${transaction.amount.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
         </div>
-        <div className="text-gray-400 text-sm">{transaction.timestamp}</div>
+        <div className="text-neutral-400 text-sm">{transaction.timestamp}</div>
       </div>
     </animated.div>
   );

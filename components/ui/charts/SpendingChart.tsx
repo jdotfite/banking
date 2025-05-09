@@ -112,7 +112,7 @@ const SpendingChart: React.FC<SpendingChartProps> = ({ selectedPeriod, periodOpt
         
         {/* Centered text overlay - adjusted font size */}
         <div className="absolute flex flex-col items-center justify-center inset-0 pointer-events-none">
-          <p className="text-gray-400 mb-1" style={{ fontSize: '15px' }}>Spent {getPeriodLabel()}</p>
+          <p className="text-neutral-400 mb-1" style={{ fontSize: '15px' }}>Spent {getPeriodLabel()}</p>
           <p className="text-white font-semibold" style={{ fontSize: '36px' }}>{formatCurrency(totalSpent)}</p>
         </div>
       </div>

@@ -14,6 +14,34 @@
 @tailwind utilities;
 
 /* Custom animations */
+.btn-ripple {
+	display: inline-block;
+	position: relative;
+	overflow: hidden;
+	transition: all ease-in-out .5s;
+}
+.btn-ripple::after {
+	content: "";
+	display: block;
+	position: absolute;
+	top: 0;
+	left: 25%;
+	height: 100%;
+	width: 50%;
+	background-color: #fff;
+	opacity: 0;
+	pointer-events: none;
+	transition: all ease-out .9s;
+	transform: scale(3, 2);
+}
+.btn-ripple:active::after {
+	padding: 0;
+	margin: 0;
+	opacity: .1;
+	transition: 0s;
+	transform: scale(0, 0);
+}
+
 @keyframes spin {
   from {
     transform: rotate(0deg);

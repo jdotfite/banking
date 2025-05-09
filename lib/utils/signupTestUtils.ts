@@ -77,6 +77,10 @@ export const autoFillSignupScreen = (screenName: string) => {
   }
   
   localStorage.setItem('signupFormData', JSON.stringify(updatedFormData));
+  
+  // Set bypass cookie to ensure middleware doesn't redirect
+  document.cookie = 'bypass_preloader=true; path=/';
+  
   window.location.reload();
 };
 
@@ -87,8 +91,10 @@ export const autoFillAndAdvance = () => {
   // Set a flag in localStorage to indicate auto-fill is active
   localStorage.setItem('autoFillActive', 'true');
   
-  // Create or recreate the auto-fill indicator
-  createAutoFillIndicator();
+  // Immediately fill and advance
+  fillCurrentScreen().then(() => {
+    clickNextButton();
+  });
 };
 
 // Fill current screen with test data
@@ -139,6 +145,9 @@ export const fillCurrentScreen = (): Promise<void> => {
     
     // Set a flag to indicate we should submit the form after reload
     localStorage.setItem('autoFillSubmitAfterLoad', 'true');
+    
+    // Set bypass cookie to ensure middleware doesn't redirect
+    document.cookie = 'bypass_preloader=true; path=/';
     
     // Reload the page to let React initialize with the data from localStorage
     // This is a more reliable way to update React's state
@@ -245,74 +254,6 @@ export const determineCurrentScreen = () => {
   return null;
 };
 
-/**
- * Creates the auto-fill indicator with play and stop buttons
- */
-export const createAutoFillIndicator = () => {
-  // Remove existing indicator if it exists
-  const existingIndicator = document.getElementById('auto-fill-indicator');
-  if (existingIndicator) {
-    existingIndicator.remove();
-  }
-
-  // Create floating indicator
-  const indicator = document.createElement('div');
-  indicator.id = 'auto-fill-indicator';
-  indicator.style.position = 'fixed';
-  indicator.style.bottom = '80px';
-  indicator.style.right = '20px';
-  indicator.style.backgroundColor = 'rgba(79, 70, 229, 0.9)';
-  indicator.style.color = 'white';
-  indicator.style.padding = '8px 16px';
-  indicator.style.borderRadius = '20px';
-  indicator.style.zIndex = '1000';
-  indicator.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
-  indicator.style.display = 'flex';
-  indicator.style.alignItems = 'center';
-  indicator.style.gap = '8px';
-
-  const playButton = document.createElement('button');
-  playButton.innerHTML = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <polygon points="5 3 19 12 5 21 5 3"></polygon>
-    </svg>
-  `;
-  playButton.style.background = 'none';
-  playButton.style.border = 'none';
-  playButton.style.cursor = 'pointer';
-  playButton.onclick = () => {
-    console.log('Play button clicked');
-    fillCurrentScreen().then(() => {
-      console.log('Form filled, clicking next button');
-      clickNextButton();
-    });
-  };
-
-  const stopButton = document.createElement('button');
-  stopButton.innerHTML = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="6" y="6" width="12" height="12" rx="2" ry="2"></rect>
-    </svg>
-  `;
-  stopButton.style.background = 'none';
-  stopButton.style.border = 'none';
-  stopButton.style.cursor = 'pointer';
-  stopButton.onclick = () => {
-    console.log('Stop button clicked');
-    // Remove the auto-fill active flag
-    localStorage.removeItem('autoFillActive');
-    
-    // Remove the indicator
-    indicator.remove();
-  };
-
-  indicator.appendChild(playButton);
-  indicator.appendChild(document.createTextNode('Auto-fill'));
-  indicator.appendChild(stopButton);
-  document.body.appendChild(indicator);
-  
-  console.log('Auto-fill indicator created');
-};
 
 export const autoCompleteSignup = () => {
   localStorage.setItem('signupFormData', JSON.stringify({
@@ -322,5 +263,7 @@ export const autoCompleteSignup = () => {
     ...testUserData.address,
     ...testUserData.password
   }));
+  // Set bypass cookie to ensure middleware doesn't redirect
+  document.cookie = 'bypass_preloader=true; path=/';
   window.location.href = '/signup';
 };

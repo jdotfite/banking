@@ -41,10 +41,10 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ setView }) => {
           <button
             key={index}
             onClick={option.action}
-            className="w-full text-left p-4 bg-[#1a1a1a] border border-gray-700 rounded-lg hover:bg-[#252525] transition-colors"
+            className="w-full text-left p-4 bg-[#1a1a1a] border border-neutral-700 rounded-lg hover:bg-[#252525] transition-colors"
           >
             <h3 className="font-medium mb-1">{option.title}</h3>
-            <p className="text-sm text-gray-400">{option.description}</p>
+            <p className="text-sm text-neutral-400">{option.description}</p>
           </button>
         ))}
       </div>
@@ -58,8 +58,8 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ setView }) => {
         </button>
       </div>
       
-      <div className="mt-8 pt-6 border-t border-gray-800 text-center">
-        <p className="text-sm text-gray-400 mb-2">Need additional support?</p>
+      <div className="mt-8 pt-6 border-t border-neutral-800 text-center">
+        <p className="text-sm text-neutral-400 mb-2">Need additional support?</p>
         <a href="tel:18002377288" className="text-green-200 hover:text-green-100 transition-colors">
           Call 1-800-237-7288
         </a>

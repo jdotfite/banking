@@ -192,7 +192,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ setView }) => {
     <>
       {!isSubmitted ? (
         <form onSubmit={handleSubmit} className="space-y-5">
-          <p className="text-gray-300 mb-4">
+          <p className="text-neutral-300 mb-4">
             Enter your email address and we'll send you instructions to reset your password.
           </p>
           
@@ -204,12 +204,12 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ setView }) => {
           )}
           
           <div className="space-y-1">
-            <label htmlFor="reset-email" className="block text-sm font-medium text-gray-300">
+            <label htmlFor="reset-email" className="block text-sm font-medium text-neutral-300">
               Email Address
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Mail size={18} className="text-gray-500" />
+                <Mail size={18} className="text-neutral-500" />
               </div>
               <input
                 type="email"
@@ -219,7 +219,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ setView }) => {
                   setEmail(e.target.value);
                   if (error) setError('');
                 }}
-                className="w-full pl-10 pr-3 py-3 bg-[#1a1a1a] border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-transparent"
+                className="w-full pl-10 pr-3 py-3 bg-[#1a1a1a] border border-neutral-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-transparent"
                 placeholder="you@example.com"
                 required
               />
@@ -237,17 +237,17 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ setView }) => {
             <button
               type="button"
               onClick={() => setView('login')}
-              className="w-full py-3 bg-transparent border border-gray-700 text-white font-medium rounded-lg hover:bg-white/5 transition-colors"
+              className="w-full py-3 bg-transparent border border-neutral-700 text-white font-medium rounded-lg hover:bg-white/5 transition-colors"
             >
               Back to login
             </button>
           </div>
           
-          <div className="mt-6 pt-4 border-t border-gray-800 flex justify-between">
+          <div className="mt-6 pt-4 border-t border-neutral-800 flex justify-between">
             <button
               type="button"
               onClick={() => setView('recoverUsername')}
-              className="text-sm text-gray-400 hover:text-white transition-colors"
+              className="text-sm text-neutral-400 hover:text-white transition-colors"
             >
               Forgot username?
             </button>
@@ -255,7 +255,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ setView }) => {
             <button
               type="button"
               onClick={() => setView('helpCenter')}
-              className="text-sm text-gray-400 hover:text-white transition-colors"
+              className="text-sm text-neutral-400 hover:text-white transition-colors"
             >
               Need more help?
             </button>
@@ -267,7 +267,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ setView }) => {
             <Mail size={32} className="text-green-200" />
           </div>
           <h2 className="text-xl font-medium mb-2">Check your email</h2>
-          <p className="text-gray-300 mb-6">
+          <p className="text-neutral-300 mb-6">
             We've sent instructions to reset your password to {email}
           </p>
           <button
@@ -276,7 +276,7 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ setView }) => {
           >
             Back to login
           </button>
-          <p className="mt-4 text-sm text-gray-400">
+          <p className="mt-4 text-sm text-neutral-400">
             Didn't receive the email? Check your spam folder or{' '}
             <button
               type="button"
@@ -350,10 +350,10 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ setView }) => {
           <button
             key={index}
             onClick={option.action}
-            className="w-full text-left p-4 bg-[#1a1a1a] border border-gray-700 rounded-lg hover:bg-[#252525] transition-colors"
+            className="w-full text-left p-4 bg-[#1a1a1a] border border-neutral-700 rounded-lg hover:bg-[#252525] transition-colors"
           >
             <h3 className="font-medium mb-1">{option.title}</h3>
-            <p className="text-sm text-gray-400">{option.description}</p>
+            <p className="text-sm text-neutral-400">{option.description}</p>
           </button>
         ))}
       </div>
@@ -367,8 +367,8 @@ const HelpCenter: React.FC<HelpCenterProps> = ({ setView }) => {
         </button>
       </div>
       
-      <div className="mt-8 pt-6 border-t border-gray-800 text-center">
-        <p className="text-sm text-gray-400 mb-2">Need additional support?</p>
+      <div className="mt-8 pt-6 border-t border-neutral-800 text-center">
+        <p className="text-sm text-neutral-400 mb-2">Need additional support?</p>
         <a href="tel:18002377288" className="text-green-200 hover:text-green-100 transition-colors">
           Call 1-800-237-7288
         </a>
@@ -449,12 +449,12 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
       )}
       
       <div className="space-y-1">
-        <label htmlFor="email" className="block text-sm font-medium text-gray-300">
+        <label htmlFor="email" className="block text-sm font-medium text-neutral-300">
           Email Address
         </label>
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Mail size={18} className="text-gray-500" />
+            <Mail size={18} className="text-neutral-500" />
           </div>
           <input
             type="email"
@@ -462,7 +462,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
             name="email"
             value={formData.email}
             onChange={handleChange}
-            className="w-full pl-10 pr-3 py-3 bg-[#1a1a1a] border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-transparent"
+            className="w-full pl-10 pr-3 py-3 bg-[#1a1a1a] border border-neutral-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-transparent"
             placeholder="you@example.com"
             required
           />
@@ -470,12 +470,12 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
       </div>
       
       <div className="space-y-1">
-        <label htmlFor="password" className="block text-sm font-medium text-gray-300">
+        <label htmlFor="password" className="block text-sm font-medium text-neutral-300">
           Password
         </label>
         <div className="relative">
           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-            <Lock size={18} className="text-gray-500" />
+            <Lock size={18} className="text-neutral-500" />
           </div>
           <input
             type={showPassword ? 'text' : 'password'}
@@ -483,13 +483,13 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
             name="password"
             value={formData.password}
             onChange={handleChange}
-            className="w-full pl-10 pr-10 py-3 bg-[#1a1a1a] border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-transparent"
+            className="w-full pl-10 pr-10 py-3 bg-[#1a1a1a] border border-neutral-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-transparent"
             placeholder="••••••••"
             required
           />
           <button
             type="button"
-            className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-gray-200"
+            className="absolute inset-y-0 right-0 pr-3 flex items-center text-neutral-400 hover:text-neutral-200"
             onClick={() => setShowPassword(!showPassword)}
             aria-label={showPassword ? 'Hide password' : 'Show password'}
           >
@@ -506,9 +506,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
             name="rememberMe"
             checked={formData.rememberMe}
             onChange={handleChange}
-            className="h-4 w-4 bg-gray-700 border-gray-600 rounded focus:ring-green-200"
+            className="h-4 w-4 bg-neutral-700 border-neutral-600 rounded focus:ring-green-200"
           />
-          <label htmlFor="rememberMe" className="ml-2 text-sm text-gray-300">
+          <label htmlFor="rememberMe" className="ml-2 text-sm text-neutral-300">
             Remember me
           </label>
         </div>
@@ -529,7 +529,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
       </button>
       
       <div className="text-center pt-2">
-        <p className="text-gray-400">
+        <p className="text-neutral-400">
           Don't have an account?{' '}
           <button
             type="button"
@@ -541,11 +541,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
         </p>
       </div>
       
-      <div className="mt-8 pt-6 border-t border-gray-800 text-center">
+      <div className="mt-8 pt-6 border-t border-neutral-800 text-center">
         <button
           type="button"
           onClick={() => setView('helpCenter')}
-          className="text-sm text-gray-400 hover:text-white inline-flex items-center gap-1 transition-colors"
+          className="text-sm text-neutral-400 hover:text-white inline-flex items-center gap-1 transition-colors"
         >
           <HelpCircle size={16} />
           <span>Need help?</span>
@@ -624,7 +624,7 @@ const RecoverUsernameForm: React.FC<RecoverUsernameFormProps> = ({ setView }) =>
     <>
       {!isSubmitted ? (
         <form onSubmit={handleSubmit} className="space-y-5">
-          <p className="text-gray-300 mb-4">
+          <p className="text-neutral-300 mb-4">
             To recover your username, please provide the following information:
           </p>
           
@@ -636,7 +636,7 @@ const RecoverUsernameForm: React.FC<RecoverUsernameFormProps> = ({ setView }) =>
           )}
           
           <div className="space-y-1">
-            <label htmlFor="memberId" className="block text-sm font-medium text-gray-300">
+            <label htmlFor="memberId" className="block text-sm font-medium text-neutral-300">
               Member ID
             </label>
             <input
@@ -645,14 +645,14 @@ const RecoverUsernameForm: React.FC<RecoverUsernameFormProps> = ({ setView }) =>
               name="memberId"
               value={formData.memberId}
               onChange={handleChange}
-              className="w-full px-3 py-3 bg-[#1a1a1a] border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-transparent"
+              className="w-full px-3 py-3 bg-[#1a1a1a] border border-neutral-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-transparent"
               placeholder="Enter your Member ID"
               required
             />
           </div>
           
           <div className="space-y-1">
-            <label htmlFor="lastFourSSN" className="block text-sm font-medium text-gray-300">
+            <label htmlFor="lastFourSSN" className="block text-sm font-medium text-neutral-300">
               Last 4 of your Social Security Number (SSN)
             </label>
             <input
@@ -661,7 +661,7 @@ const RecoverUsernameForm: React.FC<RecoverUsernameFormProps> = ({ setView }) =>
               name="lastFourSSN"
               value={formData.lastFourSSN}
               onChange={handleChange}
-              className="w-full px-3 py-3 bg-[#1a1a1a] border border-gray-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-transparent"
+              className="w-full px-3 py-3 bg-[#1a1a1a] border border-neutral-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-transparent"
               placeholder="••••"
               maxLength={4}
               required
@@ -679,14 +679,14 @@ const RecoverUsernameForm: React.FC<RecoverUsernameFormProps> = ({ setView }) =>
             <button
               type="button"
               onClick={() => setView('login')}
-              className="w-full py-3 bg-transparent border border-gray-700 text-white font-medium rounded-lg hover:bg-white/5 transition-colors"
+              className="w-full py-3 bg-transparent border border-neutral-700 text-white font-medium rounded-lg hover:bg-white/5 transition-colors"
             >
               Back to login
             </button>
           </div>
           
-          <div className="mt-6 pt-4 border-t border-gray-800 text-center">
-            <p className="text-sm text-gray-400">
+          <div className="mt-6 pt-4 border-t border-neutral-800 text-center">
+            <p className="text-sm text-neutral-400">
               If your contact information is out-of-date, please call us at
             </p>
             <p className="text-white font-medium mt-1">800-237-7288</p>
@@ -698,7 +698,7 @@ const RecoverUsernameForm: React.FC<RecoverUsernameFormProps> = ({ setView }) =>
             <Mail size={32} className="text-green-200" />
           </div>
           <h2 className="text-xl font-medium mb-2">Username sent</h2>
-          <p className="text-gray-300 mb-6">
+          <p className="text-neutral-300 mb-6">
             We've sent your username to your registered email address.
           </p>
           <button
@@ -707,7 +707,7 @@ const RecoverUsernameForm: React.FC<RecoverUsernameFormProps> = ({ setView }) =>
           >
             Back to login
           </button>
-          <p className="mt-4 text-sm text-gray-400">
+          <p className="mt-4 text-sm text-neutral-400">
             Didn't receive the email? Check your spam folder or{' '}
             <button
               type="button"

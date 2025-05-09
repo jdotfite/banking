@@ -33,7 +33,7 @@ const Header: React.FC<HeaderProps> = ({ userName }) => {
     <animated.div style={headerSpring} className="px-5 pt-8 pb-6 mx-auto max-w-md">
       <div className="flex justify-between items-center">
         <div className="flex items-center">
-          <div className="w-10 h-10 rounded-full mr-3 overflow-hidden border border-gray-700">
+          <div className="w-10 h-10 rounded-full mr-3 overflow-hidden border border-neutral-700">
             <img 
               src={userAvatar} 
               alt="Profile" 

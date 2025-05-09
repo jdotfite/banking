@@ -175,7 +175,7 @@ const EnhancedProgressBar = memo(({
   };
   
   return (
-    <div className="w-64 bg-gray-800 rounded-full h-2 mt-8 overflow-hidden">
+    <div className="w-64 bg-neutral-800 rounded-full h-2 mt-8 overflow-hidden">
       <div 
         className="h-full rounded-full" 
         style={shimmerStyle}

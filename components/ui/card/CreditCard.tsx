@@ -76,7 +76,7 @@ const CreditCard: React.FC<CreditCardProps> = ({
           {/* Card top section with balance and info button */}
           <div className="flex justify-between items-start">
             <div className="text-white">
-              <p className="text-gray-300 text-sm">Your Balance</p>
+              <p className="text-neutral-300 text-sm">Your Balance</p>
               <h1 className="text-white text-4xl font-semibold">${balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</h1>
             </div>
             <button
@@ -95,16 +95,16 @@ const CreditCard: React.FC<CreditCardProps> = ({
           >
             <div ref={contentRef}>
               <div className="grid grid-cols-2 gap-y-2">
-                <div className="text-gray-300 text-sm">Available Credit:</div>
+                <div className="text-neutral-300 text-sm">Available Credit:</div>
                 <div className="text-right font-medium text-sm">${availableCredit.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
                 
-                <div className="text-gray-300 text-sm">Minimum Payment:</div>
+                <div className="text-neutral-300 text-sm">Minimum Payment:</div>
                 <div className="text-right font-medium text-sm">${minimumPayment.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}</div>
                 
-                <div className="text-gray-300 text-sm">Due Date:</div>
+                <div className="text-neutral-300 text-sm">Due Date:</div>
                 <div className="text-right font-medium text-sm">{dueDate}</div>
                 
-                <div className="text-gray-300 text-sm">AutoPay:</div>
+                <div className="text-neutral-300 text-sm">AutoPay:</div>
                 <div className="text-right font-medium text-sm">
                   ON | <a href="#" className="text-neutral-400 hover:underline">Settings</a>
                 </div>
