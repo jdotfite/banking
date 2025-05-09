@@ -84,11 +84,13 @@ const FormInput: React.FC<FormInputProps> = ({
           </div>
         )}
       </div>
-      {error && (
-        <p className="text-red-500 text-sm mt-1" role="alert">
-          {error}
-        </p>
-      )}
+              <div className="relative">
+                <div className={`absolute top-0 left-0 w-full transition-all duration-200 ${error ? 'h-[20px] opacity-100' : 'h-0 opacity-0 overflow-hidden'}`}>
+                  <p className="text-red-500 text-sm" role="alert">
+                    {error}
+                  </p>
+                </div>
+              </div>
     </div>
   );
 };

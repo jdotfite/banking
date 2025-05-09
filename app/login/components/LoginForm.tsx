@@ -16,7 +16,10 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
     rememberMe: false
   });
   const [mounted, setMounted] = useState(false);
-  const [error, setError] = useState('');
+  const [errors, setErrors] = useState({
+    email: '',
+    password: ''
+  });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
@@ -27,12 +30,12 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
 
   const handleEmailChange = (value: string) => {
     setFormData(prev => ({ ...prev, email: value }));
-    if (error) setError('');
+    if (errors.email) setErrors(prev => ({ ...prev, email: '' }));
   };
 
   const handlePasswordChange = (value: string) => {
     setFormData(prev => ({ ...prev, password: value }));
-    if (error) setError('');
+    if (errors.password) setErrors(prev => ({ ...prev, password: '' }));
   };
 
   const handleRememberMeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,14 +45,20 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.email || !formData.password) {
-      setError('Please enter both email and password');
-      return;
+    const newErrors = {
+      email: !formData.email ? 'Email is required' : '',
+      password: !formData.password ? 'Password is required' : ''
+    };
+
+    if (formData.email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        newErrors.email = 'Please enter a valid email address';
+      }
     }
-    
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      setError('Please enter a valid email address');
+
+    setErrors(newErrors);
+    if (newErrors.email || newErrors.password) {
       return;
     }
     
@@ -94,13 +103,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
                 <p className="text-neutral-400 text-sm font-light mb-6">Sign in to continue to your account</p>
               </div>
             </div>
-              {/* Error message */}
-              {error && (
-                <p className="text-red-500 text-sm mb-4" role="alert">
-                  {error}
-                </p>
-              )}
-              
               {/* Login form with enhanced animations */}
               <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Email field */}
@@ -112,6 +114,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
                   onChange={handleEmailChange}
                   autoComplete="email"
                   inputMode="email"
+                  error={errors.email}
                 />
                 
                 {/* Password field */}
@@ -121,6 +124,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
                   value={formData.password}
                   onChange={handlePasswordChange}
                   autoComplete="current-password"
+                  error={errors.password}
                 />
                 
                 {/* Remember me and forgot password */}

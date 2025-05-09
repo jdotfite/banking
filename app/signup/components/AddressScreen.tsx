@@ -132,7 +132,11 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
                 />
                 <div className={`h-px w-0 bg-white absolute bottom-0 left-0 transition-all duration-700 ${focusedFields.streetAddress ? 'w-full' : ''}`}></div>
               </div>
-              {errors.streetAddress && <p id="street-address-error" className="text-red-500 text-sm mt-1" role="alert">{errors.streetAddress}</p>}
+              <div className="relative">
+                <div className={`absolute top-0 left-0 w-full transition-all duration-200 ${errors.streetAddress ? 'h-[20px] opacity-100' : 'h-0 opacity-0 overflow-hidden'}`}>
+                  <p id="street-address-error" className="text-red-500 text-sm" role="alert">{errors.streetAddress}</p>
+                </div>
+              </div>
             </div>
 
             {/* Apt/Suite (optional) */}
@@ -192,7 +196,11 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
                 />
                 <div className={`h-px w-0 bg-white absolute bottom-0 left-0 transition-all duration-700 ${focusedFields.zipCode ? 'w-full' : ''}`}></div>
               </div>
-              {errors.zipCode && <p id="zip-code-error" className="text-red-500 text-sm mt-1" role="alert">{errors.zipCode}</p>}
+              <div className="relative">
+                <div className={`absolute top-0 left-0 w-full transition-all duration-200 ${errors.zipCode ? 'h-[20px] opacity-100' : 'h-0 opacity-0 overflow-hidden'}`}>
+                  <p id="zip-code-error" className="text-red-500 text-sm" role="alert">{errors.zipCode}</p>
+                </div>
+              </div>
             </div>
 
             {/* City and State */}
@@ -223,26 +231,36 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
                   />
                   <div className={`h-px w-0 bg-white absolute bottom-0 left-0 transition-all duration-700 ${focusedFields.city ? 'w-full' : ''}`}></div>
                 </div>
-                {errors.city && <p id="city-error" className="text-red-500 text-sm mt-1" role="alert">{errors.city}</p>}
+                <div className="relative">
+                  <div className={`absolute top-0 left-0 w-full transition-all duration-200 ${errors.city ? 'h-[20px] opacity-100' : 'h-0 opacity-0 overflow-hidden'}`}>
+                    <p id="city-error" className="text-red-500 text-sm" role="alert">{errors.city}</p>
+                  </div>
+                </div>
               </div>
-              <div className="relative pb-[3px]">
+              <div className="relative">
                 <label htmlFor="state" className="sr-only">State</label>
-                <select
-                  id="state"
-                  value={formData.state || 'PA'}
-                  onChange={(e) => onChange('state', e.target.value)}
-                  className="w-full absolute bottom-0 pt-5 pb-1 px-0 bg-transparent border-b border-neutral-700 outline-none focus:border-neutral-700 text-white transition-all duration-200 [&:-webkit-autofill]:bg-transparent [&:-webkit-autofill]:text-white [&:-webkit-autofill]:shadow-[0_0_0_1000px_#121212_inset]"
-                  autoComplete="address-level1"
-                  onFocus={() => setFocusedFields({...focusedFields, state: true})}
-                  onBlur={() => setFocusedFields({...focusedFields, state: false})}
-                >
-                  <option value="">State</option>
-                  {states.map(state => (
-                    <option key={state} value={state}>{state}</option>
-                  ))}
-                </select>
-                <div className="h-px w-0 bg-white absolute bottom-0 left-0 transition-all duration-700"></div>
-                {errors.state && <p id="state-error" className="text-red-500 text-sm mt-1" role="alert">{errors.state}</p>}
+                <div className="relative">
+                  <select
+                    id="state"
+                    value={formData.state || 'PA'}
+                    onChange={(e) => onChange('state', e.target.value)}
+                    className="w-full pt-5 pb-1 px-0 bg-transparent border-b border-neutral-700 outline-none focus:border-neutral-700 text-white transition-all duration-200 [&:-webkit-autofill]:bg-transparent [&:-webkit-autofill]:text-white [&:-webkit-autofill]:shadow-[0_0_0_1000px_#121212_inset]"
+                    autoComplete="address-level1"
+                    onFocus={() => setFocusedFields({...focusedFields, state: true})}
+                    onBlur={() => setFocusedFields({...focusedFields, state: false})}
+                  >
+                    <option value="">State</option>
+                    {states.map(state => (
+                      <option key={state} value={state}>{state}</option>
+                    ))}
+                  </select>
+                  <div className={`h-px w-0 bg-white absolute bottom-0 left-0 transition-all duration-700 ${focusedFields.state ? 'w-full' : ''}`}></div>
+                </div>
+                <div className="relative">
+                  <div className={`absolute top-0 left-0 w-full transition-all duration-200 ${errors.state ? 'h-[20px] opacity-100' : 'h-0 opacity-0 overflow-hidden'}`}>
+                    <p id="state-error" className="text-red-500 text-sm" role="alert">{errors.state}</p>
+                  </div>
+                </div>
               </div>
             </div>
 

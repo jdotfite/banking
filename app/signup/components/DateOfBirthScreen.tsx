@@ -109,7 +109,7 @@ const DateOfBirthScreen: React.FC<DateOfBirthScreenProps> = ({ formData, onChang
           {/* Form */}
           <form onSubmit={handleNext} className="space-y-8">
             {/* Date of birth field */}
-            <div className="relative pt-4">
+            <div className="relative">
               <label 
                 htmlFor="dob"
                 className={`absolute left-0 transition-all duration-200 pointer-events-none ${
@@ -120,29 +120,31 @@ const DateOfBirthScreen: React.FC<DateOfBirthScreenProps> = ({ formData, onChang
               >
                 Date of birth (MM/DD/YYYY)
               </label>
-              <input
-                id="dob"
-                name="dob"
-                type="text"
-                inputMode="numeric"
-                value={dobValue}
-                onChange={handleDobChange}
-                maxLength={10}
-                className="w-full pt-4 pb-2 px-0 bg-transparent border-b border-neutral-700 outline-none focus:border-neutral-700 text-white transition-all duration-200 [&:-webkit-autofill]:bg-transparent [&:-webkit-autofill]:text-white [&:-webkit-autofill]:shadow-[0_0_0_1000px_#121212_inset]"
-                autoComplete="bday"
-                onFocus={() => setIsFocused(true)}
-                onBlur={() => {
-                  setIsFocused(false);
-                  // Convert autofilled YYYY-MM-DD to MM/DD/YYYY if needed
-                  if (dobValue.includes('-')) {
-                    const [year, month, day] = dobValue.split('-');
-                    setDobValue(`${month}/${day}/${year}`);
-                  }
-                }}
-                autoFocus
-              />
-              <div className={`h-px w-0 bg-white absolute bottom-0 left-0 transition-all duration-700 ${isFocused ? 'w-full' : ''}`}></div>
-              {error && <p className="text-red-500 text-sm pt-1" role="alert">{error}</p>}
+              <div className="relative">
+                <input
+                  id="dob"
+                  name="dob"
+                  type="text"
+                  inputMode="numeric"
+                  value={dobValue}
+                  onChange={handleDobChange}
+                  maxLength={10}
+                  className="w-full pt-5 pb-1 px-0 bg-transparent border-b border-neutral-700 outline-none focus:border-neutral-700 text-white transition-all duration-200 [&:-webkit-autofill]:bg-transparent [&:-webkit-autofill]:text-white [&:-webkit-autofill]:shadow-[0_0_0_1000px_#121212_inset]"
+                  autoComplete="bday"
+                  onFocus={() => setIsFocused(true)}
+                  onBlur={() => {
+                    setIsFocused(false);
+                    // Convert autofilled YYYY-MM-DD to MM/DD/YYYY if needed
+                    if (dobValue.includes('-')) {
+                      const [year, month, day] = dobValue.split('-');
+                      setDobValue(`${month}/${day}/${year}`);
+                    }
+                  }}
+                  autoFocus
+                />
+                <div className={`h-px w-0 bg-white absolute bottom-0 left-0 transition-all duration-700 ${isFocused ? 'w-full' : ''}`}></div>
+              </div>
+              {error && <p className="text-red-500 text-sm mt-1" role="alert">{error}</p>}
             </div>
 
             {/* Next button */}
