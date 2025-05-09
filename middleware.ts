@@ -18,22 +18,20 @@ export function middleware(request: NextRequest) {
     return NextResponse.next();
   }
   
+  // Skip redirects if this is a preloader request
+  const isPreloaderRequest = request.headers.get('x-preloader-complete') === 'true';
+  
   // If the user is authenticated and trying to access onboarding/login/signup
-  if (isAuthenticated && publicPaths.includes(pathname)) {
+  if (isAuthenticated && publicPaths.includes(pathname) && !isPreloaderRequest) {
     const url = request.nextUrl.clone();
     url.pathname = '/admin';
     return NextResponse.redirect(url);
   }
 
-  // Disable all redirects in development mode for testing
-  if (process.env.NODE_ENV !== 'production') {
-    return NextResponse.next();
-  }
-
-  // Production behavior - redirect root to onboarding
-  if (pathname === '/') {
+  // Redirect root to login after preloader completes in all environments
+  if (!isPreloaderRequest && pathname === '/') {
     const url = request.nextUrl.clone();
-    url.pathname = '/onboarding';
+    url.pathname = '/login';
     return NextResponse.redirect(url);
   }
   

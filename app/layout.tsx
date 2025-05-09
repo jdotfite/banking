@@ -6,6 +6,7 @@ import React from 'react';
 import RegisterServiceWorker from '@/components/RegisterServiceWorker';
 import ClientProviders from '@/components/ClientProviders';
 import PWAInstallPrompt from '@/components/ui/common/PWAInstallPrompt';
+import SimplePreloader from '@/components/preloaders/SimplePreloader';
 
 // Font setup
 const outfit = Outfit({ 
@@ -56,7 +57,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <ClientProviders>
           {/* ONLY main element in the entire app */}
           <main className="min-h-screen">
-            {children}
+            <SimplePreloader>
+              {children}
+            </SimplePreloader>
           </main>
           <PWAInstallPrompt />
         </ClientProviders>

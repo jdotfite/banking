@@ -70,8 +70,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
       localStorage.removeItem('selectedUserId');
       localStorage.setItem('selectedUserId', 'user1');
       document.cookie = `selectedUserId=user1; path=/; max-age=${60 * 60 * 24 * 7}`;
-      router.push('/admin');
-      window.location.href = '/admin'; // Force full page reload
+      router.push('/onboarding');
+      window.location.href = '/onboarding'; // Force full page reload
     }, 1000);
   };
 
@@ -88,11 +88,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
             <div className="flex items-start mb-8 relative">
               <div className="flex-1">
                 <div className="flex items-center gap-4 mb-3">
-                  <div className="h-12 w-12 md:h-14 md:w-14 bg-white rounded-lg flex items-center justify-center">
+                  <div className=" flex items-center justify-center">
                     <img 
-                      src="/images/icons/logo-light.svg" 
+                      src="/images/logos/m1st-square.svg" 
                       alt="Logo" 
-                      className="h-8 w-8 md:h-10 md:w-10 object-contain"
+                      className="h-12 w-12 md:h-10 md:w-10 object-contain"
                     />
                   </div>
                   

@@ -21,7 +21,12 @@ const Button: React.FC<ButtonProps> = ({
   className = '',
   isLoading = false
 }) => {
-  const baseClasses = 'w-full py-4 px-6 rounded-lg font-medium transition-all duration-300';
+  const baseClasses = `
+    w-full py-3 px-5 rounded-lg font-medium 
+    transition-all duration-300
+    active:scale-[0.98]
+    active:shadow-sm
+  `;
   
   const variantClasses = {
     primary: 'bg-white text-black hover:bg-neutral-200',

@@ -33,6 +33,14 @@ const ResourceLoader: React.FC<ResourceLoaderProps> = ({
     // Check if loading is complete
     if (dataProgressRef.current === 100 && imageProgressRef.current === 100 && !isCompleteRef.current) {
       isCompleteRef.current = true;
+      
+      // Set preloader complete header before calling onComplete
+      if (typeof window !== 'undefined') {
+        const headers = new Headers();
+        headers.set('x-preloader-complete', 'true');
+        window.dispatchEvent(new CustomEvent('preloader-complete', { detail: { headers } }));
+      }
+      
       onComplete();
     }
   };

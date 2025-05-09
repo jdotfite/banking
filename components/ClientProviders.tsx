@@ -19,10 +19,8 @@ export default function ClientProviders({ children }: ClientProvidersProps) {
       <IOSFullScreenProvider>
         <UserProvider>
           <SimplifiedBankingDataProvider>
-            {/* Developer Tools */}
-            {process.env.NODE_ENV === 'development' && (
-              <TestingToolkit />
-            )}
+            {/* Developer Tools - Available in all environments */}
+            <TestingToolkit />
             
             {/* Loading Spinner Container */}
             <div className="fixed inset-0 z-[200] pointer-events-none">

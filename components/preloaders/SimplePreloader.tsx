@@ -231,7 +231,7 @@ const SimplePreloader: React.FC<SimplePreloaderProps> = ({
   minDisplayTime = 2000, // Increased for better animation viewing
   transitionDuration = 800,
   onComplete,
-  routeToLoginAfterComplete = true // Default to routing to login when done
+  routeToLoginAfterComplete = false // Don't route automatically - let middleware handle it
 }) => {
   const router = useRouter();
   const [progress, setProgress] = useState(0);
@@ -265,23 +265,14 @@ const SimplePreloader: React.FC<SimplePreloaderProps> = ({
   // we can transition out the loading screen and route to login if needed
   useEffect(() => {
     if (resourcesLoaded && progressComplete) {
-      // Route to login page if specified - do this BEFORE removing the loading screen
-      // so we don't see the admin page flash briefly
-      if (routeToLoginAfterComplete) {
-        router.push('/login');
+      // Just hide the loading screen - routing will be handled by middleware
+      setIsLoading(false);
+      
+      // Call onComplete callback if provided
+      if (onComplete) {
+        onComplete();
       }
       
-      // Add a small delay to ensure routing happens before transition
-      const timer = setTimeout(() => {
-        setIsLoading(false);
-        
-        // Call onComplete callback if provided
-        if (onComplete) {
-          onComplete();
-        }
-      }, 200); // Small buffer to ensure routing happens first
-      
-      return () => clearTimeout(timer);
     }
   }, [resourcesLoaded, progressComplete, onComplete, routeToLoginAfterComplete, router, transitionDuration]);
 
