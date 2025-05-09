@@ -4,7 +4,7 @@
 import React from 'react';
 import { Bell } from 'lucide-react';
 import { animated, useSpring } from 'react-spring';
-import { useEnhancedBankingData } from '@/components/preloaders/EnhancedBankingDataProvider';
+import { useBankingData } from '@/components/preloaders/SimplifiedBankingDataProvider';
 
 interface HeaderProps {
   userName: string;
@@ -12,7 +12,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ userName }) => {
   // Get user data for avatar
-  const { userData } = useEnhancedBankingData();
+  const { userData } = useBankingData();
   const userAvatar = userData?.user?.avatar || '/images/avatar/placeholder.svg';
   // Create a spring animation for the header
   const headerSpring = useSpring({

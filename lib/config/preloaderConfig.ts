@@ -9,7 +9,8 @@ export const preloaderConfig = {
     simulateApiDelay: 1500, // Milliseconds to simulate API loading time
     preProcessData: true,   // Whether to pre-process data for faster rendering
     persistData: true,      // Whether to persist data in localStorage
-    clearCacheOnReload: false // Whether to clear cache on full page reload
+    clearCacheOnReload: false, // Whether to clear cache on full page reload
+    weight: 0.5             // Weight (0-1) for progress calculation
   },
   
   // Image preloader settings
@@ -17,18 +18,19 @@ export const preloaderConfig = {
     timeout: 10000,    // Milliseconds to wait before timing out image preloading
     retries: 2,        // Number of retries for failed image loads
     parallel: 8,       // Number of images to load in parallel
+    weight: 0.5,       // Weight (0-1) for progress calculation
     priorityImages: [  // These images will be loaded first
-      '/images/icons/logo.png',
-      '/images/card/card-signature-rewards.png',  // First onboarding slide image
-      '/images/avatar/jess-coleman.png',
-      '/images/cards/visa-signature-bg.png',
-      '/images/refer/refer-friend.png'
+      '/icons/icon-transparent.svg',
+      '/images/cards/visa-logo.svg',
+      '/images/ui/loading-spinner.svg',
+      '/images/ui/header-bg.svg',
+      '/images/merchants/default.svg'
     ]
   },
   
   // Loading screen appearance
   loadingScreen: {
-    logo: '/icons/icon-transparent.png',
+    logo: '/icons/icon-transparent.svg',
     minDisplayTime: 1000, // Minimum time to show loading screen in milliseconds
     transitionDuration: 500 // Transition duration in milliseconds
   }

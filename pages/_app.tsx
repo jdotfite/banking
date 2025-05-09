@@ -1,8 +1,7 @@
 // pages/_app.tsx
 import React, { useState, useEffect } from 'react';
 import type { AppProps } from 'next/app';
-import { BankingDataProvider } from '@/components/preloaders/BankingDataPreloader';
-import CompleteBankingPreloader from '@/components/preloaders/CompleteBankingPreloader';
+import { SimplifiedBankingDataProvider } from '@/components/preloaders/SimplifiedBankingDataProvider';
 import { useAppInitialization } from '@/lib/utils/appInit';
 
 export default function App({ Component, pageProps }: AppProps) {
@@ -19,14 +18,8 @@ export default function App({ Component, pageProps }: AppProps) {
   }, []);
 
   return (
-    <BankingDataProvider>
-      {process.env.NODE_ENV === 'development' || isPreloaded ? (
-        <Component {...pageProps} />
-      ) : (
-        <CompleteBankingPreloader onComplete={() => setIsPreloaded(true)}>
-          <Component {...pageProps} />
-        </CompleteBankingPreloader>
-      )}
-    </BankingDataProvider>
+    <SimplifiedBankingDataProvider>
+      <Component {...pageProps} />
+    </SimplifiedBankingDataProvider>
   );
 }

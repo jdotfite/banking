@@ -142,8 +142,8 @@ const DateOfBirthScreen: React.FC<DateOfBirthScreenProps> = ({ formData, onChang
                 autoFocus
               />
               <div className={`h-px w-0 bg-white absolute bottom-0 left-0 transition-all duration-700 ${isFocused ? 'w-full' : ''}`}></div>
+              {error && <p className="text-red-500 text-sm pt-1" role="alert">{error}</p>}
             </div>
-            {error && <p className="text-red-500 text-sm mt-1" role="alert">{error}</p>}
 
             {/* Next button */}
             <div className="pt-2">

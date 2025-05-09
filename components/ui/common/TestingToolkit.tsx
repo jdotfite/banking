@@ -158,7 +158,7 @@ const TestingToolkit: React.FC = () => {
               </div>
             </div>
             
-            <div className="bg-neutral-800 p-3 text-xs text-neutral-400">
+            <div className="bg-neutral-900 p-3 text-xs text-neutral-400">
               <div className="flex justify-between items-center mb-1">
                 <p>Current localStorage:</p>
                 <button

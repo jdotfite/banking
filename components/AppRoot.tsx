@@ -3,12 +3,11 @@
 
 import React, { useEffect } from 'react';
 import { UserProvider, useUser } from '@/components/context/UserContext';
-import { EnhancedBankingDataProvider } from '@/components/preloaders/EnhancedBankingDataProvider';
-import { BankingDataProvider } from '@/components/preloaders/BankingDataPreloader';
 import AppContainer from '@/components/layout/AppContainer';
 import Admin from '@/app/admin/components/Admin';
 import { useRouter } from 'next/navigation';
 import LoadingSpinner from '@/components/ui/common/LoadingSpinner';
+import SimplePreloader from '@/components/preloaders/SimplePreloader';
 
 // Inner component that uses the context
 const AppContent: React.FC = () => {
@@ -69,9 +68,11 @@ const AppContent: React.FC = () => {
 // Root component that provides context
 const AppRoot: React.FC = () => {
   return (
-    <AppContainer>
-      <AppContent />
-    </AppContainer>
+    <SimplePreloader routeToLoginAfterComplete={true}>
+      <AppContainer>
+        <AppContent />
+      </AppContainer>
+    </SimplePreloader>
   );
 };
 

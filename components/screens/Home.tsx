@@ -5,7 +5,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { animated, useSpring } from 'react-spring';
 import { getDefaultCard } from '@/lib/data/cards';
 import { getTransactions } from '@/lib/data/transactions';
-import { useEnhancedBankingData } from '@/components/preloaders/EnhancedBankingDataProvider';
+import { useBankingData } from '@/components/preloaders/SimplifiedBankingDataProvider';
 import CreditCardComponent from '../ui/card/CreditCard'; 
 import TransactionContainer from '../ui/transactions/TransactionContainer';
 import Header from '../ui/navigation/Header';
@@ -27,7 +27,7 @@ const Home: React.FC = () => {
   const isManageClickRef = useRef(false);
   
   // Get banking data from context
-  const { userData, isLoading: isBankingDataLoading } = useEnhancedBankingData();
+  const { userData, isLoading: isBankingDataLoading } = useBankingData();
   
   // React Spring animations
   const cardSpring = useSpring({

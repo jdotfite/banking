@@ -4,12 +4,6 @@ import { useEffect } from 'react';
 
 export default function RegisterServiceWorker() {
   useEffect(() => {
-    // Original development mode check
-    // if (process.env.NODE_ENV === 'development') {
-    //   console.log('Skipping service worker registration in development mode');
-    //   return;
-    // }
-    
     // Skip service worker registration on login page to prevent caching issues
     if (typeof window !== 'undefined' && window.location.pathname === '/login') {
       console.log('Skipping service worker registration on login page');
@@ -68,13 +62,6 @@ export default function RegisterServiceWorker() {
               }
             });
           });
-          
-          // Check if the service worker is controlling the page
-          if (!navigator.serviceWorker.controller) {
-            console.log('Page not yet controlled by a service worker.');
-          } else {
-            console.log('Page is controlled by a service worker');
-          }
           
           // Listen for controlling service worker changes
           navigator.serviceWorker.addEventListener('controllerchange', () => {

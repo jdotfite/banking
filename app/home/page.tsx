@@ -4,8 +4,7 @@ import React from 'react';
 import Home from './components/Home';
 import BottomNav from '@/components/ui/navigation/BottomNav';
 import { UserProvider } from '@/components/context/UserContext';
-import { EnhancedBankingDataProvider } from '@/components/preloaders/EnhancedBankingDataProvider';
-import { BankingDataProvider } from '@/components/preloaders/BankingDataPreloader';
+import { SimplifiedBankingDataProvider } from '@/components/preloaders/SimplifiedBankingDataProvider';
 import ThemeContextProvider from '@/lib/context/ThemeContextProvider';
 import IOSFullScreenProvider from '@/lib/utils/IOSFullScreenProvider';
 
@@ -14,14 +13,12 @@ export default function HomePage() {
     <ThemeContextProvider>
       <IOSFullScreenProvider>
         <UserProvider initialAdminMode={false}>
-          <BankingDataProvider>
-            <EnhancedBankingDataProvider>
-              <div className="relative min-h-screen">
-                <Home />
-                <BottomNav />
-              </div>
-            </EnhancedBankingDataProvider>
-          </BankingDataProvider>
+          <SimplifiedBankingDataProvider>
+            <div className="relative min-h-screen">
+              <Home />
+              <BottomNav />
+            </div>
+          </SimplifiedBankingDataProvider>
         </UserProvider>
       </IOSFullScreenProvider>
     </ThemeContextProvider>

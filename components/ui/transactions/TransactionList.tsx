@@ -6,7 +6,7 @@ import TransactionItem from './TransactionItem';
 import type { TransactionItemProps } from './TransactionItem';
 import { TransactionDateGroup, TransactionType } from '@/lib/types';
 import { getTransactionsByPeriod } from '@/lib/data/transactions';
-import { useBankingData } from '@/components/preloaders/BankingDataPreloader';
+import { useBankingData } from '@/components/preloaders/SimplifiedBankingDataProvider';
 
 interface TransactionListProps {
   transactionGroups: TransactionDateGroup[];

@@ -5,7 +5,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { animated, useSpring, config } from 'react-spring';
 import { Info } from 'lucide-react';
 import { CardType } from '@/lib/types';
-import { useEnhancedBankingData } from '@/components/preloaders/EnhancedBankingDataProvider';
+import { useBankingData } from '@/components/preloaders/SimplifiedBankingDataProvider';
 import { BankingDataType, BankingCreditCard } from '@/lib/types';
 
 interface CreditCardProps {
@@ -22,7 +22,7 @@ const CreditCard: React.FC<CreditCardProps> = ({
   const [contentHeight, setContentHeight] = useState(0);
   
   // Get banking data if available
-  const { userData } = useEnhancedBankingData();
+  const { userData } = useBankingData();
   
   // Get card info from banking data
   const cardInfo = userData?.creditCards?.[0];

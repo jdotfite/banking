@@ -109,5 +109,37 @@ define(['./workbox-e43f5367'], (function (workbox) { 'use strict';
     plugins: []
   }), 'GET');
 
+  // Send ready message to all clients when service worker is activated
+  self.addEventListener('activate', (event) => {
+    event.waitUntil(
+      self.clients.matchAll({includeUncontrolled: true}).then((clients) => {
+        clients.forEach((client) => {
+          try {
+            client.postMessage({type: 'SW_READY'});
+          } catch (err) {
+            console.log('Could not send SW_READY to client:', err);
+          }
+        });
+      })
+    );
+  });
+
+  // Handle incoming messages from clients
+  self.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'PING') {
+      event.ports[0].postMessage({type: 'PONG'});
+    }
+  });
+
+  // Send initial ready message when service worker starts
+  self.clients.matchAll({includeUncontrolled: true}).then((clients) => {
+    clients.forEach((client) => {
+      try {
+        client.postMessage({type: 'SW_READY'});
+      } catch (err) {
+        console.log('Could not send initial SW_READY to client:', err);
+      }
+    });
+  });
 }));
 //# sourceMappingURL=sw.js.map

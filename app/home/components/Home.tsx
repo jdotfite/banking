@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { animated, useSpring } from 'react-spring';
-import { useEnhancedBankingData } from '@/components/preloaders/EnhancedBankingDataProvider';
+import { useBankingData } from '@/components/preloaders/SimplifiedBankingDataProvider';
 import Header from '@/components/ui/navigation/Header';
 import LoadingSpinner from '@/components/ui/common/LoadingSpinner';
 import Icon from '@/components/ui/icons/Icon';
@@ -19,8 +19,8 @@ const Home: React.FC = () => {
   const transactionsContainerRef = useRef<HTMLDivElement>(null);
   const [buttonBottomPosition, setButtonBottomPosition] = useState(0);
   
-  // Get banking data from context
-  const { userData, isLoading: isBankingDataLoading } = useEnhancedBankingData();
+  // Get banking data from context - Updated import source, same API
+  const { userData, isLoading: isBankingDataLoading } = useBankingData();
   
   // React Spring animations
   const headerSpring = useSpring({
