@@ -1,7 +1,7 @@
 // components/ui/transactions/TransactionItem.tsx
 import React from 'react';
 import { animated, useSpring } from 'react-spring';
-import Icon from '../icons/Icon';
+import { getIconByName } from '@/lib/config/iconMappings';
 import { TransactionType } from '@/lib/types';
 
 export interface TransactionItemProps {
@@ -26,6 +26,10 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
     config: { mass: 1, tension: 280, friction: 25 }
   });
 
+  // Use icon from the transaction if available, or fallback to merchant name
+  // This prioritizes category-specific icons when provided
+  const IconComponent = getIconByName(transaction.icon || transaction.merchant);
+
   return (
     <animated.div 
       style={springs}
@@ -33,7 +37,7 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
     >
       <div className="flex items-center">
         <div className={`${iconBgColor} w-10 h-10 rounded-full flex items-center justify-center mr-3`}>
-          <Icon name={transaction.icon} className="w-5 h-5 text-white" />
+          <IconComponent className="w-5 h-5 text-white" />
         </div>
         <div>
           <div className="font-medium tracking-tight text-white">{transaction.merchant}</div>

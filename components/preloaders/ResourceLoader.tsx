@@ -119,7 +119,16 @@ const ResourceLoader: React.FC<ResourceLoaderProps> = ({
         '/images/ui/loading-spinner.svg',
         '/images/avatar/placeholder.svg',
         '/images/merchants/default.svg',
-        '/images/ui/header-bg.svg'
+        '/images/ui/header-bg.svg',
+        // Onboarding images
+        '/images/onboarding/mike-m1st.png',
+        '/images/onboarding/balloons.png',
+        '/images/onboarding/guy-bye.png',
+        '/images/onboarding/credit-score.png',
+        '/images/onboarding/shield-security.png',
+        '/images/onboarding/shanice-m1st.png',
+        '/images/onboarding/garth-m1st.png',
+        '/images/logos/m1st-square.svg'
       ];
       
       let loadedCount = 0;

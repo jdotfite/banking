@@ -7,6 +7,21 @@
 
 import * as LucideIcons from 'lucide-react';
 
+// Import brand icons from react-icons
+import { 
+  FaAmazon, FaWalmart, FaTarget, FaSpotify, FaNetflix, 
+  FaUber, FaPaypal, FaApple, FaStarbucks, FaCreditCard,
+  FaEbay, FaDisney, FaVenmo, FaMusic, FaShoppingCart,
+  FaShoppingBag, FaCoffee, FaUtensils, FaCar, FaDollarSign,
+  FaTv
+} from 'react-icons/fa';
+
+// Import more brand icons from Simple Icons set in react-icons
+import {
+  SiZara, SiChipotle, SiMcdonalds, SiLyft, SiHulu,
+  SiVenmo, SiNetflix
+} from 'react-icons/si';
+
 /**
  * Standard UI icons used for navigation, buttons, and general UI elements
  */
@@ -48,36 +63,38 @@ export const standardIconMap: Record<string, any> = {
 
 /**
  * Merchant-specific icons for transaction displays
+ * Enhanced with brand icons from react-icons
  */
 export const merchantIconMap: Record<string, any> = {
   // Streaming services
-  netflix: LucideIcons.Tv,
-  hulu: LucideIcons.Tv,
-  disney: LucideIcons.Tv,
+  netflix: SiNetflix || FaNetflix || LucideIcons.Tv,
+  hulu: SiHulu || FaTv,
+  disney: FaDisney || LucideIcons.Tv,
   
   // Music services
-  spotify: LucideIcons.Music,
-  appleMusic: LucideIcons.Music,
+  spotify: FaSpotify,
+  appleMusic: FaMusic,
   
   // Shopping
-  amazon: LucideIcons.ShoppingCart,
-  target: LucideIcons.ShoppingBag,
-  walmart: LucideIcons.ShoppingBag,
-  zara: LucideIcons.ShoppingBag,
+  amazon: FaAmazon,
+  target: FaTarget,
+  walmart: FaWalmart,
+  zara: SiZara,
+  ebay: FaEbay,
   
   // Transportation
-  uber: LucideIcons.Car,
-  lyft: LucideIcons.Car,
+  uber: FaUber,
+  lyft: SiLyft,
   
   // Food & Drink
-  starbucks: LucideIcons.Coffee,
-  mcdonalds: LucideIcons.UtensilsCrossed,
-  chipotle: LucideIcons.UtensilsCrossed,
+  starbucks: FaStarbucks,
+  mcdonalds: SiMcdonalds,
+  chipotle: SiChipotle,
   
   // Financial
   payroll: LucideIcons.Landmark,
-  venmo: LucideIcons.DollarSign,
-  paypal: LucideIcons.DollarSign,
+  venmo: SiVenmo || FaVenmo,
+  paypal: FaPaypal,
 };
 
 /**
@@ -85,15 +102,16 @@ export const merchantIconMap: Record<string, any> = {
  */
 export const categoryIconMap: Record<string, any> = {
   // Food & Dining
-  food: LucideIcons.UtensilsCrossed,
-  dining: LucideIcons.UtensilsCrossed,
-  groceries: LucideIcons.ShoppingCart,
-  coffee: LucideIcons.Coffee,
+  food: FaUtensils || LucideIcons.UtensilsCrossed,
+  dining: FaUtensils || LucideIcons.UtensilsCrossed,
+  groceries: FaShoppingCart,
+  coffee: FaCoffee,
   
   // Transportation
   transport: LucideIcons.Bus,
   travel: LucideIcons.Plane,
   gas: LucideIcons.Fuel,
+  car: FaCar,
   
   // Housing & Utilities
   utilities: LucideIcons.Lightbulb,
@@ -102,17 +120,18 @@ export const categoryIconMap: Record<string, any> = {
   home: LucideIcons.Home,
   
   // Shopping
-  shopping: LucideIcons.ShoppingBag,
+  shopping: FaShoppingBag,
   clothing: LucideIcons.Shirt,
+  clothes: LucideIcons.Shirt,
   electronics: LucideIcons.Smartphone,
   
   // Health & Wellness
-  health: LucideIcons.Stethoscope,
+  health: LucideIcons.Heart,
   fitness: LucideIcons.Dumbbell,
-  medical: LucideIcons.Heart, // Using Heart instead of FirstAid which isn't available
+  medical: LucideIcons.Heart,
   
   // Entertainment
-  entertainment: LucideIcons.Music,
+  entertainment: FaMusic || LucideIcons.Music,
   subscription: LucideIcons.Repeat,
   movies: LucideIcons.Film,
   
@@ -127,14 +146,78 @@ export const categoryIconMap: Record<string, any> = {
 };
 
 /**
+ * Additional normalized mappings to handle different text formats
+ * This helps with matching merchant names with different capitalizations and spaces
+ */
+const normalizedMerchantMap: Record<string, string> = {
+  'netflix': 'netflix',
+  'spotify': 'spotify',
+  'amazon': 'amazon',
+  'starbucks': 'starbucks',
+  'uber': 'uber',
+  'lyft': 'lyft',
+  'zara': 'zara',
+  'target': 'target',
+  'walmart': 'walmart',
+  'chipotle': 'chipotle',
+  'mcdonalds': 'mcdonalds',
+  'paypal': 'paypal',
+  'venmo': 'venmo',
+  'hulu': 'hulu',
+  'disney': 'disney',
+  'markcoleman': 'transfer',
+  'damienlight': 'entertainment',
+  'electricitybill': 'utilities',
+  'healthinsurance': 'health',
+  'payroll': 'transfer',
+  'homedepot': 'home',
+};
+
+/**
  * Get the appropriate icon component based on name
  * Checks all icon maps in order of priority
  */
-export const getIconByName = (name: string): any => {
-  return (
-    standardIconMap[name] || 
-    merchantIconMap[name] || 
-    categoryIconMap[name] || 
-    LucideIcons.CreditCard // Default fallback icon
-  );
+export const getIconByName = (name: string): React.FC<any> => {
+  if (!name) return FaCreditCard;
+  
+  // Normalize name for matching
+  const normalized = name.toLowerCase().replace(/\s+/g, '').replace(/[^a-z0-9]/g, '');
+  
+  // Step 1: Check for direct match in merchant map
+  if (merchantIconMap[name]) {
+    return merchantIconMap[name];
+  }
+  
+  // Step 2: Check for normalized merchant mapping
+  if (normalizedMerchantMap[normalized]) {
+    const mappedName = normalizedMerchantMap[normalized];
+    
+    if (merchantIconMap[mappedName]) {
+      return merchantIconMap[mappedName];
+    }
+    
+    if (categoryIconMap[mappedName]) {
+      return categoryIconMap[mappedName];
+    }
+  }
+  
+  // Step 3: Check standard icon maps
+  if (standardIconMap[name]) {
+    return standardIconMap[name];
+  }
+  
+  if (merchantIconMap[normalized]) {
+    return merchantIconMap[normalized];
+  }
+  
+  if (categoryIconMap[normalized]) {
+    return categoryIconMap[normalized];
+  }
+  
+  if (categoryIconMap[name]) {
+    return categoryIconMap[name];
+  }
+  
+  // Step 4: Default fallback icon
+  return FaCreditCard;
 };

@@ -7,7 +7,7 @@ interface ButtonProps {
   onClick?: () => void;
   disabled?: boolean;
   children: React.ReactNode;
-  variant?: 'primary' | 'secondary';
+  variant?: 'primary' | 'secondary' | 'borderless';
   className?: string;
   isLoading?: boolean;
 }
@@ -23,8 +23,8 @@ const Button: React.FC<ButtonProps> = ({
 }) => {
   const baseClasses = `
     w-full py-3 px-5 font-medium 
-    border border-[#aaa] text-[#eee]
-    btn-ripple
+    ${variant !== 'borderless' ? 'border border-[#aaa]' : ''}
+    text-[#eee] btn-ripple
   `;
   
   const loadingIndicator = (
@@ -48,7 +48,11 @@ const Button: React.FC<ButtonProps> = ({
         ${className}
       `}
     >
-      {isLoading ? loadingIndicator : <span className="relative block">{children}</span>}
+      {isLoading ? loadingIndicator : (
+        <span className={`relative block ${variant === 'borderless' ? 'normal-case' : 'uppercase'}`}>
+          {children}
+        </span>
+      )}
     </button>
   );
 };

@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { X, ArrowLeft } from 'lucide-react';
+import { useUser } from '@/components/context/UserContext';
 import BasicInfoScreen from '@/app/signup/components/BasicInfoScreen';
 import DateOfBirthScreen from '@/app/signup/components/DateOfBirthScreen';
 import MobilePhoneScreen from '@/app/signup/components/MobilePhoneScreen';
@@ -37,6 +38,7 @@ interface SignupFormData {
 
 const SignupFlow: React.FC = () => {
   const router = useRouter();
+  const { setSelectedUserId } = useUser();
   const [currentStep, setCurrentStep] = useState<SignupStep>(SignupStep.BASIC_INFO);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -179,11 +181,11 @@ const SignupFlow: React.FC = () => {
       // For example:
       // await apiClient.createAccount(formData);
       
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // For testing - always use the "New User" from fakeBankingData.js
+      const userId = 'user3';
       
-      // Clear any test user selection
-      localStorage.removeItem('selectedUserId');
+      // Set selected user and trigger data refresh
+      setSelectedUserId(userId);
       
       // Force a hard navigation to account setup to ensure proper state
       window.location.href = '/account-setup';

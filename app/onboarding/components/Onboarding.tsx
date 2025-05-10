@@ -6,6 +6,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { animated, useSpring } from 'react-spring';
 import { theme } from '@/lib/styles/theme';
 import AnimatedElement from '@/components/ui/common/AnimatedElement';
+import { Button } from '@/components/ui/form';
 
 // Define the onboarding slides content
 const slides = [
@@ -226,14 +227,14 @@ const Onboarding: React.FC<OnboardingProps> = () => {
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {/* Logo - fixed height */}
-      <div className="flex justify-center py-6 h-16">
+      {/* Logo - fixed height 
+      <div className="flex justify-center  h-16">
         <img 
-          src="/images/icons/logo.svg" 
+          src="/images/logos/m1st-square.svg" 
           alt="Members 1st Credit Union" 
-          className="h-10"
+          className="h-14"
         />
-      </div>
+      </div>*/}
 
       {/* Main content area - flex-grow to take available space */}
       <div className="relative flex-grow flex items-end overflow-hidden">
@@ -292,18 +293,20 @@ const Onboarding: React.FC<OnboardingProps> = () => {
             
             {/* Buttons */}
             <div className="space-y-3 pb-3">
-              <button
+              <Button
                 onClick={handleSignUp}
-                className="w-full py-3 bg-neutral-200 text-black font-medium rounded-lg hover:bg-neutral-300 transition-colors"
+                variant="primary"
+                className="w-full"
               >
-                Sign up
-              </button>
-              <button
+                SIGN UP
+              </Button>
+              <Button
                 onClick={handleLogin}
-                className="w-full py-3 bg-transparent text-white font-medium rounded-lg hover:bg-white/10 transition-colors"
+                variant="borderless"
+                className="w-full text-white"
               >
                 Log in
-              </button>
+              </Button>
             </div>
           </div>
         </div>

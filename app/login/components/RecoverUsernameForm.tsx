@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Mail, AlertCircle } from 'lucide-react';
-import { animated } from 'react-spring';
+import React, { useState, useEffect } from 'react';
+import { Mail } from 'lucide-react';
+import { FormInput, Button } from '../../../components/ui/form';
 
 interface RecoverUsernameFormProps {
   setView: (view: 'login' | 'forgotPassword' | 'recoverUsername' | 'helpCenter') => void;
@@ -14,33 +14,42 @@ const RecoverUsernameForm: React.FC<RecoverUsernameFormProps> = ({ setView }) =>
     lastFourSSN: ''
   });
   const [isSubmitted, setIsSubmitted] = useState(false);
-  const [error, setError] = useState('');
+  const [errors, setErrors] = useState({
+    memberId: '',
+    lastFourSSN: ''
+  });
+  const [mounted, setMounted] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    
-    if (name === 'lastFourSSN') {
-      const numbersOnly = value.replace(/[^0-9]/g, '');
-      if (numbersOnly.length <= 4) {
-        setFormData(prev => ({ ...prev, [name]: numbersOnly }));
-      }
-      return;
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
+
+  const handleMemberIdChange = (value: string) => {
+    setFormData(prev => ({ ...prev, memberId: value }));
+    if (errors.memberId) setErrors(prev => ({ ...prev, memberId: '' }));
+  };
+
+  const handleSsnChange = (value: string) => {
+    const numbersOnly = value.replace(/[^0-9]/g, '');
+    if (numbersOnly.length <= 4) {
+      setFormData(prev => ({ ...prev, lastFourSSN: numbersOnly }));
     }
-    
-    setFormData(prev => ({ ...prev, [name]: value }));
-    if (error) setError('');
+    if (errors.lastFourSSN) setErrors(prev => ({ ...prev, lastFourSSN: '' }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    if (!formData.memberId) {
-      setError('Please enter your Member ID');
-      return;
-    }
-    
-    if (!formData.lastFourSSN || formData.lastFourSSN.length !== 4) {
-      setError('Please enter the last 4 digits of your Social Security Number');
+    const newErrors = {
+      memberId: !formData.memberId ? 'Member ID is required' : '',
+      lastFourSSN: !formData.lastFourSSN || formData.lastFourSSN.length !== 4 
+        ? 'Please enter the last 4 digits of your SSN' 
+        : ''
+    };
+
+    setErrors(newErrors);
+    if (newErrors.memberId || newErrors.lastFourSSN) {
       return;
     }
     
@@ -49,75 +58,63 @@ const RecoverUsernameForm: React.FC<RecoverUsernameFormProps> = ({ setView }) =>
   };
 
   return (
-    <>
-      {!isSubmitted ? (
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <p className="text-neutral-300 mb-4">
-            To recover your username, please provide the following information:
-          </p>
-          
-          {error && (
-            <div className="bg-red-500/20 border border-red-500 text-red-200 p-4 rounded-lg flex items-start">
-              <AlertCircle size={20} className="mr-2 mt-0.5 flex-shrink-0" />
-              <span>{error}</span>
-            </div>
-          )}
-          
-          <div className="space-y-1">
-            <label htmlFor="memberId" className="block text-sm font-medium text-neutral-300">
-              Member ID
-            </label>
-            <input
-              type="text"
-              id="memberId"
-              name="memberId"
-              value={formData.memberId}
-              onChange={handleChange}
-              className="w-full px-3 py-3 bg-[#1a1a1a] border border-neutral-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-transparent"
-              placeholder="Enter your Member ID"
-              required
-            />
+    <div className="flex flex-col min-h-[calc(100vh-48px)] w-full bg-[#121212] pb-14">
+      {/* Form content */}
+      <div className="flex-grow overflow-auto px-6 flex flex-col justify-center">
+        <div className="w-full max-w-md mx-auto">
+          {/* Header */}
+          <div className="mb-8">
+            <h1 className="text-4xl font-extralight text-white mb-2">
+              Recover <span className="font-normal">username</span>
+            </h1>
+            <p className="text-neutral-400 text-sm">
+              To recover your username, please provide the following information:
+            </p>
           </div>
+
+          {!isSubmitted ? (
+            <form onSubmit={handleSubmit} className="space-y-8">
           
-          <div className="space-y-1">
-            <label htmlFor="lastFourSSN" className="block text-sm font-medium text-neutral-300">
-              Last 4 of your Social Security Number (SSN)
-            </label>
-            <input
-              type="password"
-              id="lastFourSSN"
-              name="lastFourSSN"
-              value={formData.lastFourSSN}
-              onChange={handleChange}
-              className="w-full px-3 py-3 bg-[#1a1a1a] border border-neutral-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-transparent"
-              placeholder="••••"
-              maxLength={4}
-              required
-            />
-          </div>
+          
+          <FormInput
+            id="memberId"
+            label="Member ID"
+            value={formData.memberId}
+            onChange={handleMemberIdChange}
+            error={errors.memberId}
+            autoComplete="username"
+          />
+
+          <FormInput
+            id="lastFourSSN"
+            type="password"
+            label="Last 4 digits of SSN"
+            value={formData.lastFourSSN}
+            onChange={handleSsnChange}
+            error={errors.lastFourSSN}
+            inputMode="numeric"
+          />
           
           <div className="flex flex-col gap-3 pt-2">
-            <button
-              type="submit"
-              className="w-full py-3 bg-green-200 text-black font-medium rounded-lg hover:bg-green-300 transition-colors"
-            >
-              Continue
-            </button>
+            <Button type="submit">
+              CONTINUE
+            </Button>
             
-            <button
-              type="button"
+            <Button 
+              type="button" 
+              variant="borderless"
               onClick={() => setView('login')}
-              className="w-full py-3 bg-transparent border border-neutral-700 text-white font-medium rounded-lg hover:bg-white/5 transition-colors"
+              className="text-white"
             >
               Back to login
-            </button>
+            </Button>
           </div>
           
           <div className="mt-6 pt-4 border-t border-neutral-800 text-center">
-            <p className="text-sm text-neutral-400">
+            <p className="text-neutral-400 text-sm">
               If your contact information is out-of-date, please call us at
             </p>
-            <p className="text-white font-medium mt-1">800-237-7288</p>
+            <a href="tel:8002377288" className="text-white font-medium mt-1 hover:underline">800-237-7288</a>
           </div>
         </form>
       ) : (
@@ -129,25 +126,37 @@ const RecoverUsernameForm: React.FC<RecoverUsernameFormProps> = ({ setView }) =>
           <p className="text-neutral-300 mb-6">
             We've sent your username to your registered email address.
           </p>
-          <button
+          <Button 
             onClick={() => setView('login')}
-            className="w-full py-3 bg-green-200 text-black font-medium rounded-lg hover:bg-green-300 transition-colors"
+            className="w-full"
           >
-            Back to login
-          </button>
+            BACK TO LOGIN
+          </Button>
           <p className="mt-4 text-sm text-neutral-400">
             Didn't receive the email? Check your spam folder or{' '}
-            <button
+            <Button
               type="button"
+              variant="secondary"
               onClick={() => setIsSubmitted(false)}
-              className="text-green-200 hover:underline"
+              className="text-green-200 hover:underline bg-transparent border-0 p-0"
             >
               try again
-            </button>
+            </Button>
           </p>
         </div>
       )}
-    </>
+        </div>
+      </div>
+      
+      {/* Footer - Fixed at bottom */}
+      <div className="w-full border-t border-neutral-800/50 fixed bottom-0 left-0 bg-[#121212]">
+        <div className="max-w-md mx-auto w-full py-4 px-6">
+          <p className="text-center text-neutral-500 text-sm">
+            See legal disclosures
+          </p>
+        </div>
+      </div>
+    </div>
   );
 };
 

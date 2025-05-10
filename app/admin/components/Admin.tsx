@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { bankingData } from '@/lib/data/fakeBankingData';
+import { bankingData as fakeBankingData } from '@/lib/data/fakeBankingData';
 import { animated, useSpring } from 'react-spring';
 
 interface AdminProps {
@@ -12,9 +12,17 @@ interface AdminProps {
 
 const Admin: React.FC<AdminProps> = ({ onSelectUser }) => {
   const router = useRouter();
-  const [users, setUsers] = useState(bankingData.users);
-  const [isLoading, setIsLoading] = useState(true);
+  // Load banking data from localStorage or fall back to fake data
+  const [bankingData, setBankingData] = useState(() => {
+    try {
+      const storedData = localStorage.getItem('bankingData');
+      return storedData ? JSON.parse(storedData) : fakeBankingData;
+    } catch {
+      return fakeBankingData;
+    }
+  });
 
+  const [users, setUsers] = useState(bankingData.users);
   // Setup viewport height for mobile browsers
   useEffect(() => {
     const setViewportHeight = () => {
@@ -31,26 +39,21 @@ const Admin: React.FC<AdminProps> = ({ onSelectUser }) => {
 
   // Generate card animations dynamically based on user count
   const newUserSpring = useSpring({
-    opacity: isLoading ? 0 : 1,
-    transform: isLoading ? 'translateY(20px)' : 'translateY(0px)',
+    opacity: 1,
+    transform: 'translateY(0px)',
     config: { tension: 280, friction: 25 },
     delay: 300,
   });
   
   // Generate springs for each user
-  const userSprings = users.map((_, index) => 
+  const userSprings = users.map((_: any, index: number) => 
     useSpring({
-      opacity: isLoading ? 0 : 1,
-      transform: isLoading ? 'translateY(20px)' : 'translateY(0px)',
+      opacity: 1,
+      transform: 'translateY(0px)',
       config: { tension: 280, friction: 25 },
       delay: 350 + (index * 50), // Stagger the animations
     })
   );
-
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 800);
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleSelectUser = (userId: string | null) => {
     if (userId === 'new') {
@@ -68,24 +71,6 @@ const Admin: React.FC<AdminProps> = ({ onSelectUser }) => {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="fixed inset-0  bg-app-black flex items-center justify-center z-50">
-        <div className="w-28 h-28">
-          <img 
-            src="/images/icons/logo.svg" 
-            alt="Loading" 
-            className="w-full h-full object-contain animate-spin"
-            style={{
-              animationDuration: '2s',
-              animationTimingFunction: 'cubic-bezier(0.68, -0.55, 0.27, 1.55)'
-            }}
-          />
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="bg-[#121212] min-h-screen">
       <div className="flex flex-col h-full overflow-y-auto">
@@ -96,9 +81,9 @@ const Admin: React.FC<AdminProps> = ({ onSelectUser }) => {
 
           <h3 className="text-lg font-medium mb-3 text-neutral-300">Existing Profiles</h3>
           
-          {users.map((user, index) => {
-            const userAccount = bankingData.accounts.find(account => account.userId === user.id);
-            const userCard = bankingData.creditCards.find(card => card.userId === user.id);
+          {users.map((user: any, index: number) => {
+            const userAccount = bankingData.accounts?.find((account: any) => account.userId === user.id);
+            const userCard = bankingData.creditCards?.find((card: any) => card.userId === user.id);
             
             return (
               <animated.div 

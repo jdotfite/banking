@@ -189,7 +189,7 @@ const CreatePasswordScreen: React.FC<CreatePasswordScreenProps> = ({
         {/* Feedback message */}
         {passwordStrength === 5 ? (
           <p className="text-white text-sm">
-            <span className="font-medium">Nice work!</span> That would take a long time to crack 🔒
+            <span className="font-medium">Great job!</span> That password is strong and would take ages to crack 🔒
           </p>
         ) : (
           <p className="text-neutral-500 text-sm">

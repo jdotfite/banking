@@ -38,10 +38,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <ClientProviders>
           {/* ONLY main element in the entire app */}
           <main className="min-h-screen">
-            {/* DISABLE ALL PRELOADING TEMPORARILY */}
-            <div className="w-full h-full">
+            <SimplePreloader>
               {children}
-            </div>
+            </SimplePreloader>
           </main>
           <PWAInstallPrompt />
         </ClientProviders>

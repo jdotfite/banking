@@ -29,16 +29,12 @@ interface BankingDataContextType {
   refreshData: () => Promise<void>;
 }
 
-// Single banking data context
 const BankingDataContext = createContext<BankingDataContextType | null>(null);
 
 interface BankingDataProviderProps {
   children: ReactNode;
 }
 
-/**
- * SimplifiedBankingDataProvider - Provides banking data to the application
- */
 export const SimplifiedBankingDataProvider: React.FC<BankingDataProviderProps> = ({ 
   children 
 }) => {
@@ -55,85 +51,79 @@ export const SimplifiedBankingDataProvider: React.FC<BankingDataProviderProps> =
   const [error, setError] = useState<Error | null>(null);
   const [hasMounted, setHasMounted] = useState(false);
   
-  const { selectedUserId, isNewUser } = useUser() as {
-    selectedUserId: string | null;
-    isNewUser: boolean;
-  };
+  const { selectedUserId, isNewUser } = useUser();
 
   useEffect(() => {
     setHasMounted(true);
   }, []);
 
-  const loadData = async () => {
+  const loadData = async (forceDefault = false) => {
     try {
       setIsLoading(true);
-      
-      // First check for guest data in localStorage
-      const guestData = localStorage.getItem('guestBankingData');
       let bankingDataObj: BankingData;
 
-      if (guestData) {
-        // Convert guest data to match BankingData structure
-        const guest = JSON.parse(guestData);
-        bankingDataObj = {
-          users: [{
-            // Preserve all properties from stored guest user
-            ...guest.user,
-            // Ensure required BankingUser fields are populated
-            id: 'guest-user',
-            username: guest.user.username || 'guest',
-            avatar: guest.user.avatar || '',
-            phone: guest.user.phone || '',
-            address: guest.user.address || '',
-            ssn: guest.user.ssn || '',
-            dob: guest.user.dob || guest.user.dateOfBirth || '',
-            occupation: guest.user.occupation || '',
-            income: guest.user.income || 0,
-            joinDate: guest.user.joinDate || new Date().toISOString(),
-            lastLogin: guest.user.lastLogin || new Date().toISOString()
-          }],
-          accounts: guest.accounts.map((a: any) => ({
-            ...a,
-            userId: 'guest-user',
-            accountNumber: a.id,
-            routingNumber: '000000000'
-          })),
-          creditCards: [],
-          loans: [],
-          transactions: {
-            'guest-user': guest.accounts.reduce((acc: any, account: any) => {
-              acc[account.id] = [];
-              return acc;
-            }, {})
-          },
-          groupedTransactions: {}
-        };
+      if (forceDefault || isNewUser) {
+        // Force load default data including user3 for new signups
+        console.log('Loading default banking data (forceDefault or new user)');
+        bankingDataObj = {...bankingData as unknown as BankingData};
       } else {
-        // Fall back to cached/default data
-        const cachedData = localStorage.getItem('bankingData');
-        if (cachedData) {
-          bankingDataObj = JSON.parse(cachedData) as BankingData;
+        // Check for guest data (only for non-new users)
+        const guestData = localStorage.getItem('guestBankingData');
+        if (guestData) {
+          const guest = JSON.parse(guestData);
+          bankingDataObj = {
+            users: [{
+              ...guest.user,
+              id: 'guest-user',
+              username: guest.user.username || 'guest',
+              avatar: guest.user.avatar || '',
+              phone: guest.user.phone || '',
+              address: guest.user.address || '',
+              ssn: guest.user.ssn || '',
+              dob: guest.user.dob || guest.user.dateOfBirth || '',
+              occupation: guest.user.occupation || '',
+              income: guest.user.income || 0,
+              joinDate: guest.user.joinDate || new Date().toISOString(),
+              lastLogin: guest.user.lastLogin || new Date().toISOString()
+            }],
+            accounts: guest.accounts.map((a: any) => ({
+              ...a,
+              userId: 'guest-user',
+              accountNumber: a.id,
+              routingNumber: '000000000'
+            })),
+            creditCards: [],
+            loans: [],
+            transactions: {
+              'guest-user': guest.accounts.reduce((acc: any, account: any) => {
+                acc[account.id] = [];
+                return acc;
+              }, {})
+            },
+            groupedTransactions: {}
+          };
         } else {
-          // Process default data
-          bankingDataObj = {...bankingData as unknown as BankingData};
-          
-          // Store in localStorage for future use
-          try {
-            localStorage.setItem('bankingData', JSON.stringify(bankingDataObj));
-          } catch (err) {
-            console.warn('Failed to cache banking data:', err);
+          // Check for cached data
+          const cachedData = localStorage.getItem('bankingData');
+          if (cachedData) {
+            bankingDataObj = JSON.parse(cachedData) as BankingData;
+          } else {
+            // Load default data
+            bankingDataObj = {...bankingData as unknown as BankingData};
+            try {
+              localStorage.setItem('bankingData', JSON.stringify(bankingDataObj));
+            } catch (err) {
+              console.warn('Failed to cache banking data:', err);
+            }
           }
         }
       }
-      
+
       setData(bankingDataObj);
       filterUserData(bankingDataObj);
     } catch (err: unknown) {
       console.error('Error loading banking data:', err);
-      const error = err instanceof Error ? err : new Error('Unknown error loading banking data');
-      setError(error);
-      
-      // Fallback to basic data if processing failed
+      setError(err instanceof Error ? err : new Error('Unknown error'));
       const fallbackData = bankingData as unknown as BankingData;
       setData(fallbackData);
       filterUserData(fallbackData);
@@ -189,7 +179,7 @@ export const SimplifiedBankingDataProvider: React.FC<BankingDataProviderProps> =
   const refreshData = async () => {
     try {
       localStorage.removeItem('bankingData');
-      await loadData();
+      await loadData(true); // Force load default data
     } catch (error) {
       console.error('Error refreshing data:', error);
     }
@@ -197,26 +187,27 @@ export const SimplifiedBankingDataProvider: React.FC<BankingDataProviderProps> =
 
   useEffect(() => {
     if (!hasMounted) return;
+    const shouldRefresh = localStorage.getItem('shouldRefreshBankingData') === 'true';
+    if (shouldRefresh) {
+      localStorage.removeItem('shouldRefreshBankingData');
+    }
+    console.log('Loading banking data for user:', selectedUserId, 'isNewUser:', isNewUser);
     loadData();
   }, [selectedUserId, isNewUser, hasMounted]);
 
-  // Provide a value that matches both the original providers
-  const value = {
-    data,
-    userData,
-    isLoading,
-    error,
-    refreshData
-  };
-
   return (
-    <BankingDataContext.Provider value={value}>
+    <BankingDataContext.Provider value={{
+      data,
+      userData,
+      isLoading,
+      error,
+      refreshData
+    }}>
       {children}
     </BankingDataContext.Provider>
   );
 };
 
-// Single clean hook export
 export const useBankingData = () => {
   const context = useContext(BankingDataContext);
   if (!context) {

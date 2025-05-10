@@ -36,34 +36,21 @@ export default function AccountSettings() {
   const displaySettings = settings.filter(s => [1, 9].includes(s.id));
 
   const handleContinue = () => {
-    // Create guest user data structure
-    const guestUserData = {
-      user: {
-        name: 'New User',
-        email: 'guest@example.com'
-      },
-      accounts: [
-        {
-          id: 'guest-checking',
-          name: 'Guest Checking',
-          balance: 1000,
-          type: 'checking'
-        },
-        {
-          id: 'guest-savings', 
-          name: 'Guest Savings',
-          balance: 5000,
-          type: 'savings'
-        }
-      ],
-      cards: [],
-      transactions: []
-    };
-
-    // Store in localStorage and set user context
-    localStorage.setItem('guestBankingData', JSON.stringify(guestUserData));
-    setSelectedUserId('new');
-    router.push('/home');
+    // Get the banking data from localStorage
+    const bankingData = JSON.parse(localStorage.getItem('bankingData') || '{}');
+    
+    // Find the most recently created user
+    const latestUser = bankingData.users?.[bankingData.users.length - 1];
+    
+    if (latestUser) {
+      // Set the selected user ID
+      setSelectedUserId(latestUser.id);
+      router.push('/home');
+    } else {
+      console.error('No user data found in bankingData');
+      // Fallback to home screen
+      router.push('/home');
+    }
   };
 
   return (
@@ -73,7 +60,7 @@ export default function AccountSettings() {
         <h1 className="text-2xl md:text-3xl font-extralight text-white mb-2 tracking-tight">
           Account <span className="font-normal">settings</span>
         </h1>
-        <p className="text-neutral-400 text-sm font-light mb-6">Configure your preferences to get started</p>
+        <p className="text-neutral-400 text-sm font-light">Configure your preferences to get started</p>
       </div>
 
       {/* Settings List */}

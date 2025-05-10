@@ -9,7 +9,6 @@ import { useBankingData } from '@/components/preloaders/SimplifiedBankingDataPro
 import CreditCardComponent from '../ui/card/CreditCard'; 
 import TransactionContainer from '../ui/transactions/TransactionContainer';
 import Header from '../ui/navigation/Header';
-import LoadingSpinner from '../ui/common/LoadingSpinner';
 import Icon from '../ui/icons/Icon';
 import { BankingDataType, BankingCreditCard } from '@/lib/types';
 import { Lock } from 'lucide-react';
@@ -17,7 +16,6 @@ import { Lock } from 'lucide-react';
 const Home: React.FC = () => {
   const card = getDefaultCard();
   const transactions = getTransactions();
-  const [isLoading, setIsLoading] = useState(true);
   const [showInfo, setShowInfo] = useState(false);
   const [balance, setBalance] = useState(25552.92);
   const payButtonsRef = useRef<HTMLDivElement>(null);
@@ -27,64 +25,50 @@ const Home: React.FC = () => {
   const isManageClickRef = useRef(false);
   
   // Get banking data from context
-  const { userData, isLoading: isBankingDataLoading } = useBankingData();
+  const { userData } = useBankingData();
   
   // React Spring animations
   const cardSpring = useSpring({
-    opacity: isLoading ? 0 : 1,
-    transform: isLoading ? 'translateY(20px)' : 'translateY(0px)',
+    opacity: 1,
+    transform: 'translateY(0px)',
     delay: 100,
     config: { tension: 280, friction: 25 }
   });
   
   const sectionSpring = useSpring({
-    opacity: isLoading ? 0 : 1,
-    transform: isLoading ? 'translateY(20px)' : 'translateY(0px)',
+    opacity: 1,
+    transform: 'translateY(0px)',
     delay: 200,
     config: { tension: 280, friction: 25 }
   });
   
   const actionsSpring = useSpring({
-    opacity: isLoading ? 0 : 1,
-    transform: isLoading ? 'translateY(20px)' : 'translateY(0px)',
+    opacity: 1,
+    transform: 'translateY(0px)',
     delay: 300,
     config: { tension: 280, friction: 25 }
   });
 
-  // Get card info from banking data if available
-  const cardInfo = userData?.creditCards?.[0];
-  const rewardsBalance = cardInfo?.rewardsBalance || 0;
-
-  // Loading simulation
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 800);
-    return () => clearTimeout(timer);
-  }, []);
-
   // Calculate button positions for transaction container
   useEffect(() => {
-    if (!isLoading) {
-      const calculatePositions = () => {
-        if (payButtonsRef.current) {
-          const rect = payButtonsRef.current.getBoundingClientRect();
-          if (rect.bottom > 0) {
-            setButtonBottomPosition(rect.bottom);
-          }
+    const calculatePositions = () => {
+      if (payButtonsRef.current) {
+        const rect = payButtonsRef.current.getBoundingClientRect();
+        if (rect.bottom > 0) {
+          setButtonBottomPosition(rect.bottom);
         }
-      };
-      
-      calculatePositions();
-      const animationDelay = setTimeout(calculatePositions, 350);
-      window.addEventListener('resize', calculatePositions);
-      
-      return () => {
-        clearTimeout(animationDelay);
-        window.removeEventListener('resize', calculatePositions);
-      };
-    }
-  }, [isLoading, showInfo]); 
+      }
+    };
+    
+    calculatePositions();
+    const animationDelay = setTimeout(calculatePositions, 350);
+    window.addEventListener('resize', calculatePositions);
+    
+    return () => {
+      clearTimeout(animationDelay);
+      window.removeEventListener('resize', calculatePositions);
+    };
+  }, [showInfo]); 
 
   // Handle transactions click
   const handleTransactionsClick = () => {
@@ -117,14 +101,8 @@ const Home: React.FC = () => {
     }
   };
 
-  // Show loading spinner if loading
-  if (isLoading || isBankingDataLoading) {
-    return (
-      <LoadingSpinner size="large" fullScreen={true} />
-    );
-  }
-
-  // Get user name and transactions from data
+  // Get card info and user data
+  const cardInfo = userData?.creditCards?.[0];
   const userName = userData?.user?.name?.split(' ')[0] || 'Guest';
   const bankingTransactions = userData?.groupedTransactions || transactions;
 
@@ -132,7 +110,7 @@ const Home: React.FC = () => {
     <div className="relative min-h-screen bg-app-black text-white">
       <Header userName={userName} />
       
-      <div className="px-5  mx-auto max-w-md">
+      <div className="px-5 mx-auto max-w-md">
         {/* Card with React Spring animation */}
         <animated.div style={cardSpring} className="mb-4">
           <CreditCardComponent 
@@ -161,7 +139,7 @@ const Home: React.FC = () => {
           <div className="bg-[#212121] rounded-xl p-4">
             <h3 className="text-sm font-medium mb-1">Rewards</h3>
             <p className="text-xs text-neutral-400 mb-2">Cash back earned</p>
-            <p className="text-green-500 font-semibold">${rewardsBalance.toFixed(2)}</p>
+            <p className="text-green-500 font-semibold">${cardInfo?.rewardsBalance?.toFixed(2) || '0.00'}</p>
           </div>
         </animated.div>
         
