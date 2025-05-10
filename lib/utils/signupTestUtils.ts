@@ -86,26 +86,14 @@ export const autoFillSignupScreen = (screenName: string) => {
 
 /**
  * Auto-fills current screen and advances to next screen
+ * without reloading the page or hiding the tester overlay
  */
 export const autoFillAndAdvance = () => {
-  // Set a flag in localStorage to indicate auto-fill is active
-  localStorage.setItem('autoFillActive', 'true');
-  
-  // Immediately fill and advance
-  fillCurrentScreen().then(() => {
-    clickNextButton();
-  });
-};
-
-// Fill current screen with test data
-export const fillCurrentScreen = (): Promise<void> => {
-  console.log('Filling current screen with test data');
+  // Fill current screen with test data
   const currentScreen = determineCurrentScreen();
-  console.log('Current screen:', currentScreen);
-  
   if (!currentScreen) {
     console.error('Could not determine current screen');
-    return Promise.resolve();
+    return;
   }
 
   // Get the test data for the current screen
@@ -127,36 +115,64 @@ export const fillCurrentScreen = (): Promise<void> => {
       testData = testUserData.password;
       break;
   }
-  
-  console.log('Using test data:', testData);
 
-  // Store the current URL to return to after reload
-  const currentUrl = window.location.href;
-  
-  // Store the test data in localStorage
+  // Simulate filling the form fields directly
+  (Object.entries(testData) as [string, string | number | Date][]).forEach(([field, value]) => {
+    const input = document.querySelector(`input[name="${field}"], input#${field}`) as HTMLInputElement;
+    if (input) {
+      // Convert value to string if needed
+      const stringValue = typeof value === 'string' ? value : String(value);
+      input.value = stringValue;
+      // Trigger React's onChange handler
+      const event = new Event('input', { bubbles: true });
+      input.dispatchEvent(event);
+    }
+  });
+
+  // Wait briefly for state updates then click next
+  setTimeout(() => {
+    clickNextButton();
+  }, 100);
+};
+
+// Fill current screen with test data (legacy version that reloads page)
+export const fillCurrentScreen = (): Promise<void> => {
+  console.warn('Using legacy fillCurrentScreen that reloads page');
+  const currentScreen = determineCurrentScreen();
+  if (!currentScreen) {
+    console.error('Could not determine current screen');
+    return Promise.resolve();
+  }
+
+  let testData = {};
+  switch (currentScreen) {
+    case 'basic':
+      testData = testUserData.basic;
+      break;
+    case 'dateOfBirth':
+      testData = testUserData.dateOfBirth;
+      break;
+    case 'mobilePhone':
+      testData = testUserData.mobilePhone;
+      break;
+    case 'address':
+      testData = testUserData.address;
+      break;
+    case 'password':
+      testData = testUserData.password;
+      break;
+  }
+
   try {
-    // Get existing form data if any
     const existingData = JSON.parse(localStorage.getItem('signupFormData') || '{}');
-    // Merge with new test data
     const updatedFormData = { ...existingData, ...testData };
-    // Save back to localStorage
     localStorage.setItem('signupFormData', JSON.stringify(updatedFormData));
-    console.log('Updated form data in localStorage:', updatedFormData);
-    
-    // Set a flag to indicate we should submit the form after reload
     localStorage.setItem('autoFillSubmitAfterLoad', 'true');
-    
-    // Set bypass cookie to ensure middleware doesn't redirect
     document.cookie = 'bypass_preloader=true; path=/';
-    
-    // Reload the page to let React initialize with the data from localStorage
-    // This is a more reliable way to update React's state
     window.location.reload();
-    
-    // Return a promise that never resolves since we're reloading the page
     return new Promise<void>(() => {});
   } catch (e) {
-    console.error('Error updating form data in localStorage:', e);
+    console.error('Error updating form data:', e);
     return Promise.resolve();
   }
 };

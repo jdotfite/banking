@@ -28,11 +28,11 @@ const Button: React.FC<ButtonProps> = ({
   `;
   
   const loadingIndicator = (
-    <div className="flex items-center justify-center">
+    <div className="flex items-center justify-center h-6">
       <div className="flex space-x-2">
-        <span className="h-2 w-2 bg-current rounded-full animate-pulse"></span>
-        <span className="h-2 w-2 bg-current rounded-full animate-pulse [animation-delay:0.2s]"></span>
-        <span className="h-2 w-2 bg-current rounded-full animate-pulse [animation-delay:0.4s]"></span>
+        <span className="h-3 w-3 bg-current rounded-full animate-pulse"></span>
+        <span className="h-3 w-3 bg-current rounded-full animate-pulse [animation-delay:0.2s]"></span>
+        <span className="h-3 w-3 bg-current rounded-full animate-pulse [animation-delay:0.4s]"></span>
       </div>
     </div>
   );

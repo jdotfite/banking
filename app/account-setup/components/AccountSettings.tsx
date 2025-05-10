@@ -2,20 +2,21 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Bell, FileText, Shield, Mail, Smartphone, AlertTriangle, Eye, EyeOff, MoonStar, Zap } from 'lucide-react';
+import { useUser } from '@/components/context/UserContext';
+import { Bell, FileText, Shield, Mail, Smartphone, AlertTriangle, Fingerprint, MoonStar } from 'lucide-react';
 import { Button } from '@/components/ui/form';
 
-export default function RegistrationCompleteView() {
+export default function AccountSettings() {
   const router = useRouter();
+  const { setSelectedUserId } = useUser();
   const [settings, setSettings] = useState([
-    { id: 1, title: 'Enable eStatements', description: 'Go paperless and access statements online', enabled: false, icon: <FileText size={20} /> },
-    { id: 2, title: 'Account notifications', description: 'Receive payment reminders and account updates', enabled: false, icon: <Bell size={20} /> },
+    { id: 1, title: 'Enable eStatements', description: 'Go paperless and access statements online', enabled: true, icon: <FileText size={20} /> },
+    { id: 2, title: 'Account notifications', description: 'Receive payment reminders and account updates', enabled: true, icon: <Bell size={20} /> },
     { id: 3, title: 'Transaction alerts', description: 'Get notified about transactions over $100', enabled: false, icon: <AlertTriangle size={20} /> },
     { id: 4, title: 'Email communications', description: 'Receive account offers and updates via email', enabled: true, icon: <Mail size={20} /> },
-    { id: 5, title: 'SMS notifications', description: 'Receive text alerts for important events', enabled: false, icon: <Smartphone size={20} /> },
-    { id: 6, title: 'Two-factor authentication', description: 'Secure your account with 2FA on login', enabled: true, icon: <Shield size={20} /> },
-    { id: 7, title: 'Biometric login', description: 'Use fingerprint or face ID to sign in', enabled: false, icon: <Zap size={20} /> },
-    { id: 8, title: 'Hide balances', description: 'Hide account balances on the dashboard', enabled: false, icon: <EyeOff size={20} /> },
+    { id: 5, title: 'SMS notifications', description: 'Receive text alerts for important events', enabled: true, icon: <Smartphone size={20} /> },
+    { id: 6, title: 'Two-factor authentication', description: 'Secure your account with 2FA', enabled: true, icon: <Shield size={20} /> },
+    { id: 7, title: 'Biometric login', description: 'Use fingerprint or face ID to sign in', enabled: false, icon: <Fingerprint size={20} /> },
     { id: 9, title: 'Dark mode', description: 'Use dark theme across the app', enabled: true, icon: <MoonStar size={20} /> }
   ]);
 
@@ -32,23 +33,43 @@ export default function RegistrationCompleteView() {
   // Group settings by category
   const securitySettings = settings.filter(s => [6, 7].includes(s.id));
   const notificationSettings = settings.filter(s => [2, 3, 4, 5].includes(s.id));
-  const displaySettings = settings.filter(s => [1, 8, 9].includes(s.id));
+  const displaySettings = settings.filter(s => [1, 9].includes(s.id));
 
   const handleContinue = () => {
+    // Create guest user data structure
+    const guestUserData = {
+      user: {
+        name: 'New User',
+        email: 'guest@example.com'
+      },
+      accounts: [
+        {
+          id: 'guest-checking',
+          name: 'Guest Checking',
+          balance: 1000,
+          type: 'checking'
+        },
+        {
+          id: 'guest-savings', 
+          name: 'Guest Savings',
+          balance: 5000,
+          type: 'savings'
+        }
+      ],
+      cards: [],
+      transactions: []
+    };
+
+    // Store in localStorage and set user context
+    localStorage.setItem('guestBankingData', JSON.stringify(guestUserData));
+    setSelectedUserId('new');
     router.push('/home');
   };
 
   return (
     <div className="min-h-screen bg-[#121212] text-neutral-200 p-6 flex flex-col">
-      {/* Logo and Header */}
+      {/* Header */}
       <div className="mb-8">
-        <div className="h-12 w-12 md:h-14 md:w-14 bg-white rounded-lg flex items-center justify-center mb-6">
-          <img 
-            src="/images/icons/logo-light.svg" 
-            alt="Logo" 
-            className="h-8 w-8 md:h-10 md:w-10 object-contain"
-          />
-        </div>
         <h1 className="text-2xl md:text-3xl font-extralight text-white mb-2 tracking-tight">
           Account <span className="font-normal">settings</span>
         </h1>

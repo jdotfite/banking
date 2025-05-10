@@ -182,8 +182,11 @@ const SignupFlow: React.FC = () => {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1000));
       
+      // Clear any test user selection
       localStorage.removeItem('selectedUserId');
-      router.push('/signup/complete');
+      
+      // Force a hard navigation to account setup to ensure proper state
+      window.location.href = '/account-setup';
       
     } catch (err) {
       console.error('Signup failed:', err);

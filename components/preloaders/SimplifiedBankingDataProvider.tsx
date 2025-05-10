@@ -68,21 +68,61 @@ export const SimplifiedBankingDataProvider: React.FC<BankingDataProviderProps> =
     try {
       setIsLoading(true);
       
-      // First try to get data from localStorage
-      const cachedData = localStorage.getItem('bankingData');
+      // First check for guest data in localStorage
+      const guestData = localStorage.getItem('guestBankingData');
       let bankingDataObj: BankingData;
-      
-      if (cachedData) {
-        bankingDataObj = JSON.parse(cachedData) as BankingData;
+
+      if (guestData) {
+        // Convert guest data to match BankingData structure
+        const guest = JSON.parse(guestData);
+        bankingDataObj = {
+          users: [{
+            // Preserve all properties from stored guest user
+            ...guest.user,
+            // Ensure required BankingUser fields are populated
+            id: 'guest-user',
+            username: guest.user.username || 'guest',
+            avatar: guest.user.avatar || '',
+            phone: guest.user.phone || '',
+            address: guest.user.address || '',
+            ssn: guest.user.ssn || '',
+            dob: guest.user.dob || guest.user.dateOfBirth || '',
+            occupation: guest.user.occupation || '',
+            income: guest.user.income || 0,
+            joinDate: guest.user.joinDate || new Date().toISOString(),
+            lastLogin: guest.user.lastLogin || new Date().toISOString()
+          }],
+          accounts: guest.accounts.map((a: any) => ({
+            ...a,
+            userId: 'guest-user',
+            accountNumber: a.id,
+            routingNumber: '000000000'
+          })),
+          creditCards: [],
+          loans: [],
+          transactions: {
+            'guest-user': guest.accounts.reduce((acc: any, account: any) => {
+              acc[account.id] = [];
+              return acc;
+            }, {})
+          },
+          groupedTransactions: {}
+        };
       } else {
-        // Process data
-        bankingDataObj = {...bankingData as unknown as BankingData};
-        
-        // Store in localStorage for future use
-        try {
-          localStorage.setItem('bankingData', JSON.stringify(bankingDataObj));
-        } catch (err) {
-          console.warn('Failed to cache banking data:', err);
+        // Fall back to cached/default data
+        const cachedData = localStorage.getItem('bankingData');
+        if (cachedData) {
+          bankingDataObj = JSON.parse(cachedData) as BankingData;
+        } else {
+          // Process default data
+          bankingDataObj = {...bankingData as unknown as BankingData};
+          
+          // Store in localStorage for future use
+          try {
+            localStorage.setItem('bankingData', JSON.stringify(bankingDataObj));
+          } catch (err) {
+            console.warn('Failed to cache banking data:', err);
+          }
         }
       }
       

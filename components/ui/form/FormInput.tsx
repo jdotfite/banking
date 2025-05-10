@@ -79,7 +79,7 @@ const FormInput: React.FC<FormInputProps> = ({
         {/* Underline animation */}
         <div className={`h-px w-0 bg-white absolute bottom-0 left-0 transition-all duration-700 ${isFocused ? 'w-full' : ''}`}></div>
         {rightElement && (
-          <div className="absolute right-0 bottom-2">
+          <div className="absolute right-0 bottom-2 z-10">
             {rightElement}
           </div>
         )}

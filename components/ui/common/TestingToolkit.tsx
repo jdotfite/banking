@@ -3,17 +3,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useUser } from '@/components/context/UserContext';
 import { 
-  Settings, 
-  X, 
-  UserPlus, 
-  LogIn, 
-  Users, 
-  Sparkles, 
-  Play,
-  Square,
+  Settings,
+  X,
+  UserPlus,
+  LogIn,
+  Users,
+  Sparkles,
   ChevronRight
 } from 'lucide-react';
-import { autoCompleteSignup, fillCurrentScreen, clickNextButton } from '@/lib/utils/signupTestUtils';
+import { autoCompleteSignup } from '@/lib/utils/signupTestUtils';
 import { animated, useSpring, config } from '@react-spring/web';
 
 /**
@@ -26,7 +24,6 @@ const TestingToolkit: React.FC = () => {
   const [isDragging, setIsDragging] = useState(false);
   const [position, setPosition] = useState({ y: 200 });
   const [activeSection, setActiveSection] = useState<string | null>(null);
-  const [autoFillActive, setAutoFillActive] = useState(false);
   const { resetUserSelection } = useUser();
   const toolkitRef = useRef<HTMLDivElement>(null);
   const dragStartPos = useRef({ y: 0 });
@@ -57,17 +54,22 @@ const TestingToolkit: React.FC = () => {
   // Panel spring: width only
   const panelAnimation = useSpring({ width: isExpanded ? 240 : 0, opacity: 1, config: { ...config.gentle, clamp: true } });
 
-  useEffect(() => {
-    setAutoFillActive(localStorage.getItem('autoFillActive') === 'true');
-  }, []);
-
+  // Mouse event handlers
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (!isDragging) {
-      setIsDragging(true);
-      dragStartPos.current = { y: e.clientY - position.y };
-      e.stopPropagation();
-    }
+    setIsDragging(true);
+    dragStartPos.current = { y: e.clientY - position.y };
+    e.stopPropagation();
+    // Removed e.preventDefault() to allow dragging
   };
+
+  // Touch event handlers for mobile support
+  const handleTouchStart = (e: React.TouchEvent) => {
+    setIsDragging(true);
+    const touch = e.touches[0];
+    dragStartPos.current = { y: touch.clientY - position.y };
+    e.stopPropagation();
+  };
+
   const handleMouseMove = (e: MouseEvent) => {
     if (isDragging) {
       const newY = e.clientY - dragStartPos.current.y;
@@ -75,44 +77,62 @@ const TestingToolkit: React.FC = () => {
       setPosition({ y: Math.min(Math.max(0, newY), maxY) });
     }
   };
+
+  const handleTouchMove = (e: TouchEvent) => {
+    if (isDragging) {
+      const touch = e.touches[0];
+      const newY = touch.clientY - dragStartPos.current.y;
+      const maxY = window.innerHeight - 60;
+      setPosition({ y: Math.min(Math.max(0, newY), maxY) });
+    }
+  };
+
   const handleMouseUp = () => setIsDragging(false);
+  const handleTouchEnd = () => setIsDragging(false);
 
   useEffect(() => {
     if (isDragging) {
+      // Add both mouse and touch event listeners
       window.addEventListener('mousemove', handleMouseMove);
       window.addEventListener('mouseup', handleMouseUp);
+      window.addEventListener('touchmove', handleTouchMove);
+      window.addEventListener('touchend', handleTouchEnd);
     }
+    
     return () => {
+      // Clean up all event listeners
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('touchmove', handleTouchMove);
+      window.removeEventListener('touchend', handleTouchEnd);
     };
   }, [isDragging]);
 
   const toggleSection = (section: string) => setActiveSection(activeSection === section ? null : section);
-  const handleMainButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => { if (!isDragging) setIsExpanded(!isExpanded); };
+  
+  const handleMainButtonClick = (e: React.MouseEvent<HTMLButtonElement>) => { 
+    if (!isDragging) setIsExpanded(!isExpanded); 
+  };
 
-  const startAutoFill = () => {
-    setAutoFillActive(true);
-    localStorage.setItem('autoFillActive', 'true');
-    // Set bypass cookie to ensure middleware doesn't redirect
-    document.cookie = 'bypass_preloader=true; path=/';
-    fillCurrentScreen().then(clickNextButton);
-  };
-  const stopAutoFill = () => {
-    setAutoFillActive(false);
-    localStorage.removeItem('autoFillActive');
-  };
   const handleClearStorage = () => { localStorage.clear(); window.location.reload(); };
   const handleClose = () => { setIsExpanded(false); setActiveSection(null); };
 
   return (
-    <div ref={toolkitRef} className="fixed right-0 z-[999]" style={{ top: `${position.y}px`, touchAction: 'none' }}>
+    <div 
+      ref={toolkitRef} 
+      className="fixed right-0 z-[999]" 
+      style={{ 
+        top: `${position.y}px`, 
+        touchAction: 'none',  // Important for touch devices
+      }}
+    >
       <div className="flex items-start">
         <animated.button
           style={buttonAnimation}
           onClick={handleMainButtonClick}
           onMouseDown={handleMouseDown}
-          className="mt-4 flex items-center justify-center bg-neutral-800 text-white w-12 h-12 rounded-l-full shadow-[inset_-4px_0_4px_-2px_rgba(0,0,0,0.3)] shadow-lg hover:bg-neutral-700 transition-colors relative  z-[999]"
+          onTouchStart={handleTouchStart}  // Added touch handler
+          className="mt-4 flex items-center justify-center bg-neutral-800 text-white w-12 h-12 rounded-l-full shadow-[inset_-4px_0_4px_-2px_rgba(0,0,0,0.3)] shadow-lg hover:bg-neutral-700 transition-colors relative z-[999]"
           aria-label="Developer Tools"
         >
           <Settings size={20} className="gear-spin" />
@@ -120,7 +140,7 @@ const TestingToolkit: React.FC = () => {
 
         <animated.div
           style={panelAnimation}
-          className="overflow-hidden bg-neutral-800 rounded-l-lg shadow-xl  z-[9999] flex flex-col h-auto relative"
+          className="overflow-hidden bg-neutral-800 rounded-l-lg shadow-xl z-[9999] flex flex-col h-auto relative"
           onClick={(e: React.MouseEvent) => e.stopPropagation()}
         >
           <div className="p-3 text-white">
@@ -167,18 +187,6 @@ const TestingToolkit: React.FC = () => {
               </button>
               {activeSection==='autofill' && (
                 <div className="pl-2 mt-1 space-y-1">
-                  <div className="flex items-center gap-2 py-1">
-                    {!autoFillActive ? (
-                      <button onClick={startAutoFill} className="text-xs text-green-400 hover:text-green-300 px-2 py-1 rounded hover:bg-green-900 flex items-center">
-                        <Play size={12} className="mr-1"/> Fill & Next
-                      </button>
-                    ) : (
-                      <button onClick={stopAutoFill} className="text-xs text-red-400 hover:text-red-300 px-2 py-1 rounded hover:bg-red-900 flex items-center">
-                        <Square size={12} className="mr-1"/> Stop
-                      </button>
-                    )}
-                    {autoFillActive && <span className="text-xs text-green-400 animate-pulse">Active</span>}
-                  </div>
                   <button onClick={autoCompleteSignupWithBypass} className="w-full text-left text-xs text-blue-400 hover:text-blue-300 py-1 px-2 rounded hover:bg-blue-900 flex items-center">
                     <Sparkles size={12} className="mr-2"/> Complete Signup
                   </button>
