@@ -4,37 +4,16 @@ import type { NextRequest } from 'next/server';
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
-  // Check if the user is authenticated by looking for a token in cookies
-  const authToken = request.cookies.get('auth_token')?.value;
-  const selectedUserId = request.cookies.get('selectedUserId')?.value;
-  const isAuthenticated = !!authToken;
-  const isNewUser = selectedUserId === 'new';
-  
-  // Public paths that don't require authentication
-  const publicPaths = ['/onboarding', '/login', '/signup', '/forgot-password'];
-  
-  // If it's a new user, allow access to onboarding flow
-  if (isNewUser && publicPaths.includes(pathname)) {
-    return NextResponse.next();
-  }
-  
-  // Skip redirects if this is a preloader request or has bypass flag in cookies
-  const isPreloaderRequest = request.headers.get('x-preloader-complete') === 'true';
-  const bypassPreloader = request.cookies.get('bypass_preloader')?.value === 'true';
-  
-  // If the user is authenticated and trying to access onboarding/login/signup
-  if (isAuthenticated && publicPaths.includes(pathname) && !isPreloaderRequest && !bypassPreloader) {
-    const url = request.nextUrl.clone();
-    url.pathname = '/admin';
-    return NextResponse.redirect(url);
-  }
-
-  // Redirect root to login after preloader completes in all environments
-  if (!isPreloaderRequest && !bypassPreloader && pathname === '/') {
+  // DEBUGGING: Temporarily disable all complex routing logic
+  // Just route root path to login
+  if (pathname === '/') {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     return NextResponse.redirect(url);
   }
+  
+  // For all other URLs, just allow normal navigation
+  // This disables the onboarding/preloader redirect logic for now
   
   // Create the response
   const response = NextResponse.next();

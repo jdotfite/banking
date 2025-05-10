@@ -13,7 +13,7 @@ export default function AuthPage() {
   const router = useRouter();
 
   const handleBack = () => {
-    router.push('/onboarding');
+    router.push('/');
   };
 
   const renderView = () => {

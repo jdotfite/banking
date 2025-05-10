@@ -70,8 +70,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
       localStorage.removeItem('selectedUserId');
       localStorage.setItem('selectedUserId', 'user1');
       document.cookie = `selectedUserId=user1; path=/; max-age=${60 * 60 * 24 * 7}`;
-      router.push('/onboarding');
-      window.location.href = '/onboarding'; // Force full page reload
+      // Redirect to home page after successful login, not onboarding
+      router.push('/home');
     }, 1000);
   };
 

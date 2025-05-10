@@ -262,17 +262,20 @@ const SimplePreloader: React.FC<SimplePreloaderProps> = ({
   };
   
   // When both resources are loaded AND progress bar has hit 100%,
-  // we can transition out the loading screen and route to login if needed
+  // we can transition out the loading screen
   useEffect(() => {
     if (resourcesLoaded && progressComplete) {
-      // Just hide the loading screen - routing will be handled by middleware
+      // Hide the loading screen
       setIsLoading(false);
+      
+      // Set a cookie to indicate the preloader is complete
+      // This will be used by middleware to determine if redirects should happen
+      document.cookie = 'preloader-complete=true; path=/';
       
       // Call onComplete callback if provided
       if (onComplete) {
         onComplete();
       }
-      
     }
   }, [resourcesLoaded, progressComplete, onComplete, routeToLoginAfterComplete, router, transitionDuration]);
 

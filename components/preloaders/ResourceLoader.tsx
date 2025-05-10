@@ -34,13 +34,23 @@ const ResourceLoader: React.FC<ResourceLoaderProps> = ({
     if (dataProgressRef.current === 100 && imageProgressRef.current === 100 && !isCompleteRef.current) {
       isCompleteRef.current = true;
       
-      // Set preloader complete header before calling onComplete
+      // Set preloader complete header and flag before calling onComplete
       if (typeof window !== 'undefined') {
+        // Set the preloader-complete flag in sessionStorage
+        sessionStorage.setItem('preloader-complete', 'true');
+        
+        // Set header in cookie instead of monkeypatching fetch
+        document.cookie = 'preloader-complete=true; path=/';
+        
+        // Dispatch the event with headers
         const headers = new Headers();
         headers.set('x-preloader-complete', 'true');
-        window.dispatchEvent(new CustomEvent('preloader-complete', { detail: { headers } }));
+        window.dispatchEvent(new CustomEvent('preloader-complete', { 
+          detail: { headers, complete: true }
+        }));
       }
       
+      // Call the onComplete callback
       onComplete();
     }
   };

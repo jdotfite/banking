@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { Button } from '../../../components/ui/form';
 
 interface DateOfBirthScreenProps {
   formData: {
@@ -149,12 +150,9 @@ const DateOfBirthScreen: React.FC<DateOfBirthScreenProps> = ({ formData, onChang
 
             {/* Next button */}
             <div className="pt-2">
-              <button
-                type="submit"
-                className="w-full py-4 px-6 rounded-lg bg-white text-black font-medium"
-              >
+              <Button type="submit">
                 NEXT
-              </button>
+              </Button>
             </div>
           </form>
         </div>

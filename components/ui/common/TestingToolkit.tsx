@@ -33,8 +33,14 @@ const TestingToolkit: React.FC = () => {
   
   // Function to navigate with a cookie that bypasses the preloader
   const navigateWithBypass = (path: string) => {
-    // Set a special cookie that the middleware will check
+    // Set special cookies that the middleware will check
     document.cookie = 'bypass_preloader=true; path=/';
+    document.cookie = 'preloader-complete=true; path=/';
+    
+    // Dispatch the preloader complete event
+    window.dispatchEvent(new CustomEvent('preloader-complete', { 
+      detail: { complete: true } 
+    }));
     
     // Navigate to the path
     window.location.href = path;

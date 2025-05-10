@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { Button } from '../../../components/ui/form';
 
 interface AddressScreenProps {
   formData: {
@@ -28,6 +29,13 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
     city: '',
     state: ''
   });
+
+  // Set default state value if not already set
+  useEffect(() => {
+    if (!formData.state) {
+      onChange('state', 'PA');
+    }
+  }, []);
 
   // US states for dropdown
   const states = [
@@ -70,7 +78,7 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
     }
 
     // Validate state
-    if (formData.state === '') {
+    if (!formData.state) {
       newErrors.state = 'State is required';
       isValid = false;
     }
@@ -242,16 +250,22 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
                 <div className="relative">
                   <select
                     id="state"
-                    value={formData.state || 'PA'}
+                    value={formData.state}
                     onChange={(e) => onChange('state', e.target.value)}
                     className="w-full pt-5 pb-1 px-0 bg-transparent border-b border-neutral-700 outline-none focus:border-neutral-700 text-white transition-all duration-200 [&:-webkit-autofill]:bg-transparent [&:-webkit-autofill]:text-white [&:-webkit-autofill]:shadow-[0_0_0_1000px_#121212_inset]"
                     autoComplete="address-level1"
                     onFocus={() => setFocusedFields({...focusedFields, state: true})}
                     onBlur={() => setFocusedFields({...focusedFields, state: false})}
                   >
-                    <option value="">State</option>
+                    <option value="" className="bg-[#121212] text-white">State</option>
                     {states.map(state => (
-                      <option key={state} value={state}>{state}</option>
+                      <option 
+                        key={state} 
+                        value={state}
+                        className="bg-[#121212] text-white hover:bg-neutral-800"
+                      >
+                        {state}
+                      </option>
                     ))}
                   </select>
                   <div className={`h-px w-0 bg-white absolute bottom-0 left-0 transition-all duration-700 ${focusedFields.state ? 'w-full' : ''}`}></div>
@@ -266,12 +280,9 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
 
             {/* Next button */}
             <div className="pt-2">
-              <button
-                type="submit"
-                className="w-full py-4 px-6 rounded-lg bg-white text-black font-medium"
-              >
+              <Button type="submit">
                 NEXT
-              </button>
+              </Button>
             </div>
           </form>
         </div>

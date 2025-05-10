@@ -38,11 +38,10 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <ClientProviders>
           {/* ONLY main element in the entire app */}
           <main className="min-h-screen">
-            <SimplePreloader 
-              onComplete={() => router.push('/onboarding')}
-            >
+            {/* DISABLE ALL PRELOADING TEMPORARILY */}
+            <div className="w-full h-full">
               {children}
-            </SimplePreloader>
+            </div>
           </main>
           <PWAInstallPrompt />
         </ClientProviders>

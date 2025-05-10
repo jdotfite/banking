@@ -4,100 +4,48 @@ import { useEffect } from 'react';
 
 export default function RegisterServiceWorker() {
   useEffect(() => {
-    // Skip service worker registration on login page to prevent caching issues
-    if (typeof window !== 'undefined' && window.location.pathname === '/login') {
-      console.log('Skipping service worker registration on login page');
-      return;
-    }
+    console.log('Service worker functionality disabled to prevent compatibility issues');
 
-    const registerSW = async () => {
+    // Service workers are disabled due to:
+    // 1. Next.js static export compatibility issues
+    // 2. Cache management complexity
+    // 3. Better reliability without service workers in this banking context
+    // Existing service workers are unregistered to prevent any issues
+    const unregisterAllServiceWorkers = async () => {
       if ('serviceWorker' in navigator) {
         try {
-          // Only clear caches and unregister in production
-          if (process.env.NODE_ENV === 'production') {
-            // Clear any caches that might be causing issues
-            if ('caches' in window) {
-              try {
-                const cacheNames = await caches.keys();
+          // Unregister any existing service workers
+          const registrations = await navigator.serviceWorker.getRegistrations();
+          if (registrations.length > 0) {
+            console.log(`Found ${registrations.length} service worker(s) to unregister.`);
+            for (const registration of registrations) {
+              await registration.unregister();
+              console.log(`Unregistered service worker for scope: ${registration.scope}`);
+            }
+          }
+
+          // Clear caches that might be causing issues
+          if ('caches' in window) {
+            try {
+              const cacheNames = await caches.keys();
+              if (cacheNames.length > 0) {
                 await Promise.all(
                   cacheNames.map(cacheName => caches.delete(cacheName))
                 );
                 console.log('All caches cleared successfully');
-              } catch (error) {
-                console.error('Error clearing caches:', error);
               }
-            }
-            
-            // Unregister any existing service workers first to ensure clean registration
-            const registrations = await navigator.serviceWorker.getRegistrations();
-            for (const registration of registrations) {
-              await registration.unregister();
-              console.log('Unregistered existing service worker');
+            } catch (error) {
+              console.error('Error clearing caches:', error);
             }
           }
-          
-          // Register the service worker with explicit scope
-          const registration = await navigator.serviceWorker.register('/sw.js', {
-            scope: '/',
-            updateViaCache: 'none' // Don't use cached versions
-          });
-          
-          console.log('✅ Service Worker registered successfully:', registration.scope);
-          
-          // Force update check immediately
-          registration.update();
-          
-          // Handle service worker updates
-          registration.addEventListener('updatefound', () => {
-            const newWorker = registration.installing;
-            console.log('Service Worker update found!');
-            
-            newWorker?.addEventListener('statechange', () => {
-              console.log('Service Worker state changed:', newWorker.state);
-              
-              // When the service worker is installed, refresh the page to activate it
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                console.log('New service worker installed, refreshing to activate');
-                window.location.reload();
-              }
-            });
-          });
-          
-          // Listen for controlling service worker changes
-          navigator.serviceWorker.addEventListener('controllerchange', () => {
-            console.log('Service Worker controller changed!');
-          });
-          
-          // Check for PWA installability
-          if ('getInstalledRelatedApps' in navigator) {
-            try {
-              // @ts-ignore - TypeScript doesn't know about this API yet
-              const relatedApps = await navigator.getInstalledRelatedApps();
-              console.log('Related installed apps:', relatedApps);
-            } catch (err) {
-              console.error('Error checking installed related apps:', err);
-            }
-          }
-          
-          // Only set up update interval in production
-          if (process.env.NODE_ENV === 'production') {
-            // Set up interval to check for updates
-            setInterval(() => {
-              registration.update();
-              console.log('Checking for Service Worker updates...');
-            }, 60 * 60 * 1000); // Check every hour
-          }
-          
         } catch (error) {
-          console.error('❌ Service Worker registration failed:', error);
+          console.error('Error unregistering service workers:', error);
         }
-      } else {
-        console.warn('Service workers are not supported in this browser.');
       }
     };
 
-    // Register service worker when the component mounts
-    registerSW();
+    // Run this when the component mounts
+    unregisterAllServiceWorkers();
     
     // Set up beforeinstallprompt event listener at the window level
     const handleBeforeInstallPrompt = (e: Event) => {
