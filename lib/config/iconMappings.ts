@@ -7,20 +7,36 @@
 
 import * as LucideIcons from 'lucide-react';
 
-// Import brand icons from react-icons
+// Import brand icons from react-icons/si (Simple Icons)
+// Simple Icons has the most comprehensive collection of brand icons
 import { 
-  FaAmazon, FaWalmart, FaTarget, FaSpotify, FaNetflix, 
-  FaUber, FaPaypal, FaApple, FaStarbucks, FaCreditCard,
-  FaEbay, FaDisney, FaVenmo, FaMusic, FaShoppingCart,
-  FaShoppingBag, FaCoffee, FaUtensils, FaCar, FaDollarSign,
+  SiNetflix,
+  SiAmazon, 
+  SiWalmart, 
+  SiTarget,
+  SiStarbucks,
+  SiZara,
+  SiUber,
+  SiLyft,
+  SiSpotify,
+  SiMcdonalds,
+  SiPaypal,
+  SiVenmo,
+  SiEbay
+} from 'react-icons/si';
+
+// Import general icons from react-icons/fa (Font Awesome)
+import {
+  FaCreditCard,
+  FaShoppingCart,
+  FaShoppingBag,
+  FaCoffee,
+  FaUtensils,
+  FaCar,
+  FaDollarSign,
+  FaMusic,
   FaTv
 } from 'react-icons/fa';
-
-// Import more brand icons from Simple Icons set in react-icons
-import {
-  SiZara, SiChipotle, SiMcdonalds, SiLyft, SiHulu,
-  SiVenmo, SiNetflix
-} from 'react-icons/si';
 
 /**
  * Standard UI icons used for navigation, buttons, and general UI elements
@@ -63,38 +79,38 @@ export const standardIconMap: Record<string, any> = {
 
 /**
  * Merchant-specific icons for transaction displays
- * Enhanced with brand icons from react-icons
+ * Using primarily Simple Icons (SI) for brands which has the most comprehensive collection
  */
 export const merchantIconMap: Record<string, any> = {
   // Streaming services
-  netflix: SiNetflix || FaNetflix || LucideIcons.Tv,
-  hulu: SiHulu || FaTv,
-  disney: FaDisney || LucideIcons.Tv,
+  netflix: SiNetflix,
+  hulu: FaTv,
+  disney: FaTv,
   
   // Music services
-  spotify: FaSpotify,
+  spotify: SiSpotify,
   appleMusic: FaMusic,
   
   // Shopping
-  amazon: FaAmazon,
-  target: FaTarget,
-  walmart: FaWalmart,
+  amazon: SiAmazon,
+  target: SiTarget,
+  walmart: SiWalmart,
   zara: SiZara,
-  ebay: FaEbay,
+  ebay: SiEbay,
   
   // Transportation
-  uber: FaUber,
+  uber: SiUber,
   lyft: SiLyft,
   
   // Food & Drink
-  starbucks: FaStarbucks,
+  starbucks: SiStarbucks,
   mcdonalds: SiMcdonalds,
-  chipotle: SiChipotle,
+  chipotle: FaUtensils,
   
   // Financial
   payroll: LucideIcons.Landmark,
-  venmo: SiVenmo || FaVenmo,
-  paypal: FaPaypal,
+  venmo: SiVenmo,
+  paypal: SiPaypal,
 };
 
 /**
@@ -102,8 +118,8 @@ export const merchantIconMap: Record<string, any> = {
  */
 export const categoryIconMap: Record<string, any> = {
   // Food & Dining
-  food: FaUtensils || LucideIcons.UtensilsCrossed,
-  dining: FaUtensils || LucideIcons.UtensilsCrossed,
+  food: FaUtensils,
+  dining: FaUtensils,
   groceries: FaShoppingCart,
   coffee: FaCoffee,
   
@@ -131,7 +147,7 @@ export const categoryIconMap: Record<string, any> = {
   medical: LucideIcons.Heart,
   
   // Entertainment
-  entertainment: FaMusic || LucideIcons.Music,
+  entertainment: FaMusic,
   subscription: LucideIcons.Repeat,
   movies: LucideIcons.Film,
   
@@ -174,10 +190,61 @@ const normalizedMerchantMap: Record<string, string> = {
 };
 
 /**
+ * Check if a name belongs to a known merchant with a brand icon
+ * @param name The merchant name to check
+ * @returns Boolean indicating if this is a known merchant with a brand icon
+ */
+export const isBrandMerchant = (name: string): boolean => {
+  if (!name) return false;
+  
+  const normalized = name.toLowerCase().replace(/\s+/g, '').replace(/[^a-z0-9]/g, '');
+  
+  // Direct match
+  if (merchantIconMap[name]) return true;
+  
+  // Normalized match
+  if (merchantIconMap[normalized]) return true;
+  
+  // Mapped match
+  if (normalizedMerchantMap[normalized] && merchantIconMap[normalizedMerchantMap[normalized]]) {
+    return true;
+  }
+  
+  return false;
+};
+
+/**
+ * Get the appropriate icon component based on merchant and category
+ * Uses an intelligent algorithm to prioritize brand icons
+ */
+export const getTransactionIcon = (merchant: string, icon?: string, category?: string): React.ComponentType<any> => {
+  // First, try to get a brand icon for the merchant
+  if (merchant && isBrandMerchant(merchant)) {
+    const brandIcon = getIconByName(merchant);
+    if (brandIcon) return brandIcon;
+  }
+  
+  // If no brand icon found, try the icon field (category icon)
+  if (icon) {
+    const categoryIcon = getIconByName(icon);
+    if (categoryIcon) return categoryIcon;
+  }
+  
+  // If that fails, try the category field
+  if (category) {
+    const categoryIconFromField = getIconByName(category);
+    if (categoryIconFromField) return categoryIconFromField;
+  }
+  
+  // Last resort - credit card fallback
+  return FaCreditCard;
+};
+
+/**
  * Get the appropriate icon component based on name
  * Checks all icon maps in order of priority
  */
-export const getIconByName = (name: string): React.FC<any> => {
+export const getIconByName = (name: string): React.ComponentType<any> => {
   if (!name) return FaCreditCard;
   
   // Normalize name for matching

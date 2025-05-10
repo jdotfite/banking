@@ -102,7 +102,7 @@ if(!self.define){let e,s={};const i=(i,a)=>(i=new URL(i+".js",a).href,s[i]||new 
   {url:"/images/icons/logo-light.svg",revision:"026e4bfdd8f0df33c95f598ea387e79f"},
   {url:"/images/icons/logo-m1st-square.svg",revision:"35ce6c4cfea660264576a32c28f073ff"},
   {url:"/images/icons/logo-new.svg",revision:"5f903f609823046b6d760304be2797fc"},
-  {url:"/images/icons/logo-pwa.png",revision:"b6f0484f3d25a7a3a036d2ab910f0e28"},
+  {url:"/images/icons/logo-m1st-square.svg",revision:"b6f0484f3d25a7a3a036d2ab910f0e28"},
   {url:"/images/icons/logo.png",revision:"ca38f62edb39448a4261c4ca6e33de5e"},
   {url:"/images/icons/logo.svg",revision:"090c0de1361ed73e5b2efddfa0274c9d"},
   {url:"/images/icons/manifest-icon-192.maskable.png",revision:"898bb45b5693a7165ce8d49eab3280b1"},

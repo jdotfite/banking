@@ -1,7 +1,7 @@
 // components/ui/transactions/TransactionItem.tsx
 import React from 'react';
 import { animated, useSpring } from 'react-spring';
-import { getIconByName } from '@/lib/config/iconMappings';
+import { getTransactionIcon } from '@/lib/config/iconMappings';
 import { TransactionType } from '@/lib/types';
 
 export interface TransactionItemProps {
@@ -26,9 +26,12 @@ const TransactionItem: React.FC<TransactionItemProps> = ({
     config: { mass: 1, tension: 280, friction: 25 }
   });
 
-  // Use icon from the transaction if available, or fallback to merchant name
-  // This prioritizes category-specific icons when provided
-  const IconComponent = getIconByName(transaction.icon || transaction.merchant);
+  // Use smart icon selection - prioritizing brand icons first, then falling back to category icons
+  const IconComponent = getTransactionIcon(
+    transaction.merchant,   // Try to find a brand icon for this merchant first
+    transaction.icon,       // Fall back to category icon if specified
+    transaction.category    // Use category field as last resort before default
+  );
 
   return (
     <animated.div 

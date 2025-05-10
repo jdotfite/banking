@@ -4,24 +4,23 @@ import React, { useState, useEffect } from 'react';
 import { animated, useSpring } from 'react-spring';
 import { X, Download, Share } from 'lucide-react';
 
-interface PWAInstallPromptProps {
-  delay?: number; // Delay in milliseconds before showing prompt
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
 }
 
-const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ delay = 4000 }) => {
+const PWAInstallPrompt: React.FC = () => {
+  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showPrompt, setShowPrompt] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
-  const [showAnimation, setShowAnimation] = useState(false);
   
   useEffect(() => {
-    // Clear PWA prompt flags from localStorage to ensure prompt shows
+    // Clear any existing PWA prompt flags to ensure the prompt shows
     localStorage.removeItem('pwaPromptSeen');
     
-    // Check if it's an iOS device
     const iosCheck = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
     setIsIOS(iosCheck);
     
-    // Check if already installed as a standalone app
     const isStandalone = 
       window.matchMedia('(display-mode: standalone)').matches || 
       (window.navigator as any).standalone || 
@@ -32,79 +31,89 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ delay = 4000 }) => 
       return;
     }
     
-    // Check if we already have a stored prompt
-    const showPromptWithDelay = () => {
+    // Store the event for later use
+    let deferredPrompt: BeforeInstallPromptEvent | null = null;
+    
+    const handler = (e: Event) => {
+      // Prevent the default browser install prompt
+      e.preventDefault();
+      console.log('beforeinstallprompt event captured successfully');
+      
+      // Store the event for later use
+      deferredPrompt = e as BeforeInstallPromptEvent;
+      setInstallPrompt(deferredPrompt);
+      
+      // Always show the install prompt when the event is fired
+      console.log('Showing PWA install prompt');
       setShowPrompt(true);
-      setShowAnimation(true);
     };
 
-    if (window.deferredPrompt) {
-      console.log('Found stored beforeinstallprompt event');
-      setTimeout(showPromptWithDelay, delay);
-    }
+    // Debug initial state
+    console.log('Initial PWA check:');
+    console.log('User agent:', navigator.userAgent);
+    console.log('Is standalone:', isStandalone);
+    console.log('Is iOS:', iosCheck);
+
+    // Add event listeners
+    window.addEventListener('beforeinstallprompt', handler);
+    
+    window.addEventListener('appinstalled', () => {
+      console.log('PWA was installed successfully');
+      setShowPrompt(false);
+    });
     
     // For iOS devices, always show the install instructions
     if (iosCheck && !isStandalone) {
       console.log('iOS device detected, showing install instructions');
-      setTimeout(showPromptWithDelay, delay);
+      setShowPrompt(true);
     }
     
-    // Listen for new beforeinstallprompt events
-    const handler = () => {
-      console.log('PWAInstallPrompt: Detected beforeinstallprompt event capture');
-      if (window.deferredPrompt) {
-        setTimeout(() => {
-          setShowPrompt(true);
-          setShowAnimation(true);
-        }, delay);
-      }
-    };
-    
-    // Listen for appinstalled events
-    const installHandler = () => {
-      console.log('PWA was installed successfully');
-      setShowPrompt(false);
-    };
-    
-    // Add event listeners
-    window.addEventListener('beforeinstallprompt', handler);
-    window.addEventListener('appinstalled', installHandler);
-    
-    // Debug logging
+    // Debug logging for PWA eligibility
     console.log('PWA install prompt component initialized');
     console.log('Is standalone mode:', isStandalone);
     console.log('Is iOS device:', iosCheck);
     
+    if ('getInstalledRelatedApps' in navigator) {
+      console.log('getInstalledRelatedApps is available');
+      // @ts-ignore - TypeScript doesn't know about this API yet
+      navigator.getInstalledRelatedApps().then((apps: any[]) => {
+        console.log('Installed related apps:', apps);
+      }).catch((err: any) => {
+        console.error('Error checking installed apps:', err);
+      });
+    }
+
     return () => {
       window.removeEventListener('beforeinstallprompt', handler);
-      window.removeEventListener('appinstalled', installHandler);
     };
   }, []);
 
   const handleInstall = async () => {
-    console.log('Install button clicked, deferredPrompt available:', !!window.deferredPrompt);
+    console.log('Install button clicked, installPrompt available:', !!installPrompt);
     
-    if (window.deferredPrompt) {
+    if (installPrompt) {
       try {
         // Show the install prompt
         console.log('Calling prompt() method...');
-        await window.deferredPrompt.prompt();
+        await installPrompt.prompt();
         
         // Wait for the user to respond to the prompt
         console.log('Waiting for user choice...');
-        const choiceResult = await window.deferredPrompt.userChoice;
+        const choiceResult = await installPrompt.userChoice;
         
         console.log('User choice was:', choiceResult.outcome);
         
         if (choiceResult.outcome === 'accepted') {
           console.log('User accepted the install prompt');
+          setShowPrompt(false);
         } else {
           console.log('User dismissed the install prompt');
+          // Don't permanently dismiss, allow the prompt to show again later
+          setTimeout(() => setShowPrompt(true), 24 * 60 * 60 * 1000); // Show again after 24 hours
         }
         
         // Clear the saved prompt since it can't be used twice
-        window.deferredPrompt = null;
-        setShowPrompt(false);
+        setInstallPrompt(null);
       } catch (error) {
         console.error('Install error:', error);
       }
@@ -114,22 +123,23 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ delay = 4000 }) => 
       setShowPrompt(false);
     } else {
       console.log('No install prompt available');
+      // If no install prompt is available, just hide the banner temporarily
       setShowPrompt(false);
+      // Try again after a short delay
+      setTimeout(() => setShowPrompt(true), 60 * 1000); // Show again after 1 minute
     }
   };
 
   const handleDismiss = () => {
     setShowPrompt(false);
-    setShowAnimation(false);
+    // Don't permanently dismiss, allow the prompt to show again later
+    setTimeout(() => setShowPrompt(true), 3 * 24 * 60 * 60 * 1000); // Show again after 3 days
   };
 
   const animation = useSpring({
     from: { y: -100, opacity: 0 },
-    to: { 
-      y: showAnimation ? 0 : -100,
-      opacity: showAnimation ? 1 : 0 
-    },
-    config: { tension: 120, friction: 21 }
+    to: { y: 0, opacity: 1 },
+    config: { tension: 300, friction: 20 }
   });
 
   if (!showPrompt) return null;
@@ -137,7 +147,7 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ delay = 4000 }) => 
   return (
     <animated.div 
       style={animation}
-      className="fixed top-0 left-0 right-0 bg-neutral-800 text-neutral-200 p-3 z-[150] shadow-[0_4px_6px_rgba(0,0,0,0.12)]"
+      className="fixed top-0 left-0 right-0 bg-white text-neutral-800 p-3 shadow-md z-[150] border-b border-neutral-200"
     >
       <div className="max-w-6xl mx-auto flex items-center justify-between">
         <div className="flex items-center">
@@ -147,31 +157,31 @@ const PWAInstallPrompt: React.FC<PWAInstallPromptProps> = ({ delay = 4000 }) => 
             className="w-8 h-8 mr-3"
           />
           <div>
-            <p className="text-xs leading-none">
+            <p className="text-sm leading-none opacity-90">
               {isIOS ? 'Add to home screen for full app experience' : 'Install for better experience'}
             </p>
           </div>
         </div>
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2">
           {!isIOS && (
             <button
               onClick={handleInstall}
-              className="bg-primary hover:bg-primary-darkborder border-neutral-300 text-neutral-300 px-3 py-1 text-xs font-medium uppercase tracking-wider border border-primary-dark transition-colors"
+              className="bg-neutral-800 text-white px-3 py-1 rounded text-sm font-medium hover:bg-neutral-700 transition-colors"
             >
-              INSTALL
+              Install
             </button>
           )}
           {isIOS && (
             <button
               onClick={handleInstall}
-              className="bg-primary hover:bg-primary-dark border border-neutral-300 text-neutral-300 px-3 py-1 text-xs font-medium uppercase tracking-wider border border-primary-dark transition-colors"
+              className="bg-neutral-800 text-white px-3 py-1 rounded text-sm font-medium hover:bg-blue-700 transition-colors flex items-center"
             >
-              INSTALL
+              <Share size={12} className="mr-1" /> Install
             </button>
           )}
           <button
             onClick={handleDismiss}
-            className="text-neutral-200 hover:text-neutral-300 transition-colors"
+            className="text-neutral-800 hover:text-neutral-600"
             aria-label="Close"
           >
             <X size={20} />

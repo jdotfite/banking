@@ -92,15 +92,15 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
                     <img 
                       src="/images/logos/m1st-square.svg" 
                       alt="Logo" 
-                      className="h-12 w-12 md:h-10 md:w-10 object-contain"
+                      className="h-14 w-14 md:h-10 md:w-10 object-contain"
                     />
                   </div>
                   
                 </div>
-                <h2 className="text-2xl md:text-3xl font-extralight text-white mb-2 tracking-tight">
+                <h2 className="text-3xl md:text-3xl font-extralight text-white mb-2 tracking-tight">
                   Welcome <span className="font-normal">back</span>
                 </h2>
-                <p className="text-neutral-400 text-sm font-light mb-6">Sign in to continue to your account</p>
+                <p className="text-neutral-400 font-light mb-6">Sign in to continue to your account</p>
               </div>
             </div>
               {/* Login form with enhanced animations */}

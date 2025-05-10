@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Manifest Test Page</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="manifest" href="/manifest.json">
+  <script>
+    // Function to check if manifest is detected
+    function checkManifest() {
+      const statusElement = document.getElementById('manifest-status');
+      
+      if ('serviceWorker' in navigator) {
+        statusElement.innerHTML += '<p>? Service Worker API is supported</p>';
+      } else {
+        statusElement.innerHTML += '<p>? Service Worker API is NOT supported</p>';
+      }
+      
+      fetch('/manifest.json')
+        .then(response => {
+          statusElement.innerHTML += `<p>Manifest fetch status: ${response.status} ${response.statusText}</p>`;
+          statusElement.innerHTML += `<p>Content-Type: ${response.headers.get('content-type')}</p>`;
+          
+          return response.json();
+        })
+        .then(data => {
+          statusElement.innerHTML += '<p>? Manifest parsed successfully</p>';
+          statusElement.innerHTML += `<p>Manifest content: <pre>${JSON.stringify(data, null, 2)}</pre></p>`;
+        })
+        .catch(error => {
+          statusElement.innerHTML += `<p>? Error fetching manifest: ${error}</p>`;
+        });
+      
+      // Check if browser thinks the page is installable
+      window.addEventListener('beforeinstallprompt', (e) => {
+        e.preventDefault();
+        statusElement.innerHTML += '<p>? Page is installable! Install prompt detected.</p>';
+      });
+      
+      // Check after 3 seconds if no install prompt was fired
+      setTimeout(() => {
+        const installCheck = document.getElementById('install-check');
+        installCheck.textContent = 'No install prompt detected yet. This may mean the PWA criteria are not met.';
+      }, 3000);
+    }
+  </script>
+</head>
+<body onload="checkManifest()">
+  <h1>Manifest Test Page</h1>
+  <div id="manifest-status">
+    <h2>Manifest Status:</h2>
+  </div>
+  <div id="install-check"></div>
+  <hr>
+  <h2>PWA Requirements Checklist:</h2>
+  <ul>
+    <li>Page served over HTTPS (or localhost)</li>
+    <li>Valid manifest.json with required fields</li>
+    <li>Registered service worker</li>
+    <li>192x192 and 512x512 icons in manifest</li>
+  </ul>
+</body>
+</html>

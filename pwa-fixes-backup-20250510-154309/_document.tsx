@@ -13,7 +13,6 @@ export default function Document() {
         <meta name="msapplication-TileColor" content="#121212" />
         <meta name="msapplication-tap-highlight" content="no" />
         <meta name="theme-color" content="#121212" />
-        <link rel="manifest" href="/manifest.json" />
         
         {/* iOS splash screens */}
         <link rel="apple-touch-startup-image" href="/images/icons/apple-splash-2048-2732.jpg" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
@@ -37,4 +36,3 @@ export default function Document() {
     </Html>
   );
 }
-

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>PWA Test Page</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#121212">
+  <link rel="manifest" href="/manifest.json">
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    button { padding: 10px; background: #333; color: white; border: none; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>PWA Test Page</h1>
+  <p>If your PWA is correctly configured, Chrome should detect this page as installable.</p>
+  <p>Status: <span id="pwa-status">Checking...</span></p>
+  <button id="install-button" style="display: none;">Install Now</button>
+
+  <script>
+    // Check if PWA is installable
+    let deferredPrompt;
+    const installButton = document.getElementById('install-button');
+    const pwaStatus = document.getElementById('pwa-status');
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      pwaStatus.textContent = "? PWA is installable!";
+      installButton.style.display = 'block';
+      console.log('beforeinstallprompt event fired');
+    });
+
+    installButton.addEventListener('click', async () => {
+      if (!deferredPrompt) {
+        return;
+      }
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log(`User response: ${outcome}`);
+      deferredPrompt = null;
+      installButton.style.display = 'none';
+    });
+
+    window.addEventListener('appinstalled', () => {
+      pwaStatus.textContent = "? App installed successfully!";
+      console.log('PWA installed');
+    });
+
+    // If no beforeinstallprompt after 3 seconds, update status
+    setTimeout(() => {
+      if (pwaStatus.textContent === "Checking...") {
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+          pwaStatus.textContent = "? Already installed as PWA!";
+        } else {
+          pwaStatus.textContent = "? Not installable. Check manifest and service worker.";
+        }
+      }
+    }, 3000);
+  </script>
+</body>
+</html>

@@ -1,0 +1,864 @@
+PWA Debug Info - Generated 05/10/2025 15:41:53
+
+
+
+=======================================
+
+FILE: C:\_websites\banking\manifest.json
+
+=======================================
+
+{
+  "id": "/",
+  "name": "Members 1st Banking",
+  "short_name": "Banking",
+  "description": "Your personal banking app",
+  "theme_color": "#7b2528",
+  "background_color": "#ffffff",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/",
+  "categories": ["finance"],
+  "screenshots": [
+    {
+      "src": "/images/marketing/screenshot1.png",
+      "sizes": "1080x1920",
+      "type": "image/png"
+    }
+  ],
+  "icons": [
+    {
+      "src": "/images/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/images/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "View Transactions",
+      "short_name": "Transactions",
+      "description": "View your recent transactions",
+      "url": "/wallet"
+    }
+  ]
+}
+
+
+=======================================
+
+FILE: C:\_websites\banking\public\manifest.json
+
+=======================================
+
+{
+  "id": "/",
+  "name": "Members 1st Banking",
+  "short_name": "Banking",
+  "description": "Your personal banking app",
+  "theme_color": "#121212",
+  "background_color": "#121212",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/",
+  "categories": ["finance"],
+  "screenshots": [
+    {
+      "src": "/images/marketing/screenshot1.png",
+      "sizes": "1080x1920",
+      "type": "image/png",
+      "form_factor": "narrow"
+    },
+    {
+      "src": "/images/marketing/screenshot-wide.png",
+      "sizes": "1920x1080",
+      "type": "image/png",
+      "form_factor": "wide"
+    }
+  ],
+  "icons": [
+    {
+      "src": "/images/icons/manifest-icon-192.maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/images/icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/images/icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "View Transactions",
+      "short_name": "Transactions",
+      "description": "View your recent transactions",
+      "url": "/wallet",
+      "icons": [
+        {
+          "src": "/images/icons/icon-96x96.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ]
+}
+
+
+=======================================
+
+FILE: C:\_websites\banking\app\layout.tsx
+
+=======================================
+
+// app/layout.tsx
+'use client';
+import { useRouter } from 'next/navigation';
+import { Outfit } from 'next/font/google';
+import './globals.css';
+import React from 'react';
+import RegisterServiceWorker from '@/components/RegisterServiceWorker';
+import ClientProviders from '@/components/ClientProviders';
+import PWAInstallPrompt from '@/components/ui/common/PWAInstallPrompt';
+import SimplePreloader from '@/components/preloaders/SimplePreloader';
+
+// Font setup
+const outfit = Outfit({ 
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-outfit',
+});
+
+// Viewport
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  themeColor: '#121212',
+};
+
+interface RootLayoutProps {
+  children: React.ReactNode;
+}
+
+export default function RootLayout({ children }: RootLayoutProps) {
+  const router = useRouter();
+  return (
+    <html lang="en" className={`${outfit.variable} dark`}>
+      <body className="font-sans bg-[#1d1d1d] text-white overflow-x-hidden">
+        <RegisterServiceWorker />
+        
+        <ClientProviders>
+          {/* ONLY main element in the entire app */}
+          <main className="min-h-screen">
+            <SimplePreloader>
+              {children}
+            </SimplePreloader>
+          </main>
+          <PWAInstallPrompt />
+        </ClientProviders>
+      </body>
+    </html>
+  );
+}
+
+
+=======================================
+
+FILE: C:\_websites\banking\pages\_document.tsx
+
+=======================================
+
+import { Html, Head, Main, NextScript } from 'next/document';
+
+export default function Document() {
+  return (
+    <Html lang="en">
+      <Head>
+        {/* PWA meta tags */}
+        <meta name="application-name" content="Banking App" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="Banking App" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="msapplication-TileColor" content="#121212" />
+        <meta name="msapplication-tap-highlight" content="no" />
+        <meta name="theme-color" content="#121212" />
+        
+        {/* iOS splash screens */}
+        <link rel="apple-touch-startup-image" href="/images/icons/apple-splash-2048-2732.jpg" media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+        <link rel="apple-touch-startup-image" href="/images/icons/apple-splash-1668-2388.jpg" media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+        <link rel="apple-touch-startup-image" href="/images/icons/apple-splash-1536-2048.jpg" media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+        <link rel="apple-touch-startup-image" href="/images/icons/apple-splash-1668-2224.jpg" media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+        <link rel="apple-touch-startup-image" href="/images/icons/apple-splash-1620-2160.jpg" media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+        <link rel="apple-touch-startup-image" href="/images/icons/apple-splash-1284-2778.jpg" media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+        <link rel="apple-touch-startup-image" href="/images/icons/apple-splash-1170-2532.jpg" media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+        <link rel="apple-touch-startup-image" href="/images/icons/apple-splash-1125-2436.jpg" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+        <link rel="apple-touch-startup-image" href="/images/icons/apple-splash-1242-2688.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+        <link rel="apple-touch-startup-image" href="/images/icons/apple-splash-828-1792.jpg" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+        <link rel="apple-touch-startup-image" href="/images/icons/apple-splash-1242-2208.jpg" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)" />
+        <link rel="apple-touch-startup-image" href="/images/icons/apple-splash-750-1334.jpg" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+        <link rel="apple-touch-startup-image" href="/images/icons/apple-splash-640-1136.jpg" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)" />
+      </Head>
+      <body>
+        <Main />
+        <NextScript />
+      </body>
+    </Html>
+  );
+}
+
+
+=======================================
+
+FILE: C:\_websites\banking\public\sw.js
+
+=======================================
+
+if(!self.define){let e,s={};const a=(a,i)=>(a=new URL(a+".js",i).href,s[a]||new Promise((s=>{if("document"in self){const e=document.createElement("script");e.src=a,e.onload=s,document.head.appendChild(e)}else e=a,importScripts(a),s()})).then((()=>{let e=s[a];if(!e)throw new Error(`Module ${a} didn’t register its module`);return e})));self.define=(i,n)=>{const c=e||("document"in self?document.currentScript.src:"")||location.href;if(s[c])return;let r={};const o=e=>a(e,c),f={module:{uri:c},exports:r,require:o};s[c]=Promise.all(i.map((e=>f[e]||o(e)))).then((e=>(n(...e),r)))}}define(["./workbox-4754cb34"],(function(e){"use strict";importScripts(),self.skipWaiting(),e.clientsClaim(),e.precacheAndRoute([{url:"/_next/static/EWwyJC-zrkUsFRZZ0b8-w/_buildManifest.js",revision:"b750c8e176948c7022d227c6b1756a6f"},{url:"/_next/static/EWwyJC-zrkUsFRZZ0b8-w/_ssgManifest.js",revision:"b6652df95db52feb4daf4eca35380933"},{url:"/_next/static/chunks/117-15bf231c7100bfae.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/146-e6e67abec57d553a.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/30a37ab2-0d78df3bb348bfc8.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/360-a18f199c1a461eac.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/390-516d758f25182403.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/465-f9c453e6033aaffe.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/466-6d6f5b938a419995.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/523-a45d054666038f26.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/600-5e5ccc8d9dffca68.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/669-4daab4102f9cc4f7.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/8e1d74a4-4fff821a89e71bf2.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/app/_not-found/page-df27608b00dfa464.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/app/account-setup/page-cde2760483d2cbce.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/app/admin/page-aeaa8ace527de6b6.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/app/credit-card/page-e67bc9ed6fc5c6fd.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/app/deposit/page-a9e20b960819ba74.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/app/forgot-password/page-20985dcb6bb33c72.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/app/home/page-338548306daac5ca.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/app/insights/page-edaf1b2ad991da07.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/app/layout-d67df60f8b4976e3.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/app/login/page-eb519410ef40127e.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/app/more/page-7c5bdb82b51dd7b2.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/app/new/page-9bae8c63c0885d56.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/app/onboarding/page-8a0ddc0f4f04ffcf.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/app/page-ab28d6e62a482ac5.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/app/signup/page-978c2ca6cbd74643.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/app/transfer/page-149d2cebdbf3908c.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/app/wallet/page-160b64a95a016456.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/fd9d1056-646c7d7c17f0eb96.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/framework-dc67dc4628e9f967.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/main-app-74294ec931a1fb40.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/main-e967637b2aab506c.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/pages/404-0eed50ef99eacbbf.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/pages/500-3cf7a67e0278fa00.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/pages/_app-ef58f42e646a2e7e.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/pages/_error-28b803cb2479b966.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/polyfills-42372ed130431b0a.js",revision:"846118c33b2c0e922d7b3a7676f81f6f"},{url:"/_next/static/chunks/styles-870f4984094909db.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/chunks/webpack-46dbfb4a60dff38b.js",revision:"EWwyJC-zrkUsFRZZ0b8-w"},{url:"/_next/static/css/c04bdb262f63c15d.css",revision:"c04bdb262f63c15d"},{url:"/_next/static/media/07a54048a9278940-s.p.woff2",revision:"5e6c7802c5c4cc0423f86c3aad29f60a"},{url:"/_next/static/media/4f2204fa15b9b11a-s.woff2",revision:"6f4cf2d9f078b52024414970b7b7f704"},{url:"/browserconfig.xml",revision:"6c3068f1a56e8dfa0d1fbadb2cbb59eb"},{url:"/cleanup-service-worker.html",revision:"f70cacbd01a02476964e6ad6b00c0d00"},{url:"/favicon.ico",revision:"993de98bf49438af0730be944db8bf82"},{url:"/fix-all-sw.html",revision:"d4de1363928f3cca5764755ea64a0f08"},{url:"/fix-service-worker.html",revision:"adcda78aeedc9f85a00252cf112c08d2"},{url:"/fix-service-worker.js",revision:"098110a9cfb54ad3576d4b70d5054c72"},{url:"/icons/icon-transparent.png",revision:"d41d8cd98f00b204e9800998ecf8427e"},{url:"/icons/icon-transparent.svg",revision:"e3497c7d569aca47c76737cc398725b6"},{url:"/images/avatar/default.png",revision:"ef7767e5db9035992fa290787f8795eb"},{url:"/images/avatar/jess-coleman.png",revision:"8617fc863dcac2c37c1b4f56b821a27d"},{url:"/images/avatar/placeholder.svg",revision:"279490b9647e5685b025fe37d830b347"},{url:"/images/avatar/robert-thompson.png",revision:"0960b261e7309c29d9e76cfec6c8a73f"},{url:"/images/card/card-signature-rewards.png",revision:"a5e995c90da2dcdba91019dd18baf65e"},{url:"/images/cards/visa-logo.svg",revision:"07f11f198ee31d93223a641d04935cee"},{url:"/images/cards/visa-platinum-bg.png",revision:"407aaffec5008c1ca034209079bf6719"},{url:"/images/cards/visa-signature-bg.png",revision:"407aaffec5008c1ca034209079bf6719"},{url:"/images/cards/visa-signature-bg.svg",revision:"407aaffec5008c1ca034209079bf6719"},{url:"/images/icons/apple-icon-180.png",revision:"bf32d21dde1b4c952c4fea41a005e0f8"},{url:"/images/icons/apple-splash-1125-2436.png",revision:"c09f12a4fdf4b47146e2948dcb03ae0f"},{url:"/images/icons/apple-splash-1170-2532.png",revision:"931a587cdf83e28333d05e8f4f15c994"},{url:"/images/icons/apple-splash-1179-2556.png",revision:"dd6ffb51f2c77580634b38cbf5492503"},{url:"/images/icons/apple-splash-1206-2622.png",revision:"29b59e32d475d2451935d720845dfcec"},{url:"/images/icons/apple-splash-1242-2208.png",revision:"434554a23e50e3adf29d2ba60822a84d"},{url:"/images/icons/apple-splash-1242-2688.png",revision:"eea06b3dea496d383dcf2080654a8094"},{url:"/images/icons/apple-splash-1284-2778.png",revision:"71b8dd8d35ba3d82b7a0a7a6d2b8944c"},{url:"/images/icons/apple-splash-1290-2796.png",revision:"602dc32fbc51ccf377dad7a387463a9d"},{url:"/images/icons/apple-splash-1320-2868.png",revision:"066f987a1e105a880aa10822072d68b6"},{url:"/images/icons/apple-splash-1334-750.png",revision:"8590b72440febe7e6b6be9619675b87c"},{url:"/images/icons/apple-splash-1488-2266.png",revision:"aae7eec8ae0fef42511d5ca0c01046c8"},{url:"/images/icons/apple-splash-1536-2048.png",revision:"b2b20885fe66c70836ef45b8e2c833a8"},{url:"/images/icons/apple-splash-1620-2160.png",revision:"8620b7fc29d5545efdbdee13006a10c4"},{url:"/images/icons/apple-splash-1640-2360.png",revision:"8e7c7a7772649f3e0fa84fedb3e22139"},{url:"/images/icons/apple-splash-1668-2224.png",revision:"93cb3e83c3a21f723fedeccfd84a92c1"},{url:"/images/icons/apple-splash-1668-2388.png",revision:"622ce9c8baec35528fd7120f328dd6cf"},{url:"/images/icons/apple-splash-1792-828.png",revision:"46535e998d382147b69f90cc084c5566"},{url:"/images/icons/apple-splash-2048-1536.png",revision:"99f353bcedaa4a6523db33b074cb8a94"},{url:"/images/icons/apple-splash-2048-2732.png",revision:"c7eb378fd0520190400ab80e2d9b4219"},{url:"/images/icons/apple-splash-2160-1620.png",revision:"7030ef468770f0e5bcd6c30ee236ab68"},{url:"/images/icons/apple-splash-2208-1242.png",revision:"5540a982736e89dd375025a98f549d08"},{url:"/images/icons/apple-splash-2224-1668.png",revision:"397f54ec1fdde0a02558b7a5730d3f75"},{url:"/images/icons/apple-splash-2266-1488.png",revision:"6356eb99b6313d7432c302c09d8311a1"},{url:"/images/icons/apple-splash-2360-1640.png",revision:"9f0dd8f1805488c59cadb728ff8d7b10"},{url:"/images/icons/apple-splash-2388-1668.png",revision:"86de535b7b26b6555cc7f8d07dedcf0f"},{url:"/images/icons/apple-splash-2436-1125.png",revision:"858f74c17015e73643e2c71399d47fc8"},{url:"/images/icons/apple-splash-2532-1170.png",revision:"88c775c6e4659e9dfe96030c8bd2582e"},{url:"/images/icons/apple-splash-2556-1179.png",revision:"58ea44ac82b62c77f598b432f0f5b979"},{url:"/images/icons/apple-splash-2622-1206.png",revision:"f615740234ed9941b43b0e52a2550861"},{url:"/images/icons/apple-splash-2688-1242.png",revision:"a8decab409673053bc2a8925e0d38782"},{url:"/images/icons/apple-splash-2732-2048.png",revision:"e48dd5544a9e83543ac9190f27fe6434"},{url:"/images/icons/apple-splash-2778-1284.png",revision:"3b8edfe4827c6821492c94abeee0e3fe"},{url:"/images/icons/apple-splash-2796-1290.png",revision:"a412d3717aed16ee52d4188628f06d72"},{url:"/images/icons/apple-splash-2868-1320.png",revision:"c99295d6f3dbb5d277df06f6b6ce1409"},{url:"/images/icons/apple-splash-640-1136.png",revision:"3f5b52b605c12f6254c0fb66fd35d0e4"},{url:"/images/icons/apple-splash-750-1334.png",revision:"ce1a186b4dc90c5710c38f45238113a5"},{url:"/images/icons/apple-splash-828-1792.png",revision:"dec9d464801d01cfa8ca9ab164851119"},{url:"/images/icons/icon-192x192.png",revision:"4886bc9103cf9091eb244b8307982b27"},{url:"/images/icons/icon-512x512.png",revision:"4a5473ecae0988fb750f7694c819030d"},{url:"/images/icons/icon-96x96.png",revision:"7c10126a98a6ef090902d49a8a2f3f7d"},{url:"/images/icons/icon-transparent.png",revision:"961e7bcac7d10fdb325c804e0f8ebcee"},{url:"/images/icons/icon.png",revision:"a17d88eb7799a70a0b8b71af35203db8"},{url:"/images/icons/logo-light.svg",revision:"026e4bfdd8f0df33c95f598ea387e79f"},{url:"/images/icons/logo-m1st-square.svg",revision:"35ce6c4cfea660264576a32c28f073ff"},{url:"/images/icons/logo-new.svg",revision:"5f903f609823046b6d760304be2797fc"},{url:"/images/icons/logo-pwa.png",revision:"b6f0484f3d25a7a3a036d2ab910f0e28"},{url:"/images/icons/logo.png",revision:"ca38f62edb39448a4261c4ca6e33de5e"},{url:"/images/icons/logo.svg",revision:"090c0de1361ed73e5b2efddfa0274c9d"},{url:"/images/icons/manifest-icon-192.maskable.png",revision:"898bb45b5693a7165ce8d49eab3280b1"},{url:"/images/icons/merchants/coffee.svg",revision:"76b4729078398f19a0c83828e43f3a0a"},{url:"/images/icons/merchants/entertainment.svg",revision:"76b4729078398f19a0c83828e43f3a0a"},{url:"/images/icons/merchants/food.svg",revision:"76b4729078398f19a0c83828e43f3a0a"},{url:"/images/icons/merchants/health.svg",revision:"76b4729078398f19a0c83828e43f3a0a"},{url:"/images/icons/merchants/home.svg",revision:"76b4729078398f19a0c83828e43f3a0a"},{url:"/images/icons/merchants/payroll.svg",revision:"76b4729078398f19a0c83828e43f3a0a"},{url:"/images/icons/merchants/placeholder.svg",revision:"76b4729078398f19a0c83828e43f3a0a"},{url:"/images/icons/merchants/shopping.svg",revision:"76b4729078398f19a0c83828e43f3a0a"},{url:"/images/icons/merchants/transport.svg",revision:"76b4729078398f19a0c83828e43f3a0a"},{url:"/images/icons/merchants/utilities.svg",revision:"76b4729078398f19a0c83828e43f3a0a"},{url:"/images/logos/logo-square-1920x1920.png",revision:"0d008fbe75b7868435de0f6b5ab9287a"},{url:"/images/logos/m1st-square-bw.svg",revision:"abfb313f9d699d5ffb372ebd27a182c3"},{url:"/images/logos/m1st-square.svg",revision:"2e3f0a2bb53a8ce779e7c52e1ffc86ee"},{url:"/images/marketing/ChatGPT Image May 2, 2025, 10_01_19 PM.png",revision:"eca9d82fc1110e997a9eb3a7e8e77e45"},{url:"/images/marketing/banner.jpg",revision:"d41d8cd98f00b204e9800998ecf8427e"},{url:"/images/marketing/go-paperless.png",revision:"2ef297b3f43f01def04a267420e527d9"},{url:"/images/marketing/refer-friend.png",revision:"86b05bb63a75abf4b8223e4fb8f84202"},{url:"/images/marketing/screenshot-wide.png",revision:"d892d112030b0d463fc33b053f7bd991"},{url:"/images/marketing/screenshot1.png",revision:"d66063376c1c0260ba62ac8239949248"},{url:"/images/merchants/default.svg",revision:"9c12027b35013c82c6e33af9e4632e71"},{url:"/images/onboarding/balloons.png",revision:"5837f21da87f724ae8aee5ddf6c4c56e"},{url:"/images/onboarding/banking-screen.svg",revision:"224738cb1817c3fd7493b3eef1e4488e"},{url:"/images/onboarding/credit-score.png",revision:"a0c50b4e497cf4f34b698d6d1505bbf9"},{url:"/images/onboarding/garth-m1st.png",revision:"27223338936822bf1fb267c72e661f1a"},{url:"/images/onboarding/guy-bye.png",revision:"f01698ca7f604777d0e37ad2b764f250"},{url:"/images/onboarding/mike-m1st.png",revision:"a470e5670b7889858f56810dc3076675"},{url:"/images/onboarding/shanice-m1st.png",revision:"d68299acea157a180878283ccc4161a6"},{url:"/images/onboarding/shield-security.png",revision:"77a367fc1c68e3115b04f7fefc5cd09b"},{url:"/images/onboarding/woman-m1st.png",revision:"59f1e0ca54b8d277b4d0f49d3a98bad8"},{url:"/images/refer/refer-friend.png",revision:"1ed34fa2d4bf9b7423bddf4b8d0f35d6"},{url:"/images/refer/refer-friend.svg",revision:"1ed34fa2d4bf9b7423bddf4b8d0f35d6"},{url:"/images/signup/steps.png",revision:"d725def1c6f87fe0153a91e4d431b517"},{url:"/images/ui/header-bg.png",revision:"d41d8cd98f00b204e9800998ecf8427e"},{url:"/images/ui/header-bg.svg",revision:"2278cddcc93c7dcfaa673eb4e7357e0f"},{url:"/images/ui/loading-spinner.svg",revision:"342a10ef02339afc68d3e6c771228e08"},{url:"/manifest.json",revision:"2b986dd5b1570be6d3bc42df3f0c201d"},{url:"/reset-user-state.html",revision:"962d17b36301325113ae2e36400f5039"},{url:"/sw-fixed.js",revision:"b6c0958bb3a279e513e8f4b15dd26aab"},{url:"/sw-register.js",revision:"6f45f63af17bdb3eb1c219e9240672fb"},{url:"/test-nav.html",revision:"a84bde7d610331415346360056f80ee1"},{url:"/unregister-all-sw.html",revision:"6b097c886e105b6a3232a6ce25b302c3"},{url:"/unregister-all-sw.js",revision:"2123f185aed632c99bcf89cc89efb5a0"},{url:"/unregister-sw.js",revision:"ee7aa43399293146f6987b4fcfd2c789"}],{ignoreURLParametersMatching:[]}),e.cleanupOutdatedCaches(),e.registerRoute("/",new e.NetworkFirst({cacheName:"start-url",plugins:[{cacheWillUpdate:async({request:e,response:s,event:a,state:i})=>s&&"opaqueredirect"===s.type?new Response(s.body,{status:200,statusText:"OK",headers:s.headers}):s}]}),"GET"),e.registerRoute(/^https:\/\/fonts\.(?:googleapis|gstatic)\.com\/.*/i,new e.CacheFirst({cacheName:"google-fonts",plugins:[new e.ExpirationPlugin({maxEntries:4,maxAgeSeconds:31536e3})]}),"GET"),e.registerRoute(/\.(?:eot|otf|ttc|ttf|woff|woff2|font.css)$/i,new e.StaleWhileRevalidate({cacheName:"static-font-assets",plugins:[new e.ExpirationPlugin({maxEntries:4,maxAgeSeconds:604800})]}),"GET"),e.registerRoute(/\.(?:jpg|jpeg|gif|png|svg|ico|webp)$/i,new e.StaleWhileRevalidate({cacheName:"static-image-assets",plugins:[new e.ExpirationPlugin({maxEntries:64,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\/_next\/image\?url=.+$/i,new e.StaleWhileRevalidate({cacheName:"next-image",plugins:[new e.ExpirationPlugin({maxEntries:64,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\.(?:mp3|wav|ogg)$/i,new e.CacheFirst({cacheName:"static-audio-assets",plugins:[new e.RangeRequestsPlugin,new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\.(?:mp4)$/i,new e.CacheFirst({cacheName:"static-video-assets",plugins:[new e.RangeRequestsPlugin,new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\.(?:js)$/i,new e.StaleWhileRevalidate({cacheName:"static-js-assets",plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\.(?:css|less)$/i,new e.StaleWhileRevalidate({cacheName:"static-style-assets",plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\/_next\/data\/.+\/.+\.json$/i,new e.StaleWhileRevalidate({cacheName:"next-data",plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/\/api\/.*$/i,new e.NetworkFirst({cacheName:"apis",networkTimeoutSeconds:10,plugins:[new e.ExpirationPlugin({maxEntries:16,maxAgeSeconds:86400})]}),"GET"),e.registerRoute(/.*/i,new e.NetworkFirst({cacheName:"others",networkTimeoutSeconds:10,plugins:[new e.ExpirationPlugin({maxEntries:32,maxAgeSeconds:86400})]}),"GET")}));
+
+
+=======================================
+
+FILE: C:\_websites\banking\public\sw-register.js
+
+=======================================
+
+// This script registers the service worker for PWA functionality
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', async function() {
+    try {
+      // Register the fixed service worker
+      const registration = await navigator.serviceWorker.register('/sw-fixed.js', {
+        scope: '/'
+      });
+      console.log('✅ Service Worker registered successfully:', registration.scope);
+      
+      // Check if the service worker is controlling the page
+      if (!navigator.serviceWorker.controller) {
+        console.log('Loading fresh service worker controller...');
+      }
+      
+      // Handle service worker updates
+      registration.addEventListener('updatefound', () => {
+        const newWorker = registration.installing;
+        console.log('Service Worker update found!');
+        
+        newWorker.addEventListener('statechange', () => {
+          console.log('Service Worker state changed:', newWorker.state);
+        });
+      });
+      
+      // Check for updates every hour
+      setInterval(() => {
+        registration.update();
+        console.log('Checking for Service Worker updates...');
+      }, 60 * 60 * 1000);
+      
+    } catch (err) {
+      console.error('❌ Service Worker registration failed:', err);
+    }
+  });
+  
+  // Listen for controlling service worker changes
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    console.log('Service Worker controller changed!');
+  });
+  
+  // Log when beforeinstallprompt is fired or prevented
+  window.addEventListener('beforeinstallprompt', (e) => {
+    console.log('beforeinstallprompt event fired');
+  });
+  
+  // Log when the app is installed
+  window.addEventListener('appinstalled', (e) => {
+    console.log('App was installed', e);
+  });
+}
+
+
+=======================================
+
+FILE: C:\_websites\banking\components\RegisterServiceWorker.tsx
+
+=======================================
+
+'use client';
+
+import { useEffect } from 'react';
+
+export default function RegisterServiceWorker() {
+  useEffect(() => {
+    if (typeof window !== 'undefined' && 'serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
+      const registerServiceWorker = async () => {
+        try {
+          // Additional check for secure context (required for service workers)
+          if (window.isSecureContext) {
+            const registration = await navigator.serviceWorker.register('/sw.js', {
+              scope: '/',
+              type: 'classic'
+            });
+            
+            console.log('ServiceWorker registration successful with scope:', registration.scope);
+            
+            // Check for updates periodically
+            registration.onupdatefound = () => {
+              const installingWorker = registration.installing;
+              if (installingWorker) {
+                installingWorker.onstatechange = () => {
+                  if (installingWorker.state === 'installed') {
+                    console.log('New service worker installed');
+                  }
+                };
+              }
+            };
+          } else {
+            console.warn('Service workers require secure context (HTTPS)');
+          }
+        } catch (error) {
+          console.error('ServiceWorker registration failed:', error);
+          // Fallback: Try registering with more basic configuration
+          try {
+            await navigator.serviceWorker.register('/sw.js');
+            console.log('Fallback service worker registration succeeded');
+          } catch (fallbackError) {
+            console.error('Fallback service worker registration failed:', fallbackError);
+          }
+        }
+      };
+
+      // Delay registration slightly to avoid conflicts with other startup processes
+      setTimeout(registerServiceWorker, 1000);
+    }
+    
+    // Set up beforeinstallprompt event listener at the window level
+    const handleBeforeInstallPrompt = (e: Event) => {
+      console.log('beforeinstallprompt event captured in RegisterServiceWorker');
+      // Don't prevent default here - let the PWAInstallPrompt component handle it
+    };
+    
+    // Set up appinstalled event listener
+    const handleAppInstalled = (e: Event) => {
+      console.log('App was installed successfully', e);
+    };
+    
+    // Add event listeners
+    window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+    window.addEventListener('appinstalled', handleAppInstalled);
+    
+    // Clean up event listeners on unmount
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener('appinstalled', handleAppInstalled);
+    };
+  }, []);
+
+  return null;
+}
+
+
+=======================================
+
+FILE: C:\_websites\banking\next.config.js
+
+=======================================
+
+// next.config.js
+const withPWA = require('next-pwa')({
+  dest: 'public',            // where sw.js and other assets go
+  register: false,           // disable automatic registration - we'll handle it manually
+  skipWaiting: true,         // activate new service worker immediately
+  disable: process.env.NODE_ENV !== 'production', // only enable PWA in production
+  buildExcludes: [/app-build-manifest.json$/], // Fix for precaching error
+  // Include specific routes in the service worker
+  scope: '/',
+  sw: 'sw.js',  // Remove leading slash to fix path issues
+  // Ensure caching is set up correctly
+  runtimeCaching: [
+    {
+      urlPattern: /^https:\/\/fonts\.(?:googleapis|gstatic)\.com\/.*/i,
+      handler: 'CacheFirst',
+      options: {
+        cacheName: 'google-fonts',
+        expiration: {
+          maxEntries: 4,
+          maxAgeSeconds: 365 * 24 * 60 * 60, // 1 year
+        },
+      },
+    },
+    {
+      urlPattern: /\.(?:eot|otf|ttc|ttf|woff|woff2|font.css)$/i,
+      handler: 'StaleWhileRevalidate',
+      options: {
+        cacheName: 'static-font-assets',
+        expiration: {
+          maxEntries: 4,
+          maxAgeSeconds: 7 * 24 * 60 * 60, // 7 days
+        },
+      },
+    },
+    {
+      urlPattern: /\.(?:jpg|jpeg|gif|png|svg|ico|webp)$/i,
+      handler: 'StaleWhileRevalidate',
+      options: {
+        cacheName: 'static-image-assets',
+        expiration: {
+          maxEntries: 64,
+          maxAgeSeconds: 24 * 60 * 60, // 24 hours
+        },
+      },
+    },
+    {
+      urlPattern: /\/_next\/image\?url=.+$/i,
+      handler: 'StaleWhileRevalidate',
+      options: {
+        cacheName: 'next-image',
+        expiration: {
+          maxEntries: 64,
+          maxAgeSeconds: 24 * 60 * 60, // 24 hours
+        },
+      },
+    },
+    {
+      urlPattern: /\.(?:mp3|wav|ogg)$/i,
+      handler: 'CacheFirst',
+      options: {
+        rangeRequests: true,
+        cacheName: 'static-audio-assets',
+        expiration: {
+          maxEntries: 32,
+          maxAgeSeconds: 24 * 60 * 60, // 24 hours
+        },
+      },
+    },
+    {
+      urlPattern: /\.(?:mp4)$/i,
+      handler: 'CacheFirst',
+      options: {
+        rangeRequests: true,
+        cacheName: 'static-video-assets',
+        expiration: {
+          maxEntries: 32,
+          maxAgeSeconds: 24 * 60 * 60, // 24 hours
+        },
+      },
+    },
+    {
+      urlPattern: /\.(?:js)$/i,
+      handler: 'StaleWhileRevalidate',
+      options: {
+        cacheName: 'static-js-assets',
+        expiration: {
+          maxEntries: 32,
+          maxAgeSeconds: 24 * 60 * 60, // 24 hours
+        },
+      },
+    },
+    {
+      urlPattern: /\.(?:css|less)$/i,
+      handler: 'StaleWhileRevalidate',
+      options: {
+        cacheName: 'static-style-assets',
+        expiration: {
+          maxEntries: 32,
+          maxAgeSeconds: 24 * 60 * 60, // 24 hours
+        },
+      },
+    },
+    {
+      urlPattern: /\/_next\/data\/.+\/.+\.json$/i,
+      handler: 'StaleWhileRevalidate',
+      options: {
+        cacheName: 'next-data',
+        expiration: {
+          maxEntries: 32,
+          maxAgeSeconds: 24 * 60 * 60, // 24 hours
+        },
+      },
+    },
+    {
+      urlPattern: /\/api\/.*$/i,
+      handler: 'NetworkFirst',
+      options: {
+        cacheName: 'apis',
+        expiration: {
+          maxEntries: 16,
+          maxAgeSeconds: 24 * 60 * 60, // 24 hours
+        },
+        networkTimeoutSeconds: 10, // fall back to cache if api does not respond within 10 seconds
+      },
+    },
+    {
+      urlPattern: /.*/i,
+      handler: 'NetworkFirst',
+      options: {
+        cacheName: 'others',
+        expiration: {
+          maxEntries: 32,
+          maxAgeSeconds: 24 * 60 * 60, // 24 hours
+        },
+        networkTimeoutSeconds: 10,
+      },
+    },
+  ],
+});
+
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  reactStrictMode: true,
+  // swcMinify is now enabled by default in Next.js 14+
+  
+  // Optimize compilation
+  compiler: {
+    // Enables the styled-components SWC transform
+    styledComponents: true,
+    // Remove console.log in production
+    removeConsole: process.env.NODE_ENV === 'production',
+  },
+  
+  // Optimize images
+  images: {
+    domains: [],
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 60,
+  },
+  
+  // Optimize builds
+  experimental: {
+    optimizeCss: true, // Enable CSS optimization
+    optimizePackageImports: ['lucide-react'],
+  },
+  
+  async redirects() {
+    return [
+      {
+        source: '/reset',
+        destination: '/reset-user-state.html',
+        permanent: false,
+      },
+    ];
+  },
+  
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: process.env.NODE_ENV === 'development' 
+              ? 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0' 
+              : 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400',
+          },
+          {
+            key: 'Service-Worker-Allowed',
+            value: '/',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-XSS-Protection',
+            value: '1; mode=block',
+          },
+        ],
+      },
+    ];
+  },
+  
+  webpack: (config, { isServer }) => {
+    if (!isServer) {
+      config.resolve.fallback = {
+        fs: false,
+        path: false,
+      };
+    }
+    
+    // Add optimization for CSS modules
+    if (!isServer) {
+      config.optimization.splitChunks.cacheGroups = {
+        ...config.optimization.splitChunks.cacheGroups,
+        styles: {
+          name: 'styles',
+          test: /\.(css|scss)$/,
+          chunks: 'all',
+          enforce: true,
+        },
+      };
+    }
+    
+    return config;
+  },
+};
+
+module.exports = withPWA(nextConfig);
+
+
+=======================================
+
+FILE: C:\_websites\banking\components\ui\common\PWAInstallPrompt.tsx
+
+=======================================
+
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { animated, useSpring } from 'react-spring';
+import { X, Download, Share } from 'lucide-react';
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>;
+}
+
+const PWAInstallPrompt: React.FC = () => {
+  const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [showPrompt, setShowPrompt] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
+  
+  useEffect(() => {
+    // Clear any existing PWA prompt flags to ensure the prompt shows
+    localStorage.removeItem('pwaPromptSeen');
+    
+    const iosCheck = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
+    setIsIOS(iosCheck);
+    
+    const isStandalone = 
+      window.matchMedia('(display-mode: standalone)').matches || 
+      (window.navigator as any).standalone || 
+      document.referrer.includes('android-app://');
+    
+    if (isStandalone) {
+      setShowPrompt(false);
+      return;
+    }
+    
+    // Store the event for later use
+    let deferredPrompt: BeforeInstallPromptEvent | null = null;
+    
+    const handler = (e: Event) => {
+      // Prevent the default browser install prompt
+      e.preventDefault();
+      console.log('beforeinstallprompt event captured successfully');
+      
+      // Store the event for later use
+      deferredPrompt = e as BeforeInstallPromptEvent;
+      setInstallPrompt(deferredPrompt);
+      
+      // Always show the install prompt when the event is fired
+      console.log('Showing PWA install prompt');
+      setShowPrompt(true);
+    };
+
+    // Debug initial state
+    console.log('Initial PWA check:');
+    console.log('User agent:', navigator.userAgent);
+    console.log('Is standalone:', isStandalone);
+    console.log('Is iOS:', iosCheck);
+
+    // Add event listeners
+    window.addEventListener('beforeinstallprompt', handler);
+    
+    window.addEventListener('appinstalled', () => {
+      console.log('PWA was installed successfully');
+      setShowPrompt(false);
+    });
+    
+    // For iOS devices, always show the install instructions
+    if (iosCheck && !isStandalone) {
+      console.log('iOS device detected, showing install instructions');
+      setShowPrompt(true);
+    }
+    
+    // Debug logging for PWA eligibility
+    console.log('PWA install prompt component initialized');
+    console.log('Is standalone mode:', isStandalone);
+    console.log('Is iOS device:', iosCheck);
+    
+    if ('getInstalledRelatedApps' in navigator) {
+      console.log('getInstalledRelatedApps is available');
+      // @ts-ignore - TypeScript doesn't know about this API yet
+      navigator.getInstalledRelatedApps().then((apps: any[]) => {
+        console.log('Installed related apps:', apps);
+      }).catch((err: any) => {
+        console.error('Error checking installed apps:', err);
+      });
+    }
+
+    return () => {
+      window.removeEventListener('beforeinstallprompt', handler);
+    };
+  }, []);
+
+  const handleInstall = async () => {
+    console.log('Install button clicked, installPrompt available:', !!installPrompt);
+    
+    if (installPrompt) {
+      try {
+        // Show the install prompt
+        console.log('Calling prompt() method...');
+        await installPrompt.prompt();
+        
+        // Wait for the user to respond to the prompt
+        console.log('Waiting for user choice...');
+        const choiceResult = await installPrompt.userChoice;
+        
+        console.log('User choice was:', choiceResult.outcome);
+        
+        if (choiceResult.outcome === 'accepted') {
+          console.log('User accepted the install prompt');
+          setShowPrompt(false);
+        } else {
+          console.log('User dismissed the install prompt');
+          // Don't permanently dismiss, allow the prompt to show again later
+          setTimeout(() => setShowPrompt(true), 24 * 60 * 60 * 1000); // Show again after 24 hours
+        }
+        
+        // Clear the saved prompt since it can't be used twice
+        setInstallPrompt(null);
+      } catch (error) {
+        console.error('Install error:', error);
+      }
+    } else if (isIOS) {
+      // For iOS, show instructions for adding to home screen
+      alert('To install this app on your iPhone: tap the Share button, then "Add to Home Screen"');
+      setShowPrompt(false);
+    } else {
+      console.log('No install prompt available');
+      // If no install prompt is available, just hide the banner temporarily
+      setShowPrompt(false);
+      // Try again after a short delay
+      setTimeout(() => setShowPrompt(true), 60 * 1000); // Show again after 1 minute
+    }
+  };
+
+  const handleDismiss = () => {
+    setShowPrompt(false);
+    // Don't permanently dismiss, allow the prompt to show again later
+    setTimeout(() => setShowPrompt(true), 3 * 24 * 60 * 60 * 1000); // Show again after 3 days
+  };
+
+  const animation = useSpring({
+    from: { y: -100, opacity: 0 },
+    to: { y: 0, opacity: 1 },
+    config: { tension: 300, friction: 20 }
+  });
+
+  if (!showPrompt) return null;
+
+  return (
+    <animated.div 
+      style={animation}
+      className="fixed top-0 left-0 right-0 bg-white text-neutral-800 p-3 shadow-md z-[150] border-b border-neutral-200"
+    >
+      <div className="max-w-6xl mx-auto flex items-center justify-between">
+        <div className="flex items-center">
+          <img 
+            src="/images/icons/logo-pwa.png" 
+            alt="App Logo"
+            className="w-8 h-8 mr-3"
+          />
+          <div>
+            <p className="text-sm leading-none opacity-90">
+              {isIOS ? 'Add to home screen for full app experience' : 'Install for better experience'}
+            </p>
+          </div>
+        </div>
+        <div className="flex items-center space-x-2">
+          {!isIOS && (
+            <button
+              onClick={handleInstall}
+              className="bg-neutral-800 text-white px-3 py-1 rounded text-sm font-medium hover:bg-neutral-700 transition-colors"
+            >
+              Install
+            </button>
+          )}
+          {isIOS && (
+            <button
+              onClick={handleInstall}
+              className="bg-neutral-800 text-white px-3 py-1 rounded text-sm font-medium hover:bg-blue-700 transition-colors flex items-center"
+            >
+              <Share size={12} className="mr-1" /> Install
+            </button>
+          )}
+          <button
+            onClick={handleDismiss}
+            className="text-neutral-800 hover:text-neutral-600"
+            aria-label="Close"
+          >
+            <X size={20} />
+          </button>
+        </div>
+      </div>
+    </animated.div>
+  );
+};
+
+export default PWAInstallPrompt;
+
+
+=======================================
+
+FILE: C:\_websites\banking\middleware.ts
+
+=======================================
+
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+export function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  
+  // DEBUGGING: Temporarily disable all complex routing logic
+  // Just route root path to login
+  if (pathname === '/') {
+    const url = request.nextUrl.clone();
+    url.pathname = '/login';
+    return NextResponse.redirect(url);
+  }
+  
+  // For all other URLs, just allow normal navigation
+  // This disables the onboarding/preloader redirect logic for now
+  
+  // Create the response
+  const response = NextResponse.next();
+  
+  // Add cache-busting headers for login page and in non-production environments
+  if (pathname === '/login' || process.env.NODE_ENV !== 'production') {
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+    response.headers.set('Pragma', 'no-cache');
+    response.headers.set('Expires', '0');
+    response.headers.set('Surrogate-Control', 'no-store');
+    
+    // Add a timestamp header for debugging
+    response.headers.set('X-Cache-Timestamp', new Date().toISOString());
+  }
+  
+  return response;
+}
+
+export const config = {
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|images|api|.*\\.png$|.*\\.svg$).*)',
+  ],
+};

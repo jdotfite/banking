@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { X, ArrowLeft } from 'lucide-react';
 import { useUser } from '@/components/context/UserContext';
@@ -206,7 +206,8 @@ const SignupFlow: React.FC = () => {
           <BasicInfoScreen 
             formData={formData} 
             onChange={handleChange} 
-            onNext={handleNext} 
+            onNext={handleNext}
+            onShowDisclosures={() => setDrawerHeight(400)}
           />
         );
       case SignupStep.DATE_OF_BIRTH:
@@ -214,7 +215,8 @@ const SignupFlow: React.FC = () => {
           <DateOfBirthScreen 
             formData={formData} 
             onChange={handleChange} 
-            onNext={handleNext} 
+            onNext={handleNext}
+            onShowDisclosures={() => setDrawerHeight(400)} 
           />
         );
       case SignupStep.MOBILE_PHONE:
@@ -230,7 +232,8 @@ const SignupFlow: React.FC = () => {
           <AddressScreen 
             formData={formData} 
             onChange={handleChange} 
-            onNext={handleNext} 
+            onNext={handleNext}
+            onShowDisclosures={() => setDrawerHeight(400)}
           />
         );
       case SignupStep.CREATE_PASSWORD:
@@ -247,8 +250,30 @@ const SignupFlow: React.FC = () => {
     }
   };
 
+  const [showDisclosure, setShowDisclosure] = useState(false);
+  const [drawerHeight, setDrawerHeight] = useState(0);
+  const drawerRef = useRef<HTMLDivElement>(null);
+  const startYRef = useRef(0);
+  const startHeightRef = useRef(0);
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    startYRef.current = e.touches[0].clientY;
+    startHeightRef.current = drawerHeight;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    const deltaY = startYRef.current - e.touches[0].clientY;
+    const newHeight = Math.min(Math.max(80, startHeightRef.current + deltaY), 500);
+    setDrawerHeight(newHeight);
+  };
+
+  const toggleDisclosure = () => {
+    setShowDisclosure(!showDisclosure);
+    setDrawerHeight(showDisclosure ? 80 : 400);
+  };
+
   return (
-    <div className="flex flex-col h-screen w-full overflow-hidden bg-[#0a0a0a]">
+    <div className="flex flex-col h-screen w-full overflow-hidden bg-[#0a0a0a] relative">
       {/* Header with navigation buttons */}
       <div className="h-12 flex items-center justify-between px-3  z-10">
         {currentStep > SignupStep.BASIC_INFO ? (
@@ -286,6 +311,52 @@ const SignupFlow: React.FC = () => {
           {error}
         </div>
       )}
+
+      {/* Disclosure drawer */}
+      <div 
+        ref={drawerRef}
+        className="fixed bottom-0 left-0 right-0 bg-neutral-800 text-neutral-200 rounded-t-lg shadow-lg transition-all duration-300 ease-in-out overflow-hidden"
+        style={{ height: `${drawerHeight}px` }}
+      >
+        {/* Handle bar */}
+        <div 
+          className="w-full h-8 bg-neutral-700 flex items-center justify-center cursor-grab active:cursor-grabbing"
+          onClick={() => setDrawerHeight(0)}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+        >
+          <div className="w-12 h-1 bg-neutral-500 rounded-full"></div>
+        </div>
+
+        {/* Disclosure content */}
+        <div className="p-4 overflow-y-auto h-[calc(100%-32px)]">
+          <h2 className="text-xl font-semibold mb-4">Legal Disclosures</h2>
+          <p className="text-sm mb-4">
+            To assist the government in combating the funding of terrorism and money laundering activities, federal law requires all financial institutions to obtain, verify, and record information that identifies each person who opens an account.
+          </p>
+          <p className="text-sm mb-4">
+            When you open an account with Members 1st Federal Credit Union, we will request your name, address, date of birth, and other information that allows us to identify you. We may also ask to see your driver's license or other identifying documents.
+          </p>
+          <p className="text-sm mb-4">
+            Members 1st Federal Credit Union is a federally insured credit union, regulated by the National Credit Union Administration (NCUA). Your deposits are insured up to the maximum amount allowed by law.
+          </p>
+          <p className="text-sm mb-4">
+            We are committed to protecting your personal information. For details on how we collect, use, and safeguard your data, please review our
+            <a href="https://www.members1st.org/privacy-policy/" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer"> Privacy Policy</a>.
+          </p>
+          <p className="text-sm mb-4">
+            For comprehensive information regarding our terms, conditions, and disclosures, please refer to our
+            <a href="https://www.members1st.org/disclosures-and-agreements/" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer"> Disclosures and Agreements</a> page.
+          </p>
+          <p className="mb-4">
+            If you have any questions or require further assistance, please contact our Customer Service at
+            <a href="tel:8002377288" className="text-blue-600 hover:underline"> (800) 237-7288</a> or visit your nearest branch.
+          </p>
+          <p className="text-sm text-gray-600 mt-6">
+            &copy; 2025 Members 1st Federal Credit Union. All rights reserved.
+          </p>
+        </div>
+      </div>
     </div>
   );
 };

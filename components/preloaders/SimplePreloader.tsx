@@ -3,6 +3,7 @@
 import React, { useState, useEffect, memo, useRef } from 'react';
 import ResourceLoader from './ResourceLoader';
 import { useRouter } from 'next/navigation';
+import { usePreloader } from '@/components/context/PreloaderContext';
 
 type SimplePreloaderProps = {
   children: React.ReactNode;
@@ -184,43 +185,59 @@ const EnhancedProgressBar = memo(({
   );
 });
 
-// Memoized loading screen with enhanced visuals but no progress bar
-const LoadingScreen = memo(({ 
-  isLoading, 
-  progress, 
-  resourcesLoaded,
-  transitionDuration,
-  onProgressComplete 
-}: { 
-  isLoading: boolean; 
+interface LoadingScreenProps {
+  isLoading: boolean;
   progress: number;
   resourcesLoaded: boolean;
   transitionDuration: number;
   onProgressComplete: () => void;
+  minDisplayTime: number;
+}
+
+// Memoized loading screen with enhanced visuals but no progress bar
+const LoadingScreen = memo<LoadingScreenProps>(({ 
+  isLoading, 
+  progress, 
+  resourcesLoaded,
+  transitionDuration,
+  onProgressComplete,
+  minDisplayTime
 }) => {
-  // Monitor progress silently without showing the bar
+  const [canHide, setCanHide] = useState(false);
+  
+  // Force the screen to stay visible for minDisplayTime
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setCanHide(true);
+      console.log('Minimum display time elapsed, screen can now hide');
+    }, minDisplayTime);
+    
+    return () => clearTimeout(timer);
+  }, []);
+  
+  // Monitor progress silently
   useEffect(() => {
     if (resourcesLoaded) {
-      // Call progress complete when resources are loaded
       onProgressComplete();
     }
   }, [resourcesLoaded, onProgressComplete]);
+
+  // Only allow hiding when canHide is true
+  const actuallyHiding = isLoading ? false : canHide;
 
   return (
     <div 
       className="fixed inset-0 bg-[#121212] flex flex-col items-center justify-center z-50"
       style={{ 
         transition: `opacity ${transitionDuration}ms ease-in-out`,
-        opacity: isLoading ? 1 : 0,
-        pointerEvents: isLoading ? 'auto' : 'none'
+        opacity: actuallyHiding ? 0 : 1,
+        pointerEvents: actuallyHiding ? 'none' : 'auto'
       }}
     >
       <AnimatedLogo />
-      {/* Progress bar removed */}
     </div>
   );
-});
-
+}); 
 /**
  * SimplePreloader - A streamlined preloader that manages loading resources and 
  * transitioning to the application with a custom animated SVG logo.
@@ -228,31 +245,40 @@ const LoadingScreen = memo(({
  */
 const SimplePreloader: React.FC<SimplePreloaderProps> = ({ 
   children, 
-  minDisplayTime = 2000, // Increased for better animation viewing
+  minDisplayTime = 2000, // Set to 2000ms (2 seconds) minimum display time
   transitionDuration = 800,
   onComplete,
-  routeToLoginAfterComplete = false // Don't route automatically - let middleware handle it
+  routeToLoginAfterComplete = false
 }) => {
+  const { isPreloaderComplete, markPreloaderComplete } = usePreloader();
   const router = useRouter();
   const [progress, setProgress] = useState(0);
   const [resourcesLoaded, setResourcesLoaded] = useState(false);
   const [progressComplete, setProgressComplete] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [loadingStartTime] = useState<number>(Date.now());
+  const minTimeElapsedRef = useRef(false);
   
   // Handle resource loading completion
   const handleResourcesLoaded = () => {
     setResourcesLoaded(true);
     
-    // Check minimum display time
-    const currentTime = Date.now();
-    const elapsedTime = currentTime - loadingStartTime;
+    // Implement minimum display time check
+    const elapsedTime = Date.now() - loadingStartTime;
+    const remainingTime = Math.max(0, minDisplayTime - elapsedTime);
     
-    // Set minimum display time if needed
-    if (elapsedTime < minDisplayTime) {
+    if (remainingTime > 0) {
+      // Wait for the minimum display time before completing
       setTimeout(() => {
-        // We still need to wait for the progress bar to complete
-      }, minDisplayTime - elapsedTime);
+        minTimeElapsedRef.current = true;
+        // Check if progress is also complete to finish loading
+        if (progressComplete) {
+          setIsLoading(false);
+        }
+      }, remainingTime);
+    } else {
+      // Minimum time already elapsed
+      minTimeElapsedRef.current = true;
     }
   };
   
@@ -261,23 +287,36 @@ const SimplePreloader: React.FC<SimplePreloaderProps> = ({
     setProgressComplete(true);
   };
   
-  // When both resources are loaded AND progress bar has hit 100%,
+  // When both resources are loaded AND progress bar has hit 100% AND minimum time elapsed,
   // we can transition out the loading screen
   useEffect(() => {
     if (resourcesLoaded && progressComplete) {
-      // Hide the loading screen
-      setIsLoading(false);
+      const elapsedTime = Date.now() - loadingStartTime;
       
-      // Set a cookie to indicate the preloader is complete
-      // This will be used by middleware to determine if redirects should happen
-      document.cookie = 'preloader-complete=true; path=/';
-      
-      // Call onComplete callback if provided
-      if (onComplete) {
-        onComplete();
+      if (elapsedTime >= minDisplayTime || minTimeElapsedRef.current) {
+        // Minimum time has passed, hide the loading screen
+        setIsLoading(false);
+        
+        // Mark preloader as complete in context
+        markPreloaderComplete();
+        
+        // Call onComplete callback if provided
+        if (onComplete) {
+          onComplete();
+        }
+      } else {
+        // Wait for the remaining time
+        const remainingTime = minDisplayTime - elapsedTime;
+        setTimeout(() => {
+          setIsLoading(false);
+          markPreloaderComplete();
+          if (onComplete) {
+            onComplete();
+          }
+        }, remainingTime);
       }
     }
-  }, [resourcesLoaded, progressComplete, onComplete, routeToLoginAfterComplete, router, transitionDuration]);
+  }, [resourcesLoaded, progressComplete, minDisplayTime, loadingStartTime, onComplete, markPreloaderComplete]);
 
   // Update progress
   const handleProgress = (newProgress: number) => {
@@ -291,25 +330,34 @@ const SimplePreloader: React.FC<SimplePreloaderProps> = ({
         onComplete={handleResourcesLoaded}
       />
       
-      {/* Always render children, but fade in when loading is complete */}
-      <div 
-        style={{ 
-          opacity: isLoading ? 0 : 1,
-          transition: `opacity ${transitionDuration}ms ease-in-out`,
-          visibility: isLoading ? 'hidden' : 'visible' 
-        }}
-      >
-        {children}
-      </div>
-      
-      {/* Loading screen */}
-      <LoadingScreen 
-        isLoading={isLoading} 
-        progress={progress}
-        resourcesLoaded={resourcesLoaded}
-        transitionDuration={transitionDuration}
-        onProgressComplete={handleProgressComplete}
-      />
+      {/* Only show preloader if not already completed */}
+      {!isPreloaderComplete && (
+        <>
+          {/* Always render children, but fade in when loading is complete */}
+          <div 
+            style={{ 
+              opacity: isLoading ? 0 : 1,
+              transition: `opacity ${transitionDuration}ms ease-in-out`,
+              visibility: isLoading ? 'hidden' : 'visible' 
+            }}
+          >
+            {children}
+          </div>
+          
+          {/* Loading screen */}
+          <LoadingScreen 
+            isLoading={isLoading} 
+            progress={progress}
+            resourcesLoaded={resourcesLoaded}
+            transitionDuration={transitionDuration}
+            onProgressComplete={handleProgressComplete}
+            minDisplayTime={minDisplayTime}
+          />
+        </>
+      )}
+
+      {/* If preloader already completed, just show children */}
+      {isPreloaderComplete && children}
     </>
   );
 };

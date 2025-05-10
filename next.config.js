@@ -1,9 +1,9 @@
-﻿// next.config.js
+// next.config.js
 const withPWA = require('next-pwa')({
   dest: 'public',            // where sw.js and other assets go
   register: false,           // disable automatic registration - we'll handle it manually
   skipWaiting: true,         // activate new service worker immediately
-  disable: process.env.NODE_ENV === 'development', // disable PWA in development
+  disable: process.env.NODE_ENV !== 'production', // only enable PWA in production
   buildExcludes: [/app-build-manifest.json$/], // Fix for precaching error
   // Include specific routes in the service worker
   scope: '/',
@@ -177,6 +177,15 @@ const nextConfig = {
   async headers() {
     return [
       {
+        source: '/manifest.json',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/manifest+json',
+          },
+        ],
+      },
+      {
         source: '/(.*)',
         headers: [
           {
@@ -232,3 +241,4 @@ const nextConfig = {
 };
 
 module.exports = withPWA(nextConfig);
+

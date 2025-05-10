@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Minimal PWA Test</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#121212">
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
+    button { padding: 10px; background: #4285f4; color: white; border: none; border-radius: 4px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>Minimal PWA Test</h1>
+  <p>This is a minimal page to test PWA installation.</p>
+  <button id="install-button" style="display: none;">Install Now</button>
+  <div id="status">Checking PWA compatibility...</div>
+
+  <script>
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/simple-sw.js')
+        .then(reg => {
+          console.log('Service worker registered:', reg);
+          document.getElementById('status').textContent += '\n? Service worker registered';
+        })
+        .catch(error => {
+          console.error('Service worker registration failed:', error);
+          document.getElementById('status').textContent += '\n? Service worker registration failed: ' + error.message;
+        });
+    } else {
+      document.getElementById('status').textContent += '\n? Service workers not supported';
+    }
+
+    // Handle install prompt
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      document.getElementById('status').textContent += '\n? Install prompt available! This page is installable.';
+      const installButton = document.getElementById('install-button');
+      installButton.style.display = 'block';
+      
+      installButton.addEventListener('click', () => {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then(choiceResult => {
+          if (choiceResult.outcome === 'accepted') {
+            console.log('User accepted the install prompt');
+          } else {
+            console.log('User dismissed the install prompt');
+          }
+          deferredPrompt = null;
+        });
+      });
+    });
+
+    // Set timeout to check if install prompt was shown
+    setTimeout(() => {
+      if (!deferredPrompt) {
+        document.getElementById('status').textContent += '\n? No install prompt detected after 3 seconds. This might mean:';
+        document.getElementById('status').textContent += '\n   - The app is already installed';
+        document.getElementById('status').textContent += '\n   - The manifest or service worker has issues';
+        document.getElementById('status').textContent += '\n   - The browser does not support PWA installation';
+        document.getElementById('status').textContent += '\n   - You need to interact with the page first';
+      }
+    }, 3000);
+
+    // Check if running as installed PWA
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      document.getElementById('status').textContent += '\n? Running as installed PWA!';
+    }
+  </script>
+</body>
+</html>

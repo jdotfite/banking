@@ -13,9 +13,10 @@ interface AddressScreenProps {
   };
   onChange: (field: string, value: string) => void;
   onNext: () => void;
+  onShowDisclosures?: () => void;
 }
 
-const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNext }) => {
+const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNext, onShowDisclosures }) => {
   const [focusedFields, setFocusedFields] = useState({
     streetAddress: false,
     aptSuite: false,
@@ -291,9 +292,12 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
       {/* Footer - Fixed at bottom */}
       <div className="w-full border-t border-neutral-800/50 fixed bottom-0 left-0 bg-[#121212]">
         <div className="max-w-md mx-auto w-full py-4 px-6">
-          <p className="text-center text-neutral-500 text-sm">
+          <button 
+            onClick={onShowDisclosures}
+            className="text-center text-neutral-500 text-sm w-full"
+          >
             See legal disclosures
-          </p>
+          </button>
         </div>
       </div>
     </div>
