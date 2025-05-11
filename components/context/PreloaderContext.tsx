@@ -14,16 +14,22 @@ const PreloaderContext = createContext<PreloaderContextType>({
 
 export const PreloaderProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isPreloaderComplete, setIsPreloaderComplete] = useState(false);
+  const [hasMounted, setHasMounted] = useState(false);
 
   useEffect(() => {
-    // Always start with preloader not complete
-    setIsPreloaderComplete(false);
+    setIsPreloaderComplete(sessionStorage.getItem('preloader-complete') === 'true');
+    setHasMounted(true);
   }, []);
 
   const markPreloaderComplete = () => {
     sessionStorage.setItem('preloader-complete', 'true');
     setIsPreloaderComplete(true);
   };
+
+  if (!hasMounted) {
+    // Prevent hydration mismatch: render nothing until client-side mount
+    return null;
+  }
 
   return (
     <PreloaderContext.Provider value={{ isPreloaderComplete, markPreloaderComplete }}>

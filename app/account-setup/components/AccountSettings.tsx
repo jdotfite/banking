@@ -72,7 +72,7 @@ export default function AccountSettings() {
             {securitySettings.map((setting) => (
               <div 
                 key={setting.id}
-                className="bg-neutral-800 rounded-lg p-4 flex items-center cursor-pointer hover:bg-neutral-700 transition-colors"
+                className="bg-neutral-800 rounded-lg p-4 flex items-center cursor-pointer hover:bg-neutral-750 transition-colors"
               >
                 <div className="mr-3 text-white">
                   {setting.icon}
@@ -104,7 +104,7 @@ export default function AccountSettings() {
             {notificationSettings.map((setting) => (
               <div 
                 key={setting.id}
-                className="bg-neutral-800 rounded-lg p-4 flex items-center cursor-pointer hover:bg-neutral-700 transition-colors"
+                className="bg-neutral-800 rounded-lg p-4 flex items-center cursor-pointer hover:bg-neutral-750 transition-colors"
               >
                 <div className="mr-3 text-white">
                   {setting.icon}
@@ -136,7 +136,7 @@ export default function AccountSettings() {
             {displaySettings.map((setting) => (
               <div 
                 key={setting.id}
-                className="bg-neutral-800 rounded-lg p-4 flex items-center cursor-pointer hover:bg-neutral-700 transition-colors"
+                className="bg-neutral-800 rounded-lg p-4 flex items-center cursor-pointer hover:bg-neutral-750 transition-colors"
               >
                 <div className="mr-3 text-white">
                   {setting.icon}

@@ -25,6 +25,16 @@ module.exports = {
           lightGray: '#718096', // For text
           green: '#48BB78', // For positive transactions
         },
+        neutral: {
+          150: '#efefef', // midpoint between #f5f5f5 (100) and #e5e5e5 (200)
+          250: '#dfdfdf', // midpoint between #e5e5e5 (200) and #d4d4d4 (300)
+          350: '#bebebe', // midpoint between #d4d4d4 (300) and #a3a3a3 (400)
+          450: '#8b8b8b', // midpoint between #a3a3a3 (400) and #737373 (500)
+          550: '#636363', // midpoint between #737373 (500) and #525252 (600)
+          650: '#484848', // midpoint between #525252 (600) and #404040 (700)
+          750: '#333333', // midpoint between #404040 (700) and #262626 (800)
+          850: '#1c1c1c', // midpoint between #262626 (800) and #171717 (900)
+        },
       },
       boxShadow: {
         'card': '0 4px 6px -1px rgba(0, 0, 0, 0.2), 0 2px 4px -1px rgba(0, 0, 0, 0.1)',
