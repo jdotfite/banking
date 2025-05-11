@@ -110,6 +110,10 @@ const DateOfBirthScreen: React.FC<DateOfBirthScreenProps> = ({ formData, onChang
 
           {/* Form */}
           <form onSubmit={handleNext} className="space-y-8">
+            {/* Error message container - aria-live */}
+            <div aria-live="polite" className="sr-only">
+              {error && <span id="dob-error">{error}</span>}
+            </div>
             {/* Date of birth field */}
             <div className="relative">
               <label 
@@ -143,6 +147,8 @@ const DateOfBirthScreen: React.FC<DateOfBirthScreenProps> = ({ formData, onChang
                     }
                   }}
                   autoFocus
+                  aria-invalid={!!error}
+                  aria-describedby={error ? "dob-error" : undefined}
                 />
                 <div className={`h-px w-0 bg-white absolute bottom-0 left-0 transition-all duration-700 ${isFocused ? 'w-full' : ''}`}></div>
               </div>

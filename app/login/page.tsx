@@ -7,6 +7,7 @@ import LoginForm from './components/LoginForm';
 import ForgotPasswordForm from './components/ForgotPasswordForm';
 import RecoverUsernameForm from './components/RecoverUsernameForm';
 import HelpCenter from './components/HelpCenter';
+import FAQPage from './components/FAQPage';
 
 export default function AuthPage() {
   const [currentView, setCurrentView] = useState<AuthViewType>('login');
@@ -26,6 +27,8 @@ export default function AuthPage() {
         return <RecoverUsernameForm setView={setCurrentView} />;
       case 'helpCenter':
         return <HelpCenter setView={setCurrentView} />;
+      case 'faq':
+        return <FAQPage setView={setCurrentView} />;
       default:
         return <LoginForm setView={setCurrentView} />;
     }

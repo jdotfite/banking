@@ -5,7 +5,7 @@ import { Mail } from 'lucide-react';
 import { FormInput, Button } from '../../../components/ui/form';
 
 interface RecoverUsernameFormProps {
-  setView: (view: 'login' | 'forgotPassword' | 'recoverUsername' | 'helpCenter') => void;
+  setView: (view: 'login' | 'forgotPassword' | 'recoverUsername' | 'helpCenter' | 'faq') => void;
 }
 
 const RecoverUsernameForm: React.FC<RecoverUsernameFormProps> = ({ setView }) => {
@@ -74,6 +74,11 @@ const RecoverUsernameForm: React.FC<RecoverUsernameFormProps> = ({ setView }) =>
 
           {!isSubmitted ? (
             <form onSubmit={handleSubmit} className="space-y-8">
+              {/* Error message container - aria-live */}
+              <div aria-live="polite" className="sr-only">
+                {errors.memberId && <span id="memberId-error">{errors.memberId}</span>}
+                {errors.lastFourSSN && <span id="ssn-error">{errors.lastFourSSN}</span>}
+              </div>
           
           
           <FormInput
@@ -83,6 +88,9 @@ const RecoverUsernameForm: React.FC<RecoverUsernameFormProps> = ({ setView }) =>
             onChange={handleMemberIdChange}
             error={errors.memberId}
             autoComplete="username"
+            autoFocus
+            aria-invalid={!!errors.memberId}
+            aria-describedby={errors.memberId ? "memberId-error" : undefined}
           />
 
           <FormInput
@@ -93,6 +101,8 @@ const RecoverUsernameForm: React.FC<RecoverUsernameFormProps> = ({ setView }) =>
             onChange={handleSsnChange}
             error={errors.lastFourSSN}
             inputMode="numeric"
+            aria-invalid={!!errors.lastFourSSN}
+            aria-describedby={errors.lastFourSSN ? "ssn-error" : undefined}
           />
           
           <div className="flex flex-col gap-3 pt-2">
@@ -104,18 +114,12 @@ const RecoverUsernameForm: React.FC<RecoverUsernameFormProps> = ({ setView }) =>
               type="button" 
               variant="borderless"
               onClick={() => setView('login')}
-              className="text-white"
+              className="text-white text-sm"
             >
               Back to login
             </Button>
           </div>
           
-          <div className="mt-6 pt-4 border-t border-neutral-800 text-center">
-            <p className="text-neutral-400 text-sm">
-              If your contact information is out-of-date, please call us at
-            </p>
-            <a href="tel:8002377288" className="text-white font-medium mt-1 hover:underline">800-237-7288</a>
-          </div>
         </form>
       ) : (
         <div className="text-center py-8">
@@ -150,10 +154,11 @@ const RecoverUsernameForm: React.FC<RecoverUsernameFormProps> = ({ setView }) =>
       
       {/* Footer - Fixed at bottom */}
       <div className="w-full border-t border-neutral-800/50 fixed bottom-0 left-0 bg-[#121212]">
-        <div className="max-w-md mx-auto w-full py-4 px-6">
-          <p className="text-center text-neutral-500 text-sm">
-            See legal disclosures
+      <div className="max-w-md mx-auto w-full py-4 px-6 text-center">
+          <p className="text-neutral-500 text-xs">
+            If your contact information is out-of-date, please call us at
           </p>
+          <a href="tel:8002377288" className="text-white text-xs font-medium mt-1 hover:underline">800-237-7288</a>
         </div>
       </div>
     </div>

@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
-    "generate-icons": "pwa-asset-generator public/logo.png public/icons -m public/manifest.json",
+    "generate-icons": "pwa-asset-generator public/images/icons/logo-m1st-square.svg public/images/icons -m public/manifest.json --icon-only --favicon --type png --background \"#ee3831\"",
     "dev:clean": "rimraf .next && next dev",
     "build:clean": "rimraf .next && next build",
     "clear-cache:win": "powershell -ExecutionPolicy Bypass -File ./scripts/clear-cache-and-restart.ps1",

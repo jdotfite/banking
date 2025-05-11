@@ -105,6 +105,11 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
             </div>
               {/* Login form with enhanced animations */}
               <form onSubmit={handleSubmit} className="space-y-5">
+                {/* Error message container - aria-live */}
+                <div aria-live="polite" className="sr-only">
+                  {errors.email && <span id="email-error">{errors.email}</span>}
+                  {errors.password && <span id="password-error">{errors.password}</span>}
+                </div>
                 {/* Email field */}
                 <FormInput
                   id="email"
@@ -115,6 +120,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
                   autoComplete="email"
                   inputMode="email"
                   error={errors.email}
+                  autoFocus
+                  aria-invalid={!!errors.email}
+                  aria-describedby={errors.email ? "email-error" : undefined}
                 />
                 
                 {/* Password field */}
@@ -125,6 +133,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
                   onChange={handlePasswordChange}
                   autoComplete="current-password"
                   error={errors.password}
+                  aria-invalid={!!errors.password}
+                  aria-describedby={errors.password ? "password-error" : undefined}
                 />
                 
                 {/* Remember me and forgot password */}
@@ -136,7 +146,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
                       name="rememberMe"
                       checked={formData.rememberMe}
                       onChange={handleRememberMeChange}
-                      className="h-4 w-4 bg-neutral-800 border-neutral-700 rounded focus:ring-white"
+                      className="h-4 w-4 bg-neutral-800 border-neutral-700 rounded focus:ring-2 focus:ring-white"
+                      aria-label="Remember me on this device"
                     />
                     <label htmlFor="rememberMe" className="ml-2 text-sm text-neutral-400">
                       Remember me

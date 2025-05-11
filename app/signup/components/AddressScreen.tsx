@@ -113,6 +113,13 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
 
           {/* Form */}
           <form onSubmit={handleNext} className="space-y-8">
+            {/* Error message container - aria-live */}
+            <div aria-live="polite" className="sr-only">
+              {errors.streetAddress && <span id="street-address-error">{errors.streetAddress}</span>}
+              {errors.zipCode && <span id="zip-code-error">{errors.zipCode}</span>}
+              {errors.city && <span id="city-error">{errors.city}</span>}
+              {errors.state && <span id="state-error">{errors.state}</span>}
+            </div>
             {/* Street address */}
             <div className="relative">
               <label htmlFor="street-address" className="sr-only">Street address</label>
@@ -138,6 +145,8 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
                   onFocus={() => setFocusedFields({...focusedFields, streetAddress: true})}
                   onBlur={() => setFocusedFields({...focusedFields, streetAddress: false})}
                   autoFocus
+                  aria-invalid={!!errors.streetAddress}
+                  aria-describedby={errors.streetAddress ? "street-address-error" : undefined}
                 />
                 <div className={`h-px w-0 bg-white absolute bottom-0 left-0 transition-all duration-700 ${focusedFields.streetAddress ? 'w-full' : ''}`}></div>
               </div>
@@ -171,6 +180,7 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
                   autoComplete="address-line2"
                   onFocus={() => setFocusedFields({...focusedFields, aptSuite: true})}
                   onBlur={() => setFocusedFields({...focusedFields, aptSuite: false})}
+                  aria-invalid={false} // Optional field so always valid
                 />
                 <div className={`h-px w-0 bg-white absolute bottom-0 left-0 transition-all duration-700 ${focusedFields.aptSuite ? 'w-full' : ''}`}></div>
               </div>
@@ -202,6 +212,8 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
                   maxLength={5}
                   onFocus={() => setFocusedFields({...focusedFields, zipCode: true})}
                   onBlur={() => setFocusedFields({...focusedFields, zipCode: false})}
+                  aria-invalid={!!errors.zipCode}
+                  aria-describedby={errors.zipCode ? "zip-code-error" : undefined}
                 />
                 <div className={`h-px w-0 bg-white absolute bottom-0 left-0 transition-all duration-700 ${focusedFields.zipCode ? 'w-full' : ''}`}></div>
               </div>
@@ -232,11 +244,13 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
                     type="text"
                     value={formData.city}
                     onChange={(e) => onChange('city', e.target.value)}
-                  className="w-full pt-5 pb-1 px-0 bg-transparent border-b border-neutral-700 outline-none focus:border-neutral-700 text-white transition-all duration-200"
+                    className="w-full pt-5 pb-1 px-0 bg-transparent border-b border-neutral-700 outline-none focus:border-neutral-700 text-white transition-all duration-200"
                     autoComplete="address-level2"
                     autoCapitalize="words"
                     onFocus={() => setFocusedFields({...focusedFields, city: true})}
                     onBlur={() => setFocusedFields({...focusedFields, city: false})}
+                    aria-invalid={!!errors.city}
+                    aria-describedby={errors.city ? "city-error" : undefined}
                   />
                   <div className={`h-px w-0 bg-white absolute bottom-0 left-0 transition-all duration-700 ${focusedFields.city ? 'w-full' : ''}`}></div>
                 </div>
@@ -257,6 +271,8 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
                     autoComplete="address-level1"
                     onFocus={() => setFocusedFields({...focusedFields, state: true})}
                     onBlur={() => setFocusedFields({...focusedFields, state: false})}
+                    aria-invalid={!!errors.state}
+                    aria-describedby={errors.state ? "state-error" : undefined}
                   >
                     <option value="" className="bg-[#121212] text-white">State</option>
                     {states.map(state => (

@@ -3,9 +3,10 @@
 import React, { useState } from 'react';
 import { Mail, AlertCircle } from 'lucide-react';
 import { animated } from 'react-spring';
+import { Button, FormInput } from '../../../components/ui/form';
 
 interface ForgotPasswordFormProps {
-  setView: (view: 'login' | 'forgotPassword' | 'recoverUsername' | 'helpCenter') => void;
+  setView: (view: 'login' | 'forgotPassword' | 'recoverUsername' | 'helpCenter' | 'faq') => void;
 }
 
 const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ setView }) => {
@@ -32,12 +33,24 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ setView }) => {
   };
 
   return (
-    <>
+    <div className="flex flex-col min-h-[calc(100vh-48px)] w-full bg-[#121212] pb-14">
+      {/* Main content */}
+      <div className="flex-grow overflow-auto px-6 flex flex-col justify-center">
+        <div className="w-full max-w-md mx-auto">
       {!isSubmitted ? (
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <p className="text-neutral-300 mb-4">
-            Enter your email address and we'll send you instructions to reset your password.
-          </p>
+        <form onSubmit={handleSubmit} className="space-y-8">
+          {/* Error message container - aria-live */}
+          <div aria-live="polite" className="sr-only">
+            {error && <span id="email-error">{error}</span>}
+          </div>
+          <div className="mb-8">
+            <h1 className="text-4xl font-extralight text-white mb-2">
+              Reset <span className="font-normal">password</span>
+            </h1>
+            <p className="text-neutral-400 text-sm">
+              Enter your email address and we'll send you instructions to reset your password.
+            </p>
+          </div>
           
           {error && (
             <div className="bg-red-500/20 border border-red-500 text-red-200 p-4 rounded-lg flex items-start">
@@ -46,63 +59,35 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ setView }) => {
             </div>
           )}
           
-          <div className="space-y-1">
-            <label htmlFor="reset-email" className="block text-sm font-medium text-neutral-300">
-              Email Address
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Mail size={18} className="text-neutral-500" />
-              </div>
-              <input
-                type="email"
-                id="reset-email"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  if (error) setError('');
-                }}
-                className="w-full pl-10 pr-3 py-3 bg-[#1a1a1a] border border-neutral-700 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-200 focus:border-transparent"
-                placeholder="you@example.com"
-                required
-              />
-            </div>
-          </div>
+          <FormInput
+            id="reset-email"
+            type="email"
+            value={email}
+            onChange={(value: string) => {
+              setEmail(value);
+              if (error) setError('');
+            }}
+            label="Email Address"
+            autoFocus
+            aria-invalid={!!error}
+            aria-describedby={error ? "email-error" : undefined}
+          />
           
           <div className="flex flex-col gap-3 pt-2">
-            <button
-              type="submit"
-              className="w-full py-3 bg-green-200 text-black font-medium rounded-lg hover:bg-green-300 transition-colors"
-            >
-              Send reset instructions
-            </button>
+            <Button type="submit">
+              SEND EMAIL
+            </Button>
             
-            <button
-              type="button"
+            <Button 
+              type="button" 
+              variant="borderless"
               onClick={() => setView('login')}
-              className="w-full py-3 bg-transparent border border-neutral-700 text-white font-medium rounded-lg hover:bg-white/5 transition-colors"
+              className="text-white text-sm"
             >
               Back to login
-            </button>
+            </Button>
           </div>
           
-          <div className="mt-6 pt-4 border-t border-neutral-800 flex justify-between">
-            <button
-              type="button"
-              onClick={() => setView('recoverUsername')}
-              className="text-sm text-neutral-400 hover:text-white transition-colors"
-            >
-              Forgot username?
-            </button>
-            
-            <button
-              type="button"
-              onClick={() => setView('helpCenter')}
-              className="text-sm text-neutral-400 hover:text-white transition-colors"
-            >
-              Need more help?
-            </button>
-          </div>
         </form>
       ) : (
         <div className="text-center py-8">
@@ -113,12 +98,12 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ setView }) => {
           <p className="text-neutral-300 mb-6">
             We've sent instructions to reset your password to {email}
           </p>
-          <button
+          <Button 
             onClick={() => setView('login')}
-            className="w-full py-3 bg-green-200 text-black font-medium rounded-lg hover:bg-green-300 transition-colors"
+            className="w-full"
           >
-            Back to login
-          </button>
+            BACK TO LOGIN
+          </Button>
           <p className="mt-4 text-sm text-neutral-400">
             Didn't receive the email? Check your spam folder or{' '}
             <button
@@ -131,7 +116,19 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ setView }) => {
           </p>
         </div>
       )}
-    </>
+        </div>
+      </div>
+      
+      {/* Footer - Fixed at bottom */}
+      <div className="w-full border-t border-neutral-800/50 fixed bottom-0 left-0 bg-[#121212]">
+        <div className="max-w-md mx-auto w-full py-4 px-6 text-center">
+          <p className="text-neutral-500 text-xs">
+            If your contact information is out-of-date, please call us at
+          </p>
+          <a href="tel:8002377288" className="text-white text-xs font-medium mt-1 hover:underline">800-237-7288</a>
+        </div>
+      </div>
+    </div>
   );
 };
 

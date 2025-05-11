@@ -1,6 +1,6 @@
 import { ReactNode } from 'react';
 
-export type AuthViewType = 'login' | 'forgotPassword' | 'recoverUsername' | 'helpCenter';
+export type AuthViewType = 'login' | 'forgotPassword' | 'recoverUsername' | 'helpCenter' | 'faq';
 
 export interface ViewProps {
   setView: (view: AuthViewType) => void;

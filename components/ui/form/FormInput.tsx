@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 interface FormInputProps {
   id: string;
   type?: 'text' | 'email' | 'password' | 'tel' | 'number';
-  label: string;
+  label?: string;
   value: string;
   onChange: (value: string) => void;
   error?: string;
