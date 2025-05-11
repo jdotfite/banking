@@ -315,44 +315,44 @@ const SignupFlow: React.FC = () => {
       {/* Disclosure drawer */}
       <div 
         ref={drawerRef}
-        className="fixed bottom-0 left-0 right-0 bg-neutral-800 text-neutral-200 rounded-t-lg shadow-lg transition-all duration-300 ease-in-out overflow-hidden"
+        className="fixed bottom-0 left-0 right-0 bg-neutral-950 text-neutral-200 rounded-t-lg shadow-lg transition-all duration-300 ease-in-out overflow-hidden"
         style={{ height: `${drawerHeight}px` }}
       >
         {/* Handle bar */}
         <div 
-          className="w-full h-8 bg-neutral-700 flex items-center justify-center cursor-grab active:cursor-grabbing"
+          className="w-full h-8 bg-neutral-950 flex items-center justify-center cursor-grab active:cursor-grabbing"
           onClick={() => setDrawerHeight(0)}
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
         >
-          <div className="w-12 h-1 bg-neutral-500 rounded-full"></div>
+          <div className="w-12 h-1 bg-neutral-900 rounded-full"></div>
         </div>
 
         {/* Disclosure content */}
         <div className="p-4 overflow-y-auto h-[calc(100%-32px)]">
-          <h2 className="text-xl font-semibold mb-4">Legal Disclosures</h2>
-          <p className="text-sm mb-4">
+          <h2 className="text-sm font-semibold mb-4">Legal Disclosures</h2>
+          <p className="text-xs mb-4">
             To assist the government in combating the funding of terrorism and money laundering activities, federal law requires all financial institutions to obtain, verify, and record information that identifies each person who opens an account.
           </p>
-          <p className="text-sm mb-4">
+          <p className="text-xs mb-4">
             When you open an account with Members 1st Federal Credit Union, we will request your name, address, date of birth, and other information that allows us to identify you. We may also ask to see your driver's license or other identifying documents.
           </p>
-          <p className="text-sm mb-4">
+          <p className="text-xs mb-4">
             Members 1st Federal Credit Union is a federally insured credit union, regulated by the National Credit Union Administration (NCUA). Your deposits are insured up to the maximum amount allowed by law.
           </p>
-          <p className="text-sm mb-4">
+          <p className="text-xs mb-4">
             We are committed to protecting your personal information. For details on how we collect, use, and safeguard your data, please review our
             <a href="https://www.members1st.org/privacy-policy/" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer"> Privacy Policy</a>.
           </p>
-          <p className="text-sm mb-4">
+          <p className="text-xs mb-4">
             For comprehensive information regarding our terms, conditions, and disclosures, please refer to our
             <a href="https://www.members1st.org/disclosures-and-agreements/" className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer"> Disclosures and Agreements</a> page.
           </p>
-          <p className="mb-4">
+          <p className="text-xs mb-4">
             If you have any questions or require further assistance, please contact our Customer Service at
             <a href="tel:8002377288" className="text-blue-600 hover:underline"> (800) 237-7288</a> or visit your nearest branch.
           </p>
-          <p className="text-sm text-gray-600 mt-6">
+          <p className="text-xs text-neutral-600 mt-6">
             &copy; 2025 Members 1st Federal Credit Union. All rights reserved.
           </p>
         </div>

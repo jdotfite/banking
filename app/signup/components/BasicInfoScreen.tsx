@@ -17,13 +17,13 @@ const ProgressIndicator = () => (
         <span className="text-sm font-light text-white mt-2">Basic info</span>
       </div>
       <div className="flex flex-col items-center flex-1">
-        <div className="flex items-center justify-center w-14 h-14 rounded-full bg-neutral-700 text-neutral-500 relative">
+        <div className="flex items-center justify-center w-14 h-14 rounded-full bg-neutral-700 text-neutral-400 relative">
           <Shield size={24} strokeWidth={1.5} />
         </div>
         <span className="text-sm font-light text-neutral-500 mt-2">Verification</span>
       </div>
       <div className="flex flex-col items-center flex-1">
-        <div className="flex items-center justify-center w-14 h-14 rounded-full bg-neutral-700 text-neutral-500 relative">
+        <div className="flex items-center justify-center w-14 h-14 rounded-full bg-neutral-700 text-neutral-400 relative">
           <Heart size={24} strokeWidth={1.5} />
         </div>
         <span className="text-sm font-light text-neutral-500 mt-2">You're in!</span>
