@@ -25,18 +25,18 @@ import {
   SiEbay
 } from 'react-icons/si';
 
-// Import general icons from react-icons/fa (Font Awesome)
+// Import general icons from react-icons/fa6 (Font Awesome 6)
 import {
   FaCreditCard,
-  FaShoppingCart,
-  FaShoppingBag,
-  FaCoffee,
+  FaCartShopping,
+  FaBagShopping,
+  FaMugSaucer,
   FaUtensils,
   FaCar,
   FaDollarSign,
   FaMusic,
   FaTv
-} from 'react-icons/fa';
+} from 'react-icons/fa6';
 
 /**
  * Standard UI icons used for navigation, buttons, and general UI elements
@@ -120,8 +120,8 @@ export const categoryIconMap: Record<string, any> = {
   // Food & Dining
   food: FaUtensils,
   dining: FaUtensils,
-  groceries: FaShoppingCart,
-  coffee: FaCoffee,
+  groceries: FaCartShopping,
+  coffee: FaMugSaucer,
   
   // Transportation
   transport: LucideIcons.Bus,
@@ -136,7 +136,7 @@ export const categoryIconMap: Record<string, any> = {
   home: LucideIcons.Home,
   
   // Shopping
-  shopping: FaShoppingBag,
+  shopping: FaBagShopping,
   clothing: LucideIcons.Shirt,
   clothes: LucideIcons.Shirt,
   electronics: LucideIcons.Smartphone,
