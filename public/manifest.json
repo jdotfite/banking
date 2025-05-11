@@ -51,20 +51,5 @@
       "type": "image/png",
       "purpose": "maskable"
     }
-  ],
-  "shortcuts": [
-    {
-      "name": "View Transactions",
-      "short_name": "Transactions",
-      "description": "View your recent transactions",
-      "url": "/wallet",
-      "icons": [
-        {
-          "src": "/images/icons/icon-192x192.png",
-          "sizes": "96x96",
-          "type": "image/png"
-        }
-      ]
-    }
   ]
 }
