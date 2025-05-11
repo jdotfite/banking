@@ -13,6 +13,10 @@ declare global {
   interface Window {
     deferredPrompt: BeforeInstallPromptEvent | null;
   }
+
+  interface WindowEventMap {
+    beforeinstallprompt: BeforeInstallPromptEvent;
+  }
   namespace JSX {
     interface IntrinsicElements {
       [elemName: string]: any;

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
+import type { BeforeInstallPromptEvent } from '@/types';
 
 export default function RegisterServiceWorker() {
   useEffect(() => {
@@ -39,7 +40,7 @@ export default function RegisterServiceWorker() {
     }
     
     // Set up beforeinstallprompt event listener at the window level
-    const handleBeforeInstallPrompt = (e) => {
+    const handleBeforeInstallPrompt = (e: BeforeInstallPromptEvent) => {
       console.log('beforeinstallprompt event captured in RegisterServiceWorker');
       // Store event for later use by the PWAInstallPrompt component
       window.deferredPrompt = e;
@@ -47,7 +48,7 @@ export default function RegisterServiceWorker() {
     };
     
     // Set up appinstalled event listener
-    const handleAppInstalled = (e) => {
+    const handleAppInstalled = (e: Event) => {
       console.log('App was installed successfully', e);
       // Clear the stored prompt
       window.deferredPrompt = null;
