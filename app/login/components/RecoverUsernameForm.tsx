@@ -88,7 +88,6 @@ const RecoverUsernameForm: React.FC<RecoverUsernameFormProps> = ({ setView }) =>
             onChange={handleMemberIdChange}
             error={errors.memberId}
             autoComplete="username"
-            autoFocus
             aria-invalid={!!errors.memberId}
             aria-describedby={errors.memberId ? "memberId-error" : undefined}
           />
