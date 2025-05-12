@@ -148,7 +148,6 @@ const CreatePasswordScreen: React.FC<CreatePasswordScreenProps> = ({
           onChange={handlePasswordChange}
           error={error}
           autoComplete="new-password"
-          autoFocus
         />
 
         {/* Password strength indicator with checkmark */}

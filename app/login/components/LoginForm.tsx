@@ -120,7 +120,6 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
                   autoComplete="email"
                   inputMode="email"
                   error={errors.email}
-                  autoFocus
                   aria-invalid={!!errors.email}
                   aria-describedby={errors.email ? "email-error" : undefined}
                 />

@@ -146,7 +146,6 @@ const DateOfBirthScreen: React.FC<DateOfBirthScreenProps> = ({ formData, onChang
                       setDobValue(`${month}/${day}/${year}`);
                     }
                   }}
-                  autoFocus
                   aria-invalid={!!error}
                   aria-describedby={error ? "dob-error" : undefined}
                 />

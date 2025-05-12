@@ -121,7 +121,6 @@ const BasicInfoScreen: React.FC<BasicInfoScreenProps> = ({ formData, onChange, o
               error={errors.firstName}
               autoComplete="given-name"
               autoCapitalize="words"
-              autoFocus
             />
 
             <FormInput
