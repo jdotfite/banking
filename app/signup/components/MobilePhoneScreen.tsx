@@ -68,7 +68,6 @@ const MobilePhoneScreen: React.FC<MobilePhoneScreenProps> = ({ formData, onChang
           value={formData.mobilePhone}
           onChange={handlePhoneChange}
           error={error}
-          autoFocus
         />
 
         {/* Marketing consent text */}

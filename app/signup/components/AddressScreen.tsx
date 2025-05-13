@@ -144,7 +144,6 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
                   autoCapitalize="words"
                   onFocus={() => setFocusedFields({...focusedFields, streetAddress: true})}
                   onBlur={() => setFocusedFields({...focusedFields, streetAddress: false})}
-                  autoFocus
                   aria-invalid={!!errors.streetAddress}
                   aria-describedby={errors.streetAddress ? "street-address-error" : undefined}
                 />

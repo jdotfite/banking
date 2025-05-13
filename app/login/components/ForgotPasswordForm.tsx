@@ -68,7 +68,6 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({ setView }) => {
               if (error) setError('');
             }}
             label="Email Address"
-            autoFocus
             aria-invalid={!!error}
             aria-describedby={error ? "email-error" : undefined}
           />
