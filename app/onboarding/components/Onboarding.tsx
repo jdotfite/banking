@@ -80,13 +80,13 @@ interface OnboardingProps {}
 const Onboarding: React.FC<OnboardingProps> = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [slideDirection, setSlideDirection] = useState<'left' | 'right'>('right');
-  const [initialLoad, setInitialLoad] = useState(true);
   const [autoAdvance, setAutoAdvance] = useState(true);
   // Added state for detecting small devices
   const [isSmallDevice, setIsSmallDevice] = useState(false);
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
   const autoAdvanceTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const hasMountedRef = useRef(false);
   const router = useRouter();
   
   useEffect(() => {
@@ -104,8 +104,8 @@ const Onboarding: React.FC<OnboardingProps> = () => {
 
     setViewportHeight();
     window.addEventListener('resize', setViewportHeight);
-    setInitialLoad(false);
     startAutoAdvanceTimer();
+    hasMountedRef.current = true;
     
     return () => {
       if (autoAdvanceTimerRef.current) {
@@ -180,10 +180,10 @@ const Onboarding: React.FC<OnboardingProps> = () => {
     opacity: 1,
     transform: 'translateX(0%)',
     from: { 
-      opacity: (initialLoad && currentSlide === 0) ? 1 : 0,
-      transform: (initialLoad && currentSlide === 0) ? 'translateX(0%)' : `translateX(${slideDirection === 'right' ? '100%' : '-100%'})`
+      opacity: 0,
+      transform: `translateX(${slideDirection === 'right' ? '100%' : '-100%'})`
     },
-    reset: !(initialLoad && currentSlide === 0),
+    reset: true,
     config: { tension: 280, friction: 60 },
     onRest: () => {
       // Restart auto-advance timer after animation completes
@@ -238,20 +238,33 @@ const Onboarding: React.FC<OnboardingProps> = () => {
 
       {/* Main content area - flex-grow to take available space */}
       <div className="relative flex-grow flex items-end overflow-hidden">
-        <animated.div 
-          style={slideAnimation}
-          className="absolute inset-0 flex flex-col items-center justify-end"
-        >
-          {/* Image container with proper constraints */}
-          <div className="w-full h-full flex items-end justify-center px-4 ">
-            <img 
-              src={slides[currentSlide].image} 
-              alt={slides[currentSlide].imageAlt}
-              className="max-h-full max-w-full object-contain object-bottom"
-              style={{ maxHeight: 'calc(100% - 20px)' }} // Ensure some bottom padding
-            />
+        {(!hasMountedRef.current && currentSlide === 0) ? (
+          // On first render, show static slide (no animation)
+          <div className="absolute inset-0 flex flex-col items-center justify-end">
+            <div className="w-full h-full flex items-end justify-center px-4 ">
+              <img 
+                src={slides[currentSlide].image} 
+                alt={slides[currentSlide].imageAlt}
+                className="max-h-full max-w-full object-contain object-bottom"
+                style={{ maxHeight: 'calc(100% - 20px)' }}
+              />
+            </div>
           </div>
-        </animated.div>
+        ) : (
+          <animated.div 
+            style={slideAnimation}
+            className="absolute inset-0 flex flex-col items-center justify-end"
+          >
+            <div className="w-full h-full flex items-end justify-center px-4 ">
+              <img 
+                src={slides[currentSlide].image} 
+                alt={slides[currentSlide].imageAlt}
+                className="max-h-full max-w-full object-contain object-bottom"
+                style={{ maxHeight: 'calc(100% - 20px)' }}
+              />
+            </div>
+          </animated.div>
+        )}
       </div>
 
    {/* Dark gray bottom section - with flex layout */}
@@ -260,15 +273,24 @@ const Onboarding: React.FC<OnboardingProps> = () => {
         {/* Content container with flex layout */}
         <div className="flex flex-col h-full">
           {/* Text content - with fixed height */}
-          <animated.div 
-            style={slideAnimation}
-            className="w-full px-6 pt-5 h-32 overflow-hidden"
-          >
-            <h1 className="text-2xl md:text-4xl font-bold mb-2 md:mb-4">{slides[currentSlide].title}</h1>
-            <p className={`md:text-md opacity-90 ${isSmallDevice ? 'line-clamp-2 overflow-ellipsis' : ''}`}>
-              {slides[currentSlide].subtitle}
-            </p>
-          </animated.div>
+          {(!hasMountedRef.current && currentSlide === 0) ? (
+            <div className="w-full px-6 pt-5 h-32 overflow-hidden">
+              <h1 className="text-2xl md:text-4xl font-bold mb-2 md:mb-4">{slides[currentSlide].title}</h1>
+              <p className={`md:text-md opacity-90 ${isSmallDevice ? 'line-clamp-2 overflow-ellipsis' : ''}`}>
+                {slides[currentSlide].subtitle}
+              </p>
+            </div>
+          ) : (
+            <animated.div 
+              style={slideAnimation}
+              className="w-full px-6 pt-5 h-32 overflow-hidden"
+            >
+              <h1 className="text-2xl md:text-4xl font-bold mb-2 md:mb-4">{slides[currentSlide].title}</h1>
+              <p className={`md:text-md opacity-90 ${isSmallDevice ? 'line-clamp-2 overflow-ellipsis' : ''}`}>
+                {slides[currentSlide].subtitle}
+              </p>
+            </animated.div>
+          )}
           
           {/* Spacer to push content to edges */}
           <div className="flex-grow"></div>
