@@ -3,7 +3,7 @@
 import * as React from 'react';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { bankingData as fakeBankingData } from '@/lib/data/fakeBankingData';
+import generateFakeUsers from '@/lib/data/fakeBankingData';
 import { animated, useSpring } from 'react-spring';
 
 interface AdminProps {
@@ -16,9 +16,9 @@ const Admin: React.FC<AdminProps> = ({ onSelectUser }) => {
   const [bankingData, setBankingData] = useState(() => {
     try {
       const storedData = localStorage.getItem('bankingData');
-      return storedData ? JSON.parse(storedData) : fakeBankingData;
+      return storedData ? JSON.parse(storedData) : generateFakeUsers();
     } catch {
-      return fakeBankingData;
+      return generateFakeUsers();
     }
   });
 

@@ -1,7 +1,7 @@
 // pages/_app.tsx
 import React, { useState, useEffect } from 'react';
 import type { AppProps } from 'next/app';
-import { SimplifiedBankingDataProvider } from '@/components/preloaders/SimplifiedBankingDataProvider';
+import { BankingDataProvider } from '@/components/context/BankingDataProvider';
 import { useAppInitialization } from '@/lib/utils/appInit';
 
 export default function App({ Component, pageProps }: AppProps) {
@@ -18,8 +18,8 @@ export default function App({ Component, pageProps }: AppProps) {
   }, []);
 
   return (
-    <SimplifiedBankingDataProvider>
+    <BankingDataProvider>
       <Component {...pageProps} />
-    </SimplifiedBankingDataProvider>
+    </BankingDataProvider>
   );
 }

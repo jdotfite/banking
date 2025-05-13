@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { animated, useSpring } from 'react-spring';
-import { useBankingData } from '@/components/preloaders/SimplifiedBankingDataProvider';
+import { useBankingData } from '@/components/context/BankingDataProvider';
 import Header from '@/components/ui/navigation/Header';
 import LoadingSpinner from '@/components/ui/common/LoadingSpinner';
 import Icon from '@/components/ui/icons/Icon';

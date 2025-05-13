@@ -3,7 +3,7 @@
 
 import React from 'react';
 import { UserProvider } from '@/components/context/UserContext';
-import { SimplifiedBankingDataProvider } from '@/components/preloaders/SimplifiedBankingDataProvider';
+import { BankingDataProvider } from '@/components/context/BankingDataProvider';
 import ThemeContextProvider from '@/lib/context/ThemeContextProvider';
 import IOSFullScreenProvider from '@/lib/utils/IOSFullScreenProvider';
 import PWAInstallPrompt from '@/components/ui/common/PWAInstallPrompt';
@@ -18,7 +18,7 @@ export default function ClientProviders({ children }: ClientProvidersProps) {
     <ThemeContextProvider>
       <IOSFullScreenProvider>
         <UserProvider>
-          <SimplifiedBankingDataProvider>
+          <BankingDataProvider>
             {/* Developer Tools - Available in all environments */}
             <TestingToolkit />
             
@@ -28,7 +28,7 @@ export default function ClientProviders({ children }: ClientProvidersProps) {
             </div>
             
             {children}
-          </SimplifiedBankingDataProvider>
+          </BankingDataProvider>
         </UserProvider>
       </IOSFullScreenProvider>
     </ThemeContextProvider>

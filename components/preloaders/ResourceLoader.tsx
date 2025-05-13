@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { bankingData } from '@/lib/data/fakeBankingData';
+import generateFakeUsers from '@/lib/data/fakeBankingData';
 
 interface ResourceLoaderProps {
   onProgress: (progress: number) => void;
@@ -61,7 +61,7 @@ const ResourceLoader: React.FC<ResourceLoaderProps> = ({
         // Process and cache data
         try {
           // Process data
-          const processedData = {...bankingData};
+          const processedData = generateFakeUsers();
           
           // Cache data in localStorage
           localStorage.setItem('bankingData', JSON.stringify(processedData));

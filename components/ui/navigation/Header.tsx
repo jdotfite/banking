@@ -4,7 +4,7 @@
 import React from 'react';
 import { Bell } from 'lucide-react';
 import { animated, useSpring } from 'react-spring';
-import { useBankingData } from '@/components/preloaders/SimplifiedBankingDataProvider';
+import { useBankingData } from '@/components/context/BankingDataProvider';
 
 interface HeaderProps {
   userName: string;

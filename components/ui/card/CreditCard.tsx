@@ -5,7 +5,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { animated, useSpring, config } from 'react-spring';
 import { Info } from 'lucide-react';
 import { CardType } from '@/lib/types';
-import { useBankingData } from '@/components/preloaders/SimplifiedBankingDataProvider';
+import { useBankingData } from '@/components/context/BankingDataProvider';
 import { BankingDataType, BankingCreditCard } from '@/lib/types';
 
 interface CreditCardProps {

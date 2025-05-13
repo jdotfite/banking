@@ -4,7 +4,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { animated, useSpring } from 'react-spring';
 import { getDefaultCard } from '@/lib/data/cards';
 import { getTransactions } from '@/lib/data/transactions';
-import { useBankingData } from '@/components/preloaders/SimplifiedBankingDataProvider';
+import { useBankingData } from '@/components/context/BankingDataProvider';
 import CreditCardComponent from '@/components/ui/card/CreditCard'; 
 import TransactionContainer from '@/components/ui/transactions/TransactionContainer';
 import Header from '@/components/ui/navigation/Header';
