@@ -2,7 +2,7 @@
 'use client';
 
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
-import { bankingData } from '@/lib/data/fakeBankingData';
+import bankingData from '@/lib/data/fakeBankingData';
 
 // Define the context types
 type UserContextType = {

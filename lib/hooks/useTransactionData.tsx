@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useBankingData } from '@/components/preloaders/SimplifiedBankingDataProvider';
+import { useBankingData } from '@/components/context/BankingDataProvider';
 import { getTransactionsByPeriod } from '@/lib/data/transactions';
 import { TransactionDateGroup, TransactionType } from '@/lib/types';
 

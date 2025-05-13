@@ -4,7 +4,7 @@ import React from 'react';
 import Card from './components/Card';
 import BottomNav from '@/components/ui/navigation/BottomNav';
 import { UserProvider } from '@/components/context/UserContext';
-import { SimplifiedBankingDataProvider } from '@/components/preloaders/SimplifiedBankingDataProvider';
+import { BankingDataProvider } from '@/components/context/BankingDataProvider';
 import ThemeContextProvider from '@/lib/context/ThemeContextProvider';
 import IOSFullScreenProvider from '@/lib/utils/IOSFullScreenProvider';
 
@@ -13,12 +13,12 @@ export default function CreditCardPage() {
     <ThemeContextProvider>
       <IOSFullScreenProvider>
         <UserProvider initialAdminMode={false}>
-          <SimplifiedBankingDataProvider>
+          <BankingDataProvider>
             <div className="relative min-h-screen">
               <Card />
               <BottomNav />
             </div>
-          </SimplifiedBankingDataProvider>
+          </BankingDataProvider>
         </UserProvider>
       </IOSFullScreenProvider>
     </ThemeContextProvider>
