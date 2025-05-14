@@ -4,7 +4,7 @@
 import React, { useEffect } from 'react';
 import { UserProvider, useUser } from '@/components/context/UserContext';
 import AppContainer from '@/components/layout/AppContainer';
-import Admin from '@/app/admin/components/Admin';
+import Users from '@/app/users/components/Users';
 import { useRouter } from 'next/navigation';
 import LoadingSpinner from '@/components/ui/common/LoadingSpinner';
 import SimplePreloader from '@/components/preloaders/SimplePreloader';
@@ -47,7 +47,7 @@ const AppContent: React.FC = () => {
 
   // Show admin screen if in admin mode
   if (isAdminMode) {
-    return <Admin onSelectUser={handleSelectUser} />;
+    return <Users onSelectUser={handleSelectUser} />;
   }
 
   // Show main app if user is selected
@@ -62,7 +62,7 @@ const AppContent: React.FC = () => {
   }
 
   // Fallback to admin screen if no user is selected
-  return <Admin onSelectUser={handleSelectUser} />;
+  return <Users onSelectUser={handleSelectUser} />;
 };
 
 // Root component that provides context
