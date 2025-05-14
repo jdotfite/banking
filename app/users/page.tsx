@@ -1,10 +1,10 @@
-// app/admin/page.tsx
+// app/users/page.tsx
 'use client';
 
-import Admin from './components/Admin';
+import Users from './components/Users';
 import { useRouter } from 'next/navigation';
 
-export default function AdminPage() {
+export default function UsersPage() {
   const router = useRouter();
 
   const handleSelectUser = (userId: string | null) => {
@@ -16,5 +16,5 @@ export default function AdminPage() {
   };
 
   // Remove the redundant wrapper div
-  return <Admin onSelectUser={handleSelectUser} />;
+  return <Users onSelectUser={handleSelectUser} />;
 }

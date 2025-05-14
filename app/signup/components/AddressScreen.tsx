@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Button } from '../../../components/ui/form';
+import Footer from '../../../components/ui/common/Footer';
 
 interface AddressScreenProps {
   formData: {
@@ -103,7 +104,7 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
         <div className="w-full max-w-md mx-auto">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-4xl font-extralight text-white mb-2">
+            <h1 className="text-3xl font-extralight text-white mb-2">
               Your <span className="font-normal">home address</span>
             </h1>
             <p className="text-neutral-400 text-sm">
@@ -305,16 +306,7 @@ const AddressScreen: React.FC<AddressScreenProps> = ({ formData, onChange, onNex
       </div>
       
       {/* Footer - Fixed at bottom */}
-      <div className="w-full border-t border-neutral-800/50 fixed bottom-0 left-0 bg-[#121212]">
-        <div className="max-w-md mx-auto w-full py-4 px-6">
-          <button 
-            onClick={onShowDisclosures}
-            className="text-center text-neutral-500 text-sm w-full"
-          >
-            See legal disclosures
-          </button>
-        </div>
-      </div>
+      <Footer onShowDisclosures={onShowDisclosures} />
     </div>
   );
 };

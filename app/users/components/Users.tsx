@@ -6,11 +6,11 @@ import { useRouter } from 'next/navigation';
 import generateFakeUsers from '@/lib/data/fakeBankingData';
 import { animated, useSpring } from 'react-spring';
 
-interface AdminProps {
+interface UsersProps {
   onSelectUser: (userId: string | null) => void;
 }
 
-const Admin: React.FC<AdminProps> = ({ onSelectUser }) => {
+const Users: React.FC<UsersProps> = ({ onSelectUser }) => {
   const router = useRouter();
   // Load banking data from localStorage or fall back to fake data
   const [bankingData, setBankingData] = useState(() => {
@@ -89,7 +89,7 @@ const Admin: React.FC<AdminProps> = ({ onSelectUser }) => {
               <animated.div 
                 key={user.id}
                 style={userSprings[index]} 
-                className="bg-[#212121] rounded-xl p-5 mb-4 cursor-pointer hover:bg-neutral-700 transition-colors"
+                className="bg-[#212121] rounded-lg p-5 mb-4 cursor-pointer hover:bg-neutral-700 transition-colors"
                 onClick={() => handleSelectUser(user.id)}
               >
                 <div className="flex items-center mb-3">
@@ -140,4 +140,4 @@ const Admin: React.FC<AdminProps> = ({ onSelectUser }) => {
   );
 };
 
-export default Admin;
+export default Users;

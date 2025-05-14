@@ -92,7 +92,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ setView }) => {
                     <img 
                       src="/images/logos/m1st-square.svg" 
                       alt="Logo" 
-                      className="h-14 w-14 md:h-10 md:w-10 object-contain"
+                      className="h-14 w-14 object-contain"
                     />
                   </div>
                   

@@ -107,9 +107,9 @@ export const BankingDataProvider: React.FC<BankingDataProviderProps> = ({
     } else {
       setUserData({
         user: null,
-        accounts: bankingData.accounts,
-        creditCards: bankingData.creditCards,
-        loans: bankingData.loans,
+        accounts: [],
+        creditCards: [],
+        loans: [],
         transactions: {},
         groupedTransactions: []
       });
@@ -178,10 +178,10 @@ export const BankingDataProvider: React.FC<BankingDataProviderProps> = ({
   }, [cacheKey]);
 
   useEffect(() => {
-    // Only run once on mount
+    // Run on mount and when selectedUserId changes
     loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [selectedUserId]);
 
   const value = {
     data,

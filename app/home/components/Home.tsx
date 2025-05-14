@@ -183,7 +183,7 @@ const Home: React.FC = () => {
             {allAccounts.map((account) => (
               <div 
                 key={account.id}
-                className="bg-[#212121] rounded-xl p-4 flex items-center justify-between"
+                className="bg-[#212121] rounded-lg p-4 flex items-center justify-between"
               >
                 <div className="flex items-center">
                   <div 
@@ -246,7 +246,7 @@ const Home: React.FC = () => {
                   className="min-w-[90%] mr-4 snap-center first:pl-0 last:pr-5 flex"
                   onClick={() => setActivePromotionIndex(index)}
                 >
-                  <div className={`rounded-xl p-4 bg-gradient-to-br ${promo.color} relative overflow-hidden flex-1 flex flex-col`}>
+                  <div className={`rounded-lg p-4 bg-gradient-to-br ${promo.color} relative overflow-hidden flex-1 flex flex-col`}>
                     <div className="flex justify-between flex-1">
                       <div className="max-w-[65%] flex flex-col">
                         <h3 className="text-white font-medium mb-1">{promo.title}</h3>
@@ -296,7 +296,7 @@ const Home: React.FC = () => {
             {bankingTransactions.length > 0 && bankingTransactions[0].transactions.slice(0, 3).map((transaction, index) => (
               <div 
                 key={transaction.id}
-                className="bg-[#212121] rounded-xl p-3 flex items-center justify-between"
+                className="bg-[#212121] rounded-lg p-3 flex items-center justify-between"
                 onClick={handleTransactionsClick}
               >
                 <div className="flex items-center">
@@ -320,7 +320,7 @@ const Home: React.FC = () => {
             
             {/* Show a message if no transactions */}
             {(!bankingTransactions.length || !bankingTransactions[0].transactions.length) && (
-              <div className="bg-[#212121] rounded-xl p-4 text-center">
+              <div className="bg-[#212121] rounded-lg p-4 text-center">
                 <p className="text-neutral-400">No recent transactions</p>
               </div>
             )}

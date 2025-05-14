@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { User, Shield, Heart } from 'lucide-react';
 import { FormInput, Button, FormContainer } from '../../../components/ui/form';
+import Footer from '../../../components/ui/common/Footer';
 
 const ProgressIndicator = () => (
   <div className="w-full py-6 relative">
@@ -11,19 +12,19 @@ const ProgressIndicator = () => (
     
     <div className="flex items-center justify-center mx-auto max-w-md">
       <div className="flex flex-col items-center flex-1">
-        <div className="flex items-center justify-center w-14 h-14 rounded-full bg-neutral-200 text-black relative">
+        <div className="flex items-center justify-center w-12 h-12 rounded-full bg-neutral-200 text-black relative">
           <User size={24} strokeWidth={1.5} />
         </div>
         <span className="text-sm font-light text-white mt-2">Basic info</span>
       </div>
       <div className="flex flex-col items-center flex-1">
-        <div className="flex items-center justify-center w-14 h-14 rounded-full bg-neutral-700 text-neutral-400 relative">
+        <div className="flex items-center justify-center w-12 h-12 rounded-full bg-neutral-700 text-neutral-400 relative">
           <Shield size={24} strokeWidth={1.5} />
         </div>
         <span className="text-sm font-light text-neutral-500 mt-2">Verification</span>
       </div>
       <div className="flex flex-col items-center flex-1">
-        <div className="flex items-center justify-center w-14 h-14 rounded-full bg-neutral-700 text-neutral-400 relative">
+        <div className="flex items-center justify-center w-12 h-12 rounded-full bg-neutral-700 text-neutral-400 relative">
           <Heart size={24} strokeWidth={1.5} />
         </div>
         <span className="text-sm font-light text-neutral-500 mt-2">You're in!</span>
@@ -103,7 +104,7 @@ const BasicInfoScreen: React.FC<BasicInfoScreenProps> = ({ formData, onChange, o
         <div className="w-full max-w-md mx-auto">
           {/* Header */}
           <div className="mb-8">
-            <h1 className="text-4xl font-extralight text-white mb-2">
+            <h1 className="text-3xl font-extralight text-white mb-2">
               Let's <span className="font-normal">get started</span>
             </h1>
             <p className="text-neutral-400 text-sm">
@@ -112,7 +113,7 @@ const BasicInfoScreen: React.FC<BasicInfoScreenProps> = ({ formData, onChange, o
           </div>
 
           {/* Form */}
-          <form onSubmit={handleNext} className="space-y-8">
+          <form onSubmit={handleNext} className="space-y-7">
             <FormInput
               id="firstName"
               label="First Name"
@@ -145,10 +146,6 @@ const BasicInfoScreen: React.FC<BasicInfoScreenProps> = ({ formData, onChange, o
               inputMode="email"
             />
 
-            <p className="text-neutral-500 text-sm pt-1">
-              Use your legal name. You can add a preferred name later.
-            </p>
-
             {/* Next button */}
             <div className="pt-2">
               <Button type="submit">
@@ -160,16 +157,7 @@ const BasicInfoScreen: React.FC<BasicInfoScreenProps> = ({ formData, onChange, o
       </div>
       
       {/* Footer - Fixed at bottom */}
-      <div className="w-full border-t border-neutral-800/50 fixed bottom-0 left-0 bg-[#121212]">
-        <div className="max-w-md mx-auto w-full py-4 px-6">
-          <button 
-            onClick={onShowDisclosures}
-            className="text-center text-neutral-500 text-sm w-full"
-          >
-            See legal disclosures
-          </button>
-        </div>
-      </div>
+      <Footer onShowDisclosures={onShowDisclosures} />
     </div>
   );
 };

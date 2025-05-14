@@ -167,7 +167,7 @@ const SignupFlow: React.FC = () => {
     return true;
   };
 
-  // Complete signup and redirect to admin page
+  // Complete signup and redirect to users page
   const completeSignup = async () => {
     if (!validateFormData()) return;
     

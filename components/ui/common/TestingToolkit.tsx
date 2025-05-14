@@ -194,19 +194,19 @@ const TestingToolkit: React.FC = () => {
               )}
             </div>
 
-            {/* Admin */}
+            {/* Test Users */}
             <div className="mb-2">
               <button
-                onClick={() => toggleSection('admin')}
+                onClick={() => toggleSection('users')}
                 className="w-full flex items-center justify-between text-left text-neutral-300 hover:text-white py-1.5 px-2 rounded-md hover:bg-neutral-700 transition-colors"
               >
-                <span className="text-xs font-medium">Admin</span>
-                <ChevronRight size={14} className={`transform transition-transform ${activeSection==='admin'?'rotate-90':''}`} />
+                <span className="text-xs font-medium">Test Users</span>
+                <ChevronRight size={14} className={`transform transition-transform ${activeSection==='users'?'rotate-90':''}`} />
               </button>
-              {activeSection==='admin' && (
+              {activeSection==='users' && (
                 <div className="pl-2 mt-1 space-y-1">
-                  <button onClick={() => navigateWithBypass('/admin')} className="w-full text-left text-xs text-neutral-400 hover:text-white py-1 px-2 rounded hover:bg-neutral-700 flex items-center">
-                    <Users size={12} className="mr-2"/> Test Users
+                  <button onClick={() => navigateWithBypass('/users')} className="w-full text-left text-xs text-neutral-400 hover:text-white py-1 px-2 rounded hover:bg-neutral-700 flex items-center">
+                    <Users size={12} className="mr-2"/> Manage Users
                   </button>
                 </div>
               )}
