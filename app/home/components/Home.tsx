@@ -191,7 +191,7 @@ const Home: React.FC = () => {
                     style={{ backgroundColor: account.color }}
                   >
                     <Icon 
-                      name={account.type === 'credit' ? 'credit-card' : account.type} 
+name={account.type === 'credit' ? 'cards' : account.type}
                       className="w-5 h-5 text-white" 
                     />
                   </div>

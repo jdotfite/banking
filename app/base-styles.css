@@ -79,12 +79,12 @@ body {
 }
 
 /* Custom card styling */
-.credit-card {
+.cards {
   transition: all 0.3s ease;
   backface-visibility: hidden;
 }
 
-.credit-card:hover {
+.cards:hover {
   transform: scale(1.02);
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
 }
