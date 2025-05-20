@@ -191,12 +191,12 @@ const Card: React.FC = () => {
             <span className="text-sm text-neutral-300">Pay</span>
           </button>
           
-          <button className="bg-[#212121] rounded-xl p-4 flex items-center justify-center hover:bg-neutral-700 transition-colors">
+          <Link href="/cards/manage" className="bg-[#212121] rounded-xl p-4 flex items-center justify-center hover:bg-neutral-700 transition-colors">
             <div className="w-10 h-10 rounded-full bg-neutral-700 flex items-center justify-center mr-2">
               <Icon name="settings" className="w-5 h-5 text-neutral-200" />
             </div>
             <span className="text-sm text-neutral-300">Manage</span>
-          </button>
+          </Link>
         </animated.div>
         
         {/* Refer and Earn section */}
