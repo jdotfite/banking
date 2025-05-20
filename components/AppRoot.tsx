@@ -33,10 +33,13 @@ const AppContent: React.FC = () => {
     }
   }, [selectedUserId, router]);
 
-  // Redirect to onboarding page when user is selected
+  // Redirect to onboarding page when user is selected and on the root path
   useEffect(() => {
-    if (selectedUserId && selectedUserId !== 'new') {
-      router.push('/onboarding');
+    // Only redirect if on the root path
+    if (typeof window !== 'undefined' && window.location.pathname === '/') {
+      if (selectedUserId && selectedUserId !== 'new') {
+        router.push('/onboarding');
+      }
     }
   }, [selectedUserId, router]);
 

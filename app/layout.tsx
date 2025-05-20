@@ -43,7 +43,7 @@ interface RootLayoutProps {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="en" className={`${outfit.variable} dark`}>
+    <html lang="en" suppressHydrationWarning className={`${outfit.variable} dark`}>
       <head>
         <link rel="manifest" href="/manifest.json" />
         <link rel="icon" type="image/png" sizes="196x196" href="/images/icons/favicon-196.png" />

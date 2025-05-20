@@ -304,6 +304,15 @@ const SimplePreloader: React.FC<SimplePreloaderProps> = ({
         if (onComplete) {
           onComplete();
         }
+        
+        // Only redirect to login if on the root path and routeToLoginAfterComplete is true
+        if (routeToLoginAfterComplete && typeof window !== 'undefined') {
+          const currentPath = window.location.pathname;
+          // Only redirect if on the root path
+          if (currentPath === '/') {
+            router.push('/login');
+          }
+        }
       } else {
         // Wait for the remaining time
         const remainingTime = minDisplayTime - elapsedTime;
@@ -313,10 +322,19 @@ const SimplePreloader: React.FC<SimplePreloaderProps> = ({
           if (onComplete) {
             onComplete();
           }
+          
+          // Only redirect to login if on the root path and routeToLoginAfterComplete is true
+          if (routeToLoginAfterComplete && typeof window !== 'undefined') {
+            const currentPath = window.location.pathname;
+            // Only redirect if on the root path
+            if (currentPath === '/') {
+              router.push('/login');
+            }
+          }
         }, remainingTime);
       }
     }
-  }, [resourcesLoaded, progressComplete, minDisplayTime, loadingStartTime, onComplete, markPreloaderComplete]);
+  }, [resourcesLoaded, progressComplete, minDisplayTime, loadingStartTime, onComplete, markPreloaderComplete, routeToLoginAfterComplete, router]);
 
   // Update progress
   const handleProgress = (newProgress: number) => {

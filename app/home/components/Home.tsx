@@ -1,6 +1,7 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import { animated, useSpring } from 'react-spring';
 import { useBankingData } from '@/components/context/BankingDataProvider';
 import Header from '@/components/ui/navigation/Header';
@@ -21,6 +22,12 @@ const Home: React.FC = () => {
   
   // Get banking data from context - Updated import source, same API
   const { userData, isLoading: isBankingDataLoading } = useBankingData();
+  
+  // Debug logging for credit cards
+  useEffect(() => {
+    console.log('Home component - Credit cards:', userData?.creditCards);
+    console.log('Home component - Card-5001 in all cards:', userData?.creditCards?.find(card => card.id === 'card-5001'));
+  }, [userData?.creditCards]);
   
   // React Spring animations
   const headerSpring = useSpring({
@@ -181,36 +188,42 @@ const Home: React.FC = () => {
         <animated.div style={cardsSpring} className="mb-6">
           <div className="space-y-3">
             {allAccounts.map((account) => (
-              <div 
+              <Link 
                 key={account.id}
-                className="bg-[#212121] rounded-lg p-4 flex items-center justify-between"
+                href={account.type === 'credit' ? `/cards/${account.id}` : '#'}
+                className={account.type === 'credit' ? 'block cursor-pointer' : 'block cursor-default'}
+                onClick={(e) => account.type !== 'credit' && e.preventDefault()}
               >
-                <div className="flex items-center">
-                  <div 
-                    className="w-10 h-10 rounded-full flex items-center justify-center mr-3"
-                    style={{ backgroundColor: account.color }}
-                  >
-                    <Icon 
-name={account.type === 'credit' ? 'cards' : account.type}
-                      className="w-5 h-5 text-white" 
-                    />
+                <div 
+                  className="bg-[#212121] rounded-lg p-4 flex items-center justify-between"
+                >
+                  <div className="flex items-center">
+                    <div 
+                      className="w-10 h-10 rounded-full flex items-center justify-center mr-3"
+                      style={{ backgroundColor: account.color }}
+                    >
+                      <Icon 
+                        name={account.type === 'credit' ? 'cards' : account.type}
+                        className="w-5 h-5 text-white" 
+                      />
+                    </div>
+                    <div>
+                      <div className="font-medium tracking-tight text-white">{account.name}</div>
+                      <div className="text-neutral-400 text-xs">
+                        {account.accountNumber}
+                      </div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="font-medium tracking-tight text-white">{account.name}</div>
-                    <div className="text-neutral-400 text-xs">
-                      {account.accountNumber}
+                  <div className="text-right">
+                    <div className="font-medium tracking-tight text-white">
+                      ${account.balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                    </div>
+                    <div className="text-neutral-400 text-xs capitalize">
+                      {account.type}
                     </div>
                   </div>
                 </div>
-                <div className="text-right">
-                  <div className="font-medium tracking-tight text-white">
-                    ${account.balance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-                  </div>
-                  <div className="text-neutral-400 text-xs capitalize">
-                    {account.type}
-                  </div>
-                </div>
-              </div>
+              </Link>
             ))}
           </div>
         </animated.div>

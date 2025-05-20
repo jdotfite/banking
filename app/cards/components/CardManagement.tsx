@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
-import { animated, useSprings, config } from "react-spring";
-import { useDrag } from "@use-gesture/react";
+import React, { useState, useEffect, useRef } from "react";
+import { animated, useSpring, config } from "react-spring";
 import Icon from "@/components/ui/icons/Icon";
 import { ArrowLeft } from "lucide-react";
 
@@ -34,6 +33,7 @@ const CardManagement: React.FC = () => {
   const [isFrozen, setIsFrozen] = useState(false);
   const [orderNewCard, setOrderNewCard] = useState(false);
   const [cards, setCards] = useState<Card[]>(initialCards);
+  const [removing, setRemoving] = useState(false);
 
   // Action list
   const actions: Action[] = [
@@ -48,73 +48,111 @@ const CardManagement: React.FC = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  // Animation for all cards
-  const [springs, api] = useSprings(cards.length, (i) => ({
-    y: i * -15,
-    scale: Math.max(0.85, 1 - i * 0.05),
-    rot: i === 0 ? 0 : -8 + i * 4,
-    opacity: Math.max(0.6, 1 - i * 0.15),
+  // Animation for the top card
+  const [{ y, scale }, api] = useSpring(() => ({
+    y: 0,
+    scale: 1,
     config: config.stiff,
   }));
 
-  const handleCardRemoved = useCallback(() => {
-    api.start(i => {
-      if (i === 0) {
-        return {
-          y: 700,
-          opacity: 0,
-          onRest: () => {
-            setCards(c => (c.length > 1 ? c.slice(1) : initialCards));
-          }
-        };
-      }
-      return {
-        y: (i - 1) * -15,
-        scale: Math.max(0.85, 1 - (i - 1) * 0.05),
-        rot: i === 1 ? 0 : -8 + (i - 1) * 4,
-        opacity: Math.max(0.6, 1 - (i - 1) * 0.15),
-      };
-    });
-  }, [api]);
+  // Drag state refs
+  const dragging = useRef(false);
+  const startY = useRef(0);
 
-  // Drag gesture for top card
-  const bind = useDrag((state) => {
-    console.log('Drag state:', state);
-    const { active, movement: [mx, my], velocity, direction } = state;
-    const yVelocity = Math.abs(velocity[1]);
-    if (active) {
-      api.start(i => {
-        if (i === 0) {
-          return {
-            y: my,
-            rot: my / 10,
-            immediate: true,
-          };
-        }
-        return {};
+  // Touch/mouse event handlers
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (removing) return;
+    dragging.current = true;
+    startY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!dragging.current || removing) return;
+    const offsetY = e.touches[0].clientY - startY.current;
+    if (offsetY < 0) return; // Only allow downward swipe
+    api.start({ y: offsetY, immediate: true });
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!dragging.current || removing) return;
+    dragging.current = false;
+    const offsetY = Math.min(220, e.changedTouches[0].clientY - startY.current);
+    api.start({ 
+      y: offsetY,
+      scale: 1 - offsetY/150,
+      immediate: true 
+    });
+    if (offsetY > 100) {
+      setRemoving(true);
+      api.start({
+        y: 220,
+        scale: 0,
+        immediate: false,
+        config: { tension: 300, friction: 30 }
       });
-    } else {
-      if ((direction[1] > 0 && (yVelocity > 1.5 || my > 200)) || 
-          (direction[1] < 0 && (yVelocity > 1.5 || my < -200))) {
-        handleCardRemoved();
-      } else {
-        api.start(i => {
-          if (i === 0) {
-            return { y: 0, rot: 0 };
-          }
-          return {};
+      setTimeout(() => {
+        setCards((c) => {
+          const [first, ...rest] = c;
+          return [...rest, first];
         });
-      }
+        api.start({ y: 0, scale: 1, immediate: true });
+        setRemoving(false);
+      }, 300);
+    } else {
+      api.start({ y: 0, scale: 1, immediate: false });
     }
-  }, {
-    filterTaps: false,
-    bounds: { top: -200, bottom: 200, left: -200, right: 200 },
-    rubberband: 0.3,
-    pointer: { touch: true, mouse: true },
-    axis: 'y',
-    threshold: 10,
-    preventDefault: true
-  });
+  };
+
+  // Mouse events for desktop
+  const mouseDragging = useRef(false);
+  const mouseStartY = useRef(0);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (removing) return;
+    mouseDragging.current = true;
+    mouseStartY.current = e.clientY;
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!mouseDragging.current || removing) return;
+    const offsetY = e.clientY - mouseStartY.current;
+    if (offsetY < 0) return;
+    api.start({ y: offsetY, immediate: true });
+  };
+
+  const handleMouseUp = (e: MouseEvent) => {
+    if (!mouseDragging.current || removing) return;
+    mouseDragging.current = false;
+    const offsetY = Math.min(220, e.clientY - mouseStartY.current);
+    api.start({ 
+      y: offsetY,
+      scale: 1 - offsetY/150,
+      immediate: true 
+    });
+    if (offsetY > 100) {
+      setRemoving(true);
+      api.start({
+        y: 220,
+        scale: 0,
+        immediate: false,
+        config: { tension: 300, friction: 30 }
+      });
+      setTimeout(() => {
+        setCards((c) => {
+          const [first, ...rest] = c;
+          return [...rest, first];
+        });
+        api.start({ y: 0, scale: 1, immediate: true });
+        setRemoving(false);
+      }, 300);
+    } else {
+      api.start({ y: 0, scale: 1, immediate: false });
+    }
+    window.removeEventListener("mousemove", handleMouseMove);
+    window.removeEventListener("mouseup", handleMouseUp);
+  };
 
   if (isLoading) {
     return (
@@ -137,18 +175,19 @@ const CardManagement: React.FC = () => {
       <div className="px-5 max-w-md mx-auto">
         {/* Card Stack */}
         <div className="mb-8" style={{ height: '220px', position: 'relative', perspective: '1000px' }}>
-          {springs.map(({ y, scale, rot, opacity }, i) => {
-            const card = cards[i];
+          {cards.map((card, i) => {
+            const isTopCard = i === 0;
             return (
               <animated.div
                 key={card.id}
                 style={{
                   backgroundColor: card.color,
                   color: 'white',
-                  transform: y.to(y => `translateY(${y}px) scale(${scale}) rotateX(${rot}deg)`),
-                  transformStyle: 'preserve-3d',
+                  transform: isTopCard
+                    ? y.to(yVal => `translateY(${yVal}px) scale(${1 - yVal/150})`)
+                    : `translateY(${-15 * i}px) scale(${Math.max(0.85, 1 - i * 0.05)})`,
                   zIndex: cards.length - i,
-                  opacity,
+                  opacity: Math.max(0.6, 1 - i * 0.15),
                   position: 'absolute',
                   width: '100%',
                   height: '100%',
@@ -156,9 +195,14 @@ const CardManagement: React.FC = () => {
                   boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
                   padding: '16px',
                   userSelect: 'none',
-                  touchAction: 'pan-y',
+                  touchAction: 'none',
+                  transformStyle: 'preserve-3d',
+                  transition: isTopCard ? 'none' : 'top 0.3s ease, opacity 0.3s ease, transform 0.3s ease',
                 }}
-                {...(i === 0 ? bind() : {})}
+                onTouchStart={isTopCard ? handleTouchStart : undefined}
+                onTouchMove={isTopCard ? handleTouchMove : undefined}
+                onTouchEnd={isTopCard ? handleTouchEnd : undefined}
+                onMouseDown={isTopCard ? handleMouseDown : undefined}
               >
                 <div className="card-header">
                   <span className="card-holder">{card.name}</span>

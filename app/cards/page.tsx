@@ -1,26 +1,15 @@
 'use client';
 
 import React from 'react';
-import Card from './components/Card';
-import BottomNav from '@/components/ui/navigation/BottomNav';
-import { UserProvider } from '@/components/context/UserContext';
-import { BankingDataProvider } from '@/components/context/BankingDataProvider';
-import ThemeContextProvider from '@/lib/context/ThemeContextProvider';
-import IOSFullScreenProvider from '@/lib/utils/IOSFullScreenProvider';
+import dynamic from 'next/dynamic';
 
-export default function CreditCardPage() {
-  return (
-    <ThemeContextProvider>
-      <IOSFullScreenProvider>
-        <UserProvider initialAdminMode={false}>
-          <BankingDataProvider>
-            <div className="relative min-h-screen">
-              <Card />
-              <BottomNav />
-            </div>
-          </BankingDataProvider>
-        </UserProvider>
-      </IOSFullScreenProvider>
-    </ThemeContextProvider>
-  );
+const CardsListView = dynamic(() => import('@/components/screens/CardsListView'), { 
+  ssr: false,
+  loading: () => <div className="min-h-screen bg-[#121212] flex items-center justify-center">
+    <div className="animate-pulse">Loading cards...</div>
+  </div>
+});
+
+export default function CardsPage() {
+  return <CardsListView />;
 }

@@ -55,8 +55,18 @@ export const UserProvider: React.FC<UserProviderProps> = ({
         if (isAdminMode) {
           setIsAdminMode(false);
         }
+      } else {
+        // Default to user1 for testing if no user is selected
+        setSelectedUserId('user1');
+        localStorage.setItem('selectedUserId', 'user1');
+        if (isAdminMode) {
+          setIsAdminMode(false);
+        }
       }
       setIsInitialized(true);
+      
+      // Debug logging
+      console.log('Selected user ID from localStorage:', storedUserId || 'user1 (default)');
     }
   }, [isAdminMode]);
 

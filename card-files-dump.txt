@@ -1,0 +1,1584 @@
+﻿
+
+
+<<<<<<<<<<<<<< FILE: app/cards/components/Card.tsx >>>>>>>>>>>>>>>
+
+'use client';
+
+import React, { useState, useEffect, useRef } from 'react';
+import { animated, useSpring } from 'react-spring';
+import { getDefaultCard } from '@/lib/data/cards';
+import { getTransactions } from '@/lib/data/transactions';
+import { useBankingData } from '@/components/context/BankingDataProvider';
+import CreditCardComponent from '@/components/ui/card/CreditCard'; 
+import TransactionContainer from '@/components/ui/transactions/TransactionContainer';
+import Header from '@/components/ui/navigation/Header';
+import LoadingSpinner from '@/components/ui/common/LoadingSpinner';
+import Icon from '@/components/ui/icons/Icon';
+import { BankingDataType, BankingCreditCard } from '@/lib/types';
+import { Lock, ArrowLeft, Bell } from 'lucide-react';
+import Link from 'next/link';
+
+const Card: React.FC = () => {
+  const card = getDefaultCard();
+  const transactions = getTransactions();
+  const [isLoading, setIsLoading] = useState(true);
+  const [showInfo, setShowInfo] = useState(false);
+  const [balance, setBalance] = useState(25552.92);
+  const payButtonsRef = useRef<HTMLDivElement>(null);
+  const [buttonBottomPosition, setButtonBottomPosition] = useState(0);
+  const [isTransactionCollapsed, setIsTransactionCollapsed] = useState(true);
+  const [showTransactions, setShowTransactions] = useState(false);
+  const isManageClickRef = useRef(false);
+  
+  // Get banking data from context
+  const { userData, isLoading: isBankingDataLoading } = useBankingData();
+  
+  // React Spring animations
+  const cardSpring = useSpring({
+    opacity: isLoading ? 0 : 1,
+    transform: isLoading ? 'translateY(20px)' : 'translateY(0px)',
+    delay: 100,
+    config: { tension: 280, friction: 25 }
+  });
+  
+  const sectionSpring = useSpring({
+    opacity: isLoading ? 0 : 1,
+    transform: isLoading ? 'translateY(20px)' : 'translateY(0px)',
+    delay: 200,
+    config: { tension: 280, friction: 25 }
+  });
+  
+  const actionsSpring = useSpring({
+    opacity: isLoading ? 0 : 1,
+    transform: isLoading ? 'translateY(20px)' : 'translateY(0px)',
+    delay: 300,
+    config: { tension: 280, friction: 25 }
+  });
+
+  // Get card info from banking data if available
+  const cardInfo = userData?.creditCards?.[0];
+  const rewardsBalance = cardInfo?.rewardsBalance || 0;
+
+  // Loading simulation
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 800);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Calculate button positions for transaction container
+  useEffect(() => {
+    if (!isLoading) {
+      const calculatePositions = () => {
+        if (payButtonsRef.current) {
+          const rect = payButtonsRef.current.getBoundingClientRect();
+          if (rect.bottom > 0) {
+            setButtonBottomPosition(rect.bottom);
+          }
+        }
+      };
+      
+      calculatePositions();
+      const animationDelay = setTimeout(calculatePositions, 350);
+      window.addEventListener('resize', calculatePositions);
+      
+      return () => {
+        clearTimeout(animationDelay);
+        window.removeEventListener('resize', calculatePositions);
+      };
+    }
+  }, [isLoading, showInfo]); 
+
+  // Handle transactions click
+  const handleTransactionsClick = () => {
+    setShowTransactions(true);
+    setIsTransactionCollapsed(false);
+  };
+
+  // Handle manage button click
+  const handleManageClick = () => {
+    isManageClickRef.current = true;
+    setIsTransactionCollapsed(!isTransactionCollapsed);
+    
+    if (showTransactions === false && !isTransactionCollapsed) {
+      setShowTransactions(true);
+    }
+    
+    setTimeout(() => {
+      isManageClickRef.current = false;
+    }, 100);
+  };
+
+  // Handle collapse state changes
+  const handleCollapseChange = (collapsed: boolean) => {
+    setIsTransactionCollapsed(collapsed);
+    
+    if (collapsed) {
+      setTimeout(() => {
+        setShowTransactions(false);
+      }, 300);
+    }
+  };
+
+  // Show loading spinner if loading
+  if (isLoading || isBankingDataLoading) {
+    return (
+      <LoadingSpinner size="large" fullScreen={true} />
+    );
+  }
+
+  // Get user name and transactions from data
+  const userName = userData?.user?.name?.split(' ')[0] || 'Guest';
+  const bankingTransactions = userData?.groupedTransactions || transactions;
+
+  return (
+    <div className="relative min-h-screen bg-app-black text-white">
+      {/* Custom header with back button */}
+      <div className="px-5 pt-8 pb-6 mx-auto max-w-md">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center">
+            <Link href="/" className="mr-3">
+              <ArrowLeft className="w-6 h-6" />
+            </Link>
+            <div className="text-xl font-medium tracking-tight">Credit Card</div>
+          </div>
+          <button className="relative p-1">
+            <Bell className="w-6 h-6" />
+            <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full transform -translate-y-1/4 translate-x-1/4"></span>
+          </button>
+        </div>
+      </div>
+      
+      <div className="px-5 mx-auto max-w-md">
+        {/* Card with React Spring animation */}
+        <animated.div style={cardSpring} className="mb-4">
+          <CreditCardComponent 
+            showInfoState={[showInfo, setShowInfo]}
+          />
+        </animated.div>
+        
+        {/* Main sections grid */}
+        <animated.div style={sectionSpring} className="grid grid-cols-2 gap-4 mb-4">
+          {/* Transactions section */}
+          <div 
+            className="bg-[#212121] rounded-xl p-4 cursor-pointer hover:bg-neutral-700 transition-colors"
+            onClick={handleTransactionsClick}
+          >
+            <h3 className="text-sm font-medium mb-1">Transactions</h3>
+            <p className="text-xs text-neutral-400 mb-2">Spent in April</p>
+            <div className="flex space-x-1 mb-1">
+              <div className="h-4 w-1/4 rounded-full bg-purple-500"></div>
+              <div className="h-4 w-1/4 rounded-full bg-red-500"></div>
+              <div className="h-4 w-1/4 rounded-full bg-blue-500"></div>
+              <div className="h-4 w-1/4 rounded-full bg-yellow-500"></div>
+            </div>
+          </div>
+          
+          {/* Rewards section */}
+          <div className="bg-[#212121] rounded-xl p-4">
+            <h3 className="text-sm font-medium mb-1">Rewards</h3>
+            <p className="text-xs text-neutral-400 mb-2">Cash back earned</p>
+            <p className="text-green-500 font-semibold">${rewardsBalance.toFixed(2)}</p>
+          </div>
+        </animated.div>
+        
+        {/* Action buttons */}
+        <animated.div style={sectionSpring} className="grid grid-cols-2 gap-4 mb-4" ref={payButtonsRef}>
+          <button 
+            className="bg-[#212121] rounded-xl p-4 flex items-center justify-center hover:bg-neutral-700 transition-colors"
+            onClick={handleTransactionsClick}
+          >
+            <div className="w-10 h-10 rounded-full bg-neutral-700 flex items-center justify-center mr-2">
+              <Icon name="repeat" className="w-5 h-5 text-neutral-200" />
+            </div>
+            <span className="text-sm text-neutral-300">Pay</span>
+          </button>
+          
+          <Link href="/cards/manage" className="bg-[#212121] rounded-xl p-4 flex items-center justify-center hover:bg-neutral-700 transition-colors">
+            <div className="w-10 h-10 rounded-full bg-neutral-700 flex items-center justify-center mr-2">
+              <Icon name="settings" className="w-5 h-5 text-neutral-200" />
+            </div>
+            <span className="text-sm text-neutral-300">Manage</span>
+          </Link>
+        </animated.div>
+        
+        {/* Refer and Earn section */}
+        <animated.div style={actionsSpring} className="bg-[#212121] rounded-xl p-4 mb-4 relative overflow-hidden">
+          <div className="flex justify-between">
+            <div>
+              <h3 className="text-sm font-medium mb-1">Refer and Earn</h3>
+              <p className="text-xs text-neutral-400 max-w-[70%]">
+                Share a referral link to your friend and get rewarded
+              </p>
+              <button className="mt-2 text-xs text-white bg-neutral-700 px-3 py-1 rounded-full hover:bg-neutral-600 transition-colors">
+                Learn more
+              </button>
+            </div>
+            <div className="absolute right-2 bottom-2">
+              <img src="/images/marketing/refer-friend.png" alt="Refer a friend" className="h-24 object-contain" />
+            </div>
+          </div>
+        </animated.div>
+        
+        {/* Additional action buttons */}
+        <animated.div style={actionsSpring} className="grid grid-cols-2 gap-4 mb-4">
+          <button className="bg-[#212121] rounded-xl p-4 flex items-center justify-center hover:bg-neutral-700 transition-colors">
+            <div className="w-10 h-10 rounded-full bg-neutral-700 flex items-center justify-center mr-2">
+              <Icon name="transfer" className="w-5 h-5 text-neutral-200" />
+            </div>
+            <span className="text-sm text-neutral-300">Balance Transfer</span>
+          </button>
+          
+          <button className="bg-[#212121] rounded-xl p-4 flex items-center justify-center hover:bg-neutral-700 transition-colors">
+            <div className="w-10 h-10 rounded-full bg-neutral-700 flex items-center justify-center mr-2">
+              <Lock className="w-5 h-5 text-neutral-200" />
+            </div>
+            <span className="text-sm text-neutral-300">Lock/Unlock</span>
+          </button>
+        </animated.div>
+        
+        {/* Statements section */}
+        <animated.div style={actionsSpring} className="bg-[#212121] rounded-xl p-4 mb-4">
+          <div className="flex justify-between items-center">
+            <h3 className="text-sm font-medium">Statements and Documents</h3>
+            <button className="text-xs text-neutral-400 hover:text-white transition-colors">
+              View All
+            </button>
+          </div>
+        </animated.div>
+        
+        {/* Transaction Container */}
+        {showTransactions && buttonBottomPosition > 0 && (
+          <TransactionContainer 
+            transactionGroups={bankingTransactions}
+            buttonBottomPosition={buttonBottomPosition}
+            isCollapsed={isTransactionCollapsed}
+            onCollapseChange={handleCollapseChange}
+          />
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default Card;
+
+
+
+<<<<<<<<<<<<<< FILE: app/cards/components/CardDetails.tsx >>>>>>>>>>>>>>>
+
+'use client';
+
+import React, { useState, useEffect, useRef } from 'react';
+import { animated, useSpring } from 'react-spring';
+import { getDefaultCard } from '@/lib/data/cards';
+import { getTransactions } from '@/lib/data/transactions';
+import { useBankingData } from '@/components/context/BankingDataProvider';
+import CreditCardComponent from '@/components/ui/card/CreditCard'; 
+import TransactionContainer from '@/components/ui/transactions/TransactionContainer';
+import Header from '@/components/ui/navigation/Header';
+import LoadingSpinner from '@/components/ui/common/LoadingSpinner';
+import Icon from '@/components/ui/icons/Icon';
+import { BankingDataType, BankingCreditCard } from '@/lib/types';
+import { Lock, ArrowLeft, Bell } from 'lucide-react';
+import Link from 'next/link';
+
+const CreditCardView: React.FC = () => {
+  const card = getDefaultCard();
+  const transactions = getTransactions();
+  const [isLoading, setIsLoading] = useState(true);
+  const [showInfo, setShowInfo] = useState(false);
+  const [balance, setBalance] = useState(25552.92);
+  const payButtonsRef = useRef<HTMLDivElement>(null);
+  const [buttonBottomPosition, setButtonBottomPosition] = useState(0);
+  const [isTransactionCollapsed, setIsTransactionCollapsed] = useState(true);
+  const [showTransactions, setShowTransactions] = useState(false);
+  const isManageClickRef = useRef(false);
+  
+  // Get banking data from context
+  const { userData, isLoading: isBankingDataLoading } = useBankingData();
+  
+  // React Spring animations
+  const cardSpring = useSpring({
+    opacity: isLoading ? 0 : 1,
+    transform: isLoading ? 'translateY(20px)' : 'translateY(0px)',
+    delay: 100,
+    config: { tension: 280, friction: 25 }
+  });
+  
+  const sectionSpring = useSpring({
+    opacity: isLoading ? 0 : 1,
+    transform: isLoading ? 'translateY(20px)' : 'translateY(0px)',
+    delay: 200,
+    config: { tension: 280, friction: 25 }
+  });
+  
+  const actionsSpring = useSpring({
+    opacity: isLoading ? 0 : 1,
+    transform: isLoading ? 'translateY(20px)' : 'translateY(0px)',
+    delay: 300,
+    config: { tension: 280, friction: 25 }
+  });
+
+  // Get card info from banking data if available
+  const cardInfo = userData?.creditCards?.[0];
+  const rewardsBalance = cardInfo?.rewardsBalance || 0;
+
+  // Loading simulation
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 800);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Calculate button positions for transaction container
+  useEffect(() => {
+    if (!isLoading) {
+      const calculatePositions = () => {
+        if (payButtonsRef.current) {
+          const rect = payButtonsRef.current.getBoundingClientRect();
+          if (rect.bottom > 0) {
+            setButtonBottomPosition(rect.bottom);
+          }
+        }
+      };
+      
+      calculatePositions();
+      const animationDelay = setTimeout(calculatePositions, 350);
+      window.addEventListener('resize', calculatePositions);
+      
+      return () => {
+        clearTimeout(animationDelay);
+        window.removeEventListener('resize', calculatePositions);
+      };
+    }
+  }, [isLoading, showInfo]); 
+
+  // Handle transactions click
+  const handleTransactionsClick = () => {
+    setShowTransactions(true);
+    setIsTransactionCollapsed(false);
+  };
+
+  // Handle manage button click
+  const handleManageClick = () => {
+    isManageClickRef.current = true;
+    setIsTransactionCollapsed(!isTransactionCollapsed);
+    
+    if (showTransactions === false && !isTransactionCollapsed) {
+      setShowTransactions(true);
+    }
+    
+    setTimeout(() => {
+      isManageClickRef.current = false;
+    }, 100);
+  };
+
+  // Handle collapse state changes
+  const handleCollapseChange = (collapsed: boolean) => {
+    setIsTransactionCollapsed(collapsed);
+    
+    if (collapsed) {
+      setTimeout(() => {
+        setShowTransactions(false);
+      }, 300);
+    }
+  };
+
+  // Show loading spinner if loading
+  if (isLoading || isBankingDataLoading) {
+    return (
+      <LoadingSpinner size="large" fullScreen={true} />
+    );
+  }
+
+  // Get user name and transactions from data
+  const userName = userData?.user?.name?.split(' ')[0] || 'Guest';
+  const bankingTransactions = userData?.groupedTransactions || transactions;
+
+  return (
+    <div className="relative min-h-screen bg-app-black text-white">
+      {/* Custom header with back button */}
+      <div className="px-5 pt-8 pb-6 mx-auto max-w-md">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center">
+            <Link href="/" className="mr-3">
+              <ArrowLeft className="w-6 h-6" />
+            </Link>
+            <div className="text-xl font-medium tracking-tight">Credit Card</div>
+          </div>
+          <button className="relative p-1">
+            <Bell className="w-6 h-6" />
+            <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full transform -translate-y-1/4 translate-x-1/4"></span>
+          </button>
+        </div>
+      </div>
+      
+      <div className="px-5 mx-auto max-w-md">
+        {/* Card with React Spring animation */}
+        <animated.div style={cardSpring} className="mb-4">
+          <CreditCardComponent 
+            showInfoState={[showInfo, setShowInfo]}
+          />
+        </animated.div>
+        
+        {/* Main sections grid */}
+        <animated.div style={sectionSpring} className="grid grid-cols-2 gap-4 mb-4">
+          {/* Transactions section */}
+          <div 
+            className="bg-[#212121] rounded-xl p-4 cursor-pointer hover:bg-neutral-700 transition-colors"
+            onClick={handleTransactionsClick}
+          >
+            <h3 className="text-sm font-medium mb-1">Transactions</h3>
+            <p className="text-xs text-neutral-400 mb-2">Spent in April</p>
+            <div className="flex space-x-1 mb-1">
+              <div className="h-4 w-1/4 rounded-full bg-purple-500"></div>
+              <div className="h-4 w-1/4 rounded-full bg-red-500"></div>
+              <div className="h-4 w-1/4 rounded-full bg-blue-500"></div>
+              <div className="h-4 w-1/4 rounded-full bg-yellow-500"></div>
+            </div>
+          </div>
+          
+          {/* Rewards section */}
+          <div className="bg-[#212121] rounded-xl p-4">
+            <h3 className="text-sm font-medium mb-1">Rewards</h3>
+            <p className="text-xs text-neutral-400 mb-2">Cash back earned</p>
+            <p className="text-green-500 font-semibold">${rewardsBalance.toFixed(2)}</p>
+          </div>
+        </animated.div>
+        
+        {/* Action buttons */}
+        <animated.div style={sectionSpring} className="grid grid-cols-2 gap-4 mb-4" ref={payButtonsRef}>
+          <button 
+            className="bg-[#212121] rounded-xl p-4 flex items-center justify-center hover:bg-neutral-700 transition-colors"
+            onClick={handleTransactionsClick}
+          >
+            <div className="w-10 h-10 rounded-full bg-neutral-700 flex items-center justify-center mr-2">
+              <Icon name="repeat" className="w-5 h-5 text-neutral-200" />
+            </div>
+            <span className="text-sm text-neutral-300">Pay</span>
+          </button>
+          
+          <button className="bg-[#212121] rounded-xl p-4 flex items-center justify-center hover:bg-neutral-700 transition-colors">
+            <div className="w-10 h-10 rounded-full bg-neutral-700 flex items-center justify-center mr-2">
+              <Icon name="settings" className="w-5 h-5 text-neutral-200" />
+            </div>
+            <span className="text-sm text-neutral-300">Manage</span>
+          </button>
+        </animated.div>
+        
+        {/* Refer and Earn section */}
+        <animated.div style={actionsSpring} className="bg-[#212121] rounded-xl p-4 mb-4 relative overflow-hidden">
+          <div className="flex justify-between">
+            <div>
+              <h3 className="text-sm font-medium mb-1">Refer and Earn</h3>
+              <p className="text-xs text-neutral-400 max-w-[70%]">
+                Share a referral link to your friend and get rewarded
+              </p>
+              <button className="mt-2 text-xs text-white bg-neutral-700 px-3 py-1 rounded-full hover:bg-neutral-600 transition-colors">
+                Learn more
+              </button>
+            </div>
+            <div className="absolute right-2 bottom-2">
+              <img src="/images/marketing/refer-friend.png" alt="Refer a friend" className="h-24 object-contain" />
+            </div>
+          </div>
+        </animated.div>
+        
+        {/* Additional action buttons */}
+        <animated.div style={actionsSpring} className="grid grid-cols-2 gap-4 mb-4">
+          <button className="bg-[#212121] rounded-xl p-4 flex items-center justify-center hover:bg-neutral-700 transition-colors">
+            <div className="w-10 h-10 rounded-full bg-neutral-700 flex items-center justify-center mr-2">
+              <Icon name="transfer" className="w-5 h-5 text-neutral-200" />
+            </div>
+            <span className="text-sm text-neutral-300">Balance Transfer</span>
+          </button>
+          
+          <button className="bg-[#212121] rounded-xl p-4 flex items-center justify-center hover:bg-neutral-700 transition-colors">
+            <div className="w-10 h-10 rounded-full bg-neutral-700 flex items-center justify-center mr-2">
+              <Lock className="w-5 h-5 text-neutral-200" />
+            </div>
+            <span className="text-sm text-neutral-300">Lock/Unlock</span>
+          </button>
+        </animated.div>
+        
+        {/* Statements section */}
+        <animated.div style={actionsSpring} className="bg-[#212121] rounded-xl p-4 mb-4">
+          <div className="flex justify-between items-center">
+            <h3 className="text-sm font-medium">Statements and Documents</h3>
+            <button className="text-xs text-neutral-400 hover:text-white transition-colors">
+              View All
+            </button>
+          </div>
+        </animated.div>
+        
+        {/* Transaction Container */}
+        {showTransactions && buttonBottomPosition > 0 && (
+          <TransactionContainer 
+            transactionGroups={bankingTransactions}
+            buttonBottomPosition={buttonBottomPosition}
+            isCollapsed={isTransactionCollapsed}
+            onCollapseChange={handleCollapseChange}
+          />
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default CreditCardView;
+
+
+
+<<<<<<<<<<<<<< FILE: app/cards/components/CardManagement.tsx >>>>>>>>>>>>>>>
+
+"use client";
+
+import React, { useState, useEffect, useRef } from "react";
+import { animated, useSpring, config } from "react-spring";
+import Icon from "@/components/ui/icons/Icon";
+import { ArrowLeft } from "lucide-react";
+
+type Card = {
+  id: number;
+  name: string;
+  brand: string;
+  number: string;
+  validThru: string;
+  cvv: string;
+  color: string;
+};
+
+type Action = {
+  icon: string;
+  label: string;
+  type: string;
+};
+
+// Card data
+const initialCards: Card[] = [
+  { id: 1, name: "John Smith", brand: "BANK", number: "xxxx xxxx xxxx 5678", validThru: "12/25", cvv: "xxx", color: "#5B69FF" },
+  { id: 2, name: "John Smith", brand: "BANK", number: "xxxx xxxx xxxx 9012", validThru: "10/24", cvv: "xxx", color: "#7B61FF" },
+  { id: 3, name: "John Smith", brand: "BANK", number: "xxxx xxxx xxxx 3456", validThru: "08/26", cvv: "xxx", color: "#9A58FF" },
+];
+
+const CardManagement: React.FC = () => {
+  const [isLoading, setIsLoading] = useState(true);
+  const [isFrozen, setIsFrozen] = useState(false);
+  const [orderNewCard, setOrderNewCard] = useState(false);
+  const [cards, setCards] = useState<Card[]>(initialCards);
+  const [removing, setRemoving] = useState(false);
+
+  // Action list
+  const actions: Action[] = [
+    { icon: "clock", label: "Set Limits", type: "link" },
+    { icon: "grid", label: "Transaction History", type: "link" },
+    { icon: "credit-card", label: "Manage PIN", type: "link" },
+    { icon: "phone", label: "Contact/Request", type: "link" },
+  ];
+
+  useEffect(() => {
+    const timer = setTimeout(() => setIsLoading(false), 300);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Animation for the top card
+  const [{ y, scale }, api] = useSpring(() => ({
+    y: 0,
+    scale: 1,
+    config: config.stiff,
+  }));
+
+  // Drag state refs
+  const dragging = useRef(false);
+  const startY = useRef(0);
+
+  // Touch/mouse event handlers
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (removing) return;
+    dragging.current = true;
+    startY.current = e.touches[0].clientY;
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!dragging.current || removing) return;
+    const offsetY = e.touches[0].clientY - startY.current;
+    if (offsetY < 0) return; // Only allow downward swipe
+    api.start({ y: offsetY, immediate: true });
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!dragging.current || removing) return;
+    dragging.current = false;
+    const offsetY = Math.min(220, e.changedTouches[0].clientY - startY.current);
+    api.start({ 
+      y: offsetY,
+      scale: 1 - offsetY/150,
+      immediate: true 
+    });
+    if (offsetY > 100) {
+      setRemoving(true);
+      api.start({
+        y: 220,
+        scale: 0,
+        immediate: false,
+        config: { tension: 300, friction: 30 }
+      });
+      setTimeout(() => {
+        setCards((c) => {
+          const [first, ...rest] = c;
+          return [...rest, first];
+        });
+        api.start({ y: 0, scale: 1, immediate: true });
+        setRemoving(false);
+      }, 300);
+    } else {
+      api.start({ y: 0, scale: 1, immediate: false });
+    }
+  };
+
+  // Mouse events for desktop
+  const mouseDragging = useRef(false);
+  const mouseStartY = useRef(0);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (removing) return;
+    mouseDragging.current = true;
+    mouseStartY.current = e.clientY;
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!mouseDragging.current || removing) return;
+    const offsetY = e.clientY - mouseStartY.current;
+    if (offsetY < 0) return;
+    api.start({ y: offsetY, immediate: true });
+  };
+
+  const handleMouseUp = (e: MouseEvent) => {
+    if (!mouseDragging.current || removing) return;
+    mouseDragging.current = false;
+    const offsetY = Math.min(220, e.clientY - mouseStartY.current);
+    api.start({ 
+      y: offsetY,
+      scale: 1 - offsetY/150,
+      immediate: true 
+    });
+    if (offsetY > 100) {
+      setRemoving(true);
+      api.start({
+        y: 220,
+        scale: 0,
+        immediate: false,
+        config: { tension: 300, friction: 30 }
+      });
+      setTimeout(() => {
+        setCards((c) => {
+          const [first, ...rest] = c;
+          return [...rest, first];
+        });
+        api.start({ y: 0, scale: 1, immediate: true });
+        setRemoving(false);
+      }, 300);
+    } else {
+      api.start({ y: 0, scale: 1, immediate: false });
+    }
+    window.removeEventListener("mousemove", handleMouseMove);
+    window.removeEventListener("mouseup", handleMouseUp);
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#121212] flex items-center justify-center">
+        <div className="animate-pulse">Loading card management...</div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-[#121212] text-white pb-8 relative z-10">
+      {/* Header */}
+      <div className="flex items-center px-5 pt-8 pb-6 max-w-md mx-auto">
+        <button className="mr-3 p-1 rounded hover:bg-neutral-800 transition-colors">
+          <ArrowLeft className="w-6 h-6" />
+        </button>
+        <h1 className="text-xl font-semibold tracking-tight">Card Management</h1>
+      </div>
+
+      <div className="px-5 max-w-md mx-auto">
+        {/* Card Stack */}
+        <div className="mb-8" style={{ height: '220px', position: 'relative', perspective: '1000px' }}>
+          {cards.map((card, i) => {
+            const isTopCard = i === 0;
+            return (
+              <animated.div
+                key={card.id}
+                style={{
+                  backgroundColor: card.color,
+                  color: 'white',
+                  transform: isTopCard
+                    ? y.to(yVal => `translateY(${yVal}px) scale(${1 - yVal/150})`)
+                    : `translateY(${-15 * i}px) scale(${Math.max(0.85, 1 - i * 0.05)})`,
+                  zIndex: cards.length - i,
+                  opacity: Math.max(0.6, 1 - i * 0.15),
+                  position: 'absolute',
+                  width: '100%',
+                  height: '100%',
+                  borderRadius: '16px',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.08)',
+                  padding: '16px',
+                  userSelect: 'none',
+                  touchAction: 'none',
+                  transformStyle: 'preserve-3d',
+                  transition: isTopCard ? 'none' : 'top 0.3s ease, opacity 0.3s ease, transform 0.3s ease',
+                }}
+                onTouchStart={isTopCard ? handleTouchStart : undefined}
+                onTouchMove={isTopCard ? handleTouchMove : undefined}
+                onTouchEnd={isTopCard ? handleTouchEnd : undefined}
+                onMouseDown={isTopCard ? handleMouseDown : undefined}
+              >
+                <div className="card-header">
+                  <span className="card-holder">{card.name}</span>
+                  <span className="card-brand">{card.brand}</span>
+                </div>
+                <div className="card-number">{card.number}</div>
+                <div className="card-footer">
+                  <div className="card-valid">
+                    <span className="label">VALID</span>
+                    <span className="value">{card.validThru}</span>
+                  </div>
+                  <div className="card-cvv">
+                    <span className="label">CVV</span>
+                    <span className="value">{card.cvv}</span>
+                  </div>
+                  <div className="card-network">
+                    <div className="mastercard-logo">
+                      <div className="circle circle-red" />
+                      <div className="circle circle-yellow" />
+                    </div>
+                  </div>
+                </div>
+              </animated.div>
+            );
+          })}
+        </div>
+
+        {/* Action List */}
+        <div className="bg-transparent rounded-xl divide-y divide-neutral-800">
+          {/* Freeze Card */}
+          <div className="flex items-center justify-between py-4">
+            <div className="flex items-center">
+              <div className="w-10 h-10 flex items-center justify-center bg-neutral-800 rounded-lg mr-4">
+                <Icon name="snowflake" className="w-5 h-5 text-neutral-300" />
+              </div>
+              <span className="text-base">Freeze Card</span>
+            </div>
+            <label className="inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                className="sr-only"
+                checked={isFrozen}
+                onChange={() => setIsFrozen((v) => !v)}
+              />
+              <span
+                className={`w-10 h-6 flex items-center rounded-full p-1 transition-colors ${
+                  isFrozen ? "bg-blue-600" : "bg-neutral-700"
+                }`}
+              >
+                <span
+                  className={`h-4 w-4 bg-white rounded-full shadow-md transform transition-transform ${
+                    isFrozen ? "translate-x-4" : ""
+                  }`}
+                />
+              </span>
+            </label>
+          </div>
+
+          {/* Other Actions */}
+          {actions.map((action, idx) => (
+            <div
+              key={action.label}
+              className="flex items-center justify-between py-4"
+            >
+              <div className="flex items-center">
+                <div className="w-10 h-10 flex items-center justify-center bg-neutral-800 rounded-lg mr-4">
+                  <Icon name={action.icon} className="w-5 h-5 text-neutral-300" />
+                </div>
+                <span className="text-base">{action.label}</span>
+              </div>
+              <span>
+                <Icon name="chevron-right" className="w-5 h-5 text-neutral-500" />
+              </span>
+            </div>
+          ))}
+
+          {/* Order New Card */}
+          <div className="flex items-center justify-between py-4">
+            <div className="flex items-center">
+              <div className="w-10 h-10 flex items-center justify-center bg-neutral-800 rounded-lg mr-4">
+                <Icon name="contactless" className="w-5 h-5 text-neutral-300" />
+              </div>
+              <span className="text-base">Order New Card</span>
+            </div>
+            <label className="inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                className="sr-only"
+                checked={orderNewCard}
+                onChange={() => setOrderNewCard((v) => !v)}
+              />
+              <span
+                className={`w-10 h-6 flex items-center rounded-full p-1 transition-colors ${
+                  orderNewCard ? "bg-blue-600" : "bg-neutral-700"
+                }`}
+              >
+                <span
+                  className={`h-4 w-4 bg-white rounded-full shadow-md transform transition-transform ${
+                    orderNewCard ? "translate-x-4" : ""
+                  }`}
+                />
+              </span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CardManagement;
+
+
+
+<<<<<<<<<<<<<< FILE: app/cards/page.tsx >>>>>>>>>>>>>>>
+
+'use client';
+
+import React from 'react';
+import dynamic from 'next/dynamic';
+
+const CardsListView = dynamic(() => import('@/components/screens/CardsListView'), { 
+  ssr: false,
+  loading: () => <div className="min-h-screen bg-[#121212] flex items-center justify-center">
+    <div className="animate-pulse">Loading cards...</div>
+  </div>
+});
+
+export default function CardsPage() {
+  return <CardsListView />;
+}
+
+
+
+<<<<<<<<<<<<<< FILE: app/cards/manage/page.tsx >>>>>>>>>>>>>>>
+
+"use client";
+
+import CardManagement from "../components/CardManagement";
+
+export default function CardManagementPage() {
+  return <CardManagement />;
+}
+
+
+
+<<<<<<<<<<<<<< FILE: components/context/BankingDataProvider.tsx >>>>>>>>>>>>>>>
+
+'use client';
+
+import React, { useState, useEffect, createContext, useContext, ReactNode, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import generateFakeUsers from '@/lib/data/fakeBankingData';
+import { useUser } from '@/components/context/UserContext';
+import {
+  BankingData,
+  BankingUser,
+  BankingAccount,
+  BankingCreditCard,
+  BankingLoan,
+  BankingTransaction,
+  TransactionDateGroup,
+  FilteredUserData
+} from '@/lib/types/bankingDataTypes';
+
+type BankingDataContextType = {
+  data: BankingData | null;
+  userData: FilteredUserData | null;
+  isLoading: boolean;
+  error: Error | null;
+  refreshData: () => Promise<void>;
+  clearCache: () => void;
+  preProcessData: (data: BankingData) => BankingData;
+};
+
+const BankingDataContext = createContext<BankingDataContextType | null>(null);
+
+interface BankingDataProviderProps {
+  children: ReactNode;
+  cacheKey?: string;
+  simulateApiDelay?: number;
+  preProcess?: boolean;
+}
+
+export const BankingDataProvider: React.FC<BankingDataProviderProps> = ({
+  children,
+  cacheKey = 'bankingData',
+  simulateApiDelay = 0,
+  preProcess = false
+}) => {
+  const [data, setData] = useState<BankingData | null>(null);
+  const [userData, setUserData] = useState<FilteredUserData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+  
+  const { selectedUserId, isNewUser } = useUser();
+  const router = useRouter();
+
+  const preProcessData = useCallback((rawData: BankingData): BankingData => {
+    if (!preProcess) return rawData;
+    
+    const processedData = JSON.parse(JSON.stringify(rawData));
+    
+    // Calculate category totals
+    processedData.users.forEach((user: BankingUser) => {
+      const userTransactions: BankingTransaction[] = [];
+      
+      Object.values(processedData.transactions[user.id] || {}).forEach(accountTxs => {
+        userTransactions.push(...(accountTxs as BankingTransaction[]));
+      });
+      
+      const categoryTotals = userTransactions.reduce((totals: Record<string, number>, tx) => {
+        if (!tx.isIncoming) {
+          const category = tx.category || 'other';
+          totals[category] = (totals[category] || 0) + tx.amount;
+        }
+        return totals;
+      }, {});
+      
+      processedData.categoryTotals = processedData.categoryTotals || {};
+      processedData.categoryTotals[user.id] = categoryTotals;
+    });
+    
+    return processedData;
+  }, [preProcess]);
+
+  const filterUserData = useCallback((bankingData: BankingData) => {
+    if (selectedUserId && selectedUserId !== 'new') {
+      const user = bankingData.users.find(u => u.id === selectedUserId) || null;
+      const accounts = bankingData.accounts.filter(a => a.userId === selectedUserId);
+      const creditCards = bankingData.creditCards.filter(c => c.userId === selectedUserId);
+      const loans = bankingData.loans.filter(l => l.userId === selectedUserId);
+      const transactions = bankingData.transactions[selectedUserId] || {};
+      const groupedTransactions = bankingData.groupedTransactions[selectedUserId] || [];
+      const categoryTotals = bankingData.categoryTotals?.[selectedUserId];
+      
+      setUserData({
+        user,
+        accounts,
+        creditCards,
+        loans,
+        transactions,
+        groupedTransactions,
+        categoryTotals
+      });
+    } else if (isNewUser) {
+      setUserData({
+        user: null,
+        accounts: [],
+        creditCards: [],
+        loans: [],
+        transactions: {},
+        groupedTransactions: []
+      });
+    } else {
+      setUserData({
+        user: null,
+        accounts: [],
+        creditCards: [],
+        loans: [],
+        transactions: {},
+        groupedTransactions: []
+      });
+    }
+  }, [selectedUserId, isNewUser]);
+
+  const loadData = useCallback(async (forceDefault = false) => {
+    try {
+      setIsLoading(true);
+      let bankingDataObj: BankingData;
+
+      // Check for fresh install first
+      const freshInstall = !localStorage.getItem('appInitialized');
+      if (freshInstall) {
+        console.log('Fresh installation detected - initializing with default data');
+        localStorage.clear();
+        localStorage.setItem('appInitialized', 'true');
+        router.push('/onboarding');
+        const generatedData = generateFakeUsers();
+        console.log('Generated fresh banking data');
+        bankingDataObj = preProcessData(structuredClone(generatedData));
+      } else if (forceDefault) {
+        const generatedData = generateFakeUsers();
+        console.log('Generated fresh banking data (force default)');
+        bankingDataObj = preProcessData(structuredClone(generatedData));
+      } else {
+        const cachedData = localStorage.getItem(cacheKey);
+        if (cachedData) {
+          console.log('Loading cached banking data');
+          bankingDataObj = preProcessData(JSON.parse(cachedData));
+        } else {
+          const generatedData = generateFakeUsers();
+          console.log('Generated fresh banking data (no cache)');
+          bankingDataObj = preProcessData(structuredClone(generatedData));
+        }
+      }
+
+      setData(bankingDataObj);
+      filterUserData(bankingDataObj);
+
+      if (simulateApiDelay > 0) {
+        await new Promise(resolve => setTimeout(resolve, simulateApiDelay));
+      }
+
+      if (!forceDefault) {
+        localStorage.setItem(cacheKey, JSON.stringify(bankingDataObj));
+      }
+    } catch (err) {
+      console.error('Error loading banking data:', err);
+      setError(err instanceof Error ? err : new Error('Unknown error'));
+      const fallbackData = preProcessData(generateFakeUsers());
+      setData(fallbackData);
+      filterUserData(fallbackData);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [cacheKey, filterUserData, preProcessData, simulateApiDelay]);
+
+  const refreshData = useCallback(async () => {
+    localStorage.removeItem(cacheKey);
+    await loadData(true);
+  }, [cacheKey, loadData]);
+
+  const clearCache = useCallback(() => {
+    localStorage.removeItem(cacheKey);
+  }, [cacheKey]);
+
+  useEffect(() => {
+    // Run on mount and when selectedUserId changes
+    loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedUserId]);
+
+  const value = {
+    data,
+    userData,
+    isLoading,
+    error,
+    refreshData,
+    clearCache,
+    preProcessData
+  };
+
+  return (
+    <BankingDataContext.Provider value={value}>
+      {children}
+    </BankingDataContext.Provider>
+  );
+};
+
+export const useBankingData = () => {
+  const context = useContext(BankingDataContext);
+  if (!context) {
+    throw new Error('useBankingData must be used within a BankingDataProvider');
+  }
+  return context;
+};
+
+
+
+<<<<<<<<<<<<<< FILE: components/screens/CardsListView.tsx >>>>>>>>>>>>>>>
+
+'use client';
+
+import React, { useState, useEffect } from 'react';
+import { useBankingData } from '@/lib/hooks/useBankingData';
+import LoadingSpinner from '@/components/ui/common/LoadingSpinner';
+import { ArrowLeft, Plus } from 'lucide-react';
+import Link from 'next/link';
+
+const CardsListView: React.FC = () => {
+  const [isLoading, setIsLoading] = useState(true);
+  
+  // Get banking data from context
+  const { userData, isLoading: isBankingDataLoading } = useBankingData();
+  
+  // Loading simulation
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 800);
+    return () => clearTimeout(timer);
+  }, []);
+  
+  // Show loading spinner if loading
+  if (isLoading || isBankingDataLoading) {
+    return (
+      <LoadingSpinner size="large" fullScreen={true} />
+    );
+  }
+
+  const creditCards = userData?.creditCards || [];
+
+  return (
+    <div className="relative min-h-screen bg-[#121212] text-white">
+      {/* Header */}
+      <div className="px-5 pt-8 pb-6 mx-auto max-w-md">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center">
+            <Link href="/" className="mr-3">
+              <ArrowLeft className="w-6 h-6" />
+            </Link>
+            <div className="text-xl font-medium tracking-tight">My Cards</div>
+          </div>
+          <button className="p-2 bg-[#212121] rounded-full">
+            <Plus className="w-5 h-5" />
+          </button>
+        </div>
+      </div>
+      
+      <div className="px-5 mx-auto max-w-md">
+        {/* Cards list */}
+        <div className="space-y-4">
+          {creditCards.map((card) => (
+            <Link 
+              key={card.id}
+              href={`/cards/${card.id}`}
+              className="block bg-[#212121] rounded-xl p-4 hover:bg-neutral-800 transition-colors"
+            >
+              <div className="flex items-center">
+                <div 
+                  className="w-12 h-12 rounded-full flex items-center justify-center mr-4"
+                  style={{ backgroundColor: card.color }}
+                >
+                  <span className="text-white text-lg font-bold">
+                    {card.name.charAt(0)}
+                  </span>
+                </div>
+                <div>
+                  <div className="font-medium text-white">{card.name}</div>
+                  <div className="text-neutral-400 text-sm">
+                    •••• {card.cardNumber.slice(-4)}
+                  </div>
+                </div>
+                <div className="ml-auto text-right">
+                  <div className="text-white font-medium">
+                    ${card.currentBalance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                  </div>
+                  <div className="text-neutral-400 text-xs">
+                    Exp: {card.expiryMonth}/{card.expiryYear}
+                  </div>
+                </div>
+              </div>
+            </Link>
+          ))}
+          
+          {/* Show a message if no cards */}
+          {!creditCards.length && (
+            <div className="bg-[#212121] rounded-xl p-6 text-center">
+              <p className="text-neutral-400 mb-4">You don't have any credit cards yet</p>
+              <button className="px-4 py-2 bg-blue-600 text-white rounded-lg">
+                Apply for a Card
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default CardsListView;
+
+
+
+<<<<<<<<<<<<<< FILE: components/screens/CreditCardView.tsx >>>>>>>>>>>>>>>
+
+'use client';
+
+import React, { useState, useEffect, useRef } from 'react';
+import { animated, useSpring } from 'react-spring';
+import { useBankingData } from '@/lib/hooks/useBankingData';
+import CreditCardComponent from '@/components/ui/card/CreditCard'; 
+import TransactionContainer from '@/components/ui/transactions/TransactionContainer';
+import LoadingSpinner from '@/components/ui/common/LoadingSpinner';
+import Icon from '@/components/ui/icons/Icon';
+import { Lock, ArrowLeft, Bell } from 'lucide-react';
+import Link from 'next/link';
+import { useParams } from 'next/navigation';
+
+const CreditCardView: React.FC = () => {
+  const { id } = useParams();
+  const [isLoading, setIsLoading] = useState(true);
+  const [showInfo, setShowInfo] = useState(false);
+  const payButtonsRef = useRef<HTMLDivElement>(null);
+  const [buttonBottomPosition, setButtonBottomPosition] = useState(0);
+  const [isTransactionCollapsed, setIsTransactionCollapsed] = useState(true);
+  const [showTransactions, setShowTransactions] = useState(false);
+  const isManageClickRef = useRef(false);
+  
+  // Get banking data from context
+  const { userData, isLoading: isBankingDataLoading } = useBankingData();
+  
+  // React Spring animations
+  const cardSpring = useSpring({
+    opacity: isLoading ? 0 : 1,
+    transform: isLoading ? 'translateY(20px)' : 'translateY(0px)',
+    delay: 100,
+    config: { tension: 280, friction: 25 }
+  });
+  
+  const sectionSpring = useSpring({
+    opacity: isLoading ? 0 : 1,
+    transform: isLoading ? 'translateY(20px)' : 'translateY(0px)',
+    delay: 200,
+    config: { tension: 280, friction: 25 }
+  });
+  
+  const actionsSpring = useSpring({
+    opacity: isLoading ? 0 : 1,
+    transform: isLoading ? 'translateY(20px)' : 'translateY(0px)',
+    delay: 300,
+    config: { tension: 280, friction: 25 }
+  });
+
+  // Find the selected card using the ID from the URL params
+  const cardInfo = userData?.creditCards?.find(card => card.id === id) || userData?.creditCards?.[0];
+  const rewardsBalance = cardInfo?.rewardsBalance || 0;
+
+  // Loading simulation
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 800);
+    return () => clearTimeout(timer);
+  }, []);
+
+  // Calculate button positions for transaction container
+  useEffect(() => {
+    if (!isLoading) {
+      const calculatePositions = () => {
+        if (payButtonsRef.current) {
+          const rect = payButtonsRef.current.getBoundingClientRect();
+          if (rect.bottom > 0) {
+            setButtonBottomPosition(rect.bottom);
+          }
+        }
+      };
+      
+      calculatePositions();
+      const animationDelay = setTimeout(calculatePositions, 350);
+      window.addEventListener('resize', calculatePositions);
+      
+      return () => {
+        clearTimeout(animationDelay);
+        window.removeEventListener('resize', calculatePositions);
+      };
+    }
+  }, [isLoading, showInfo]); 
+
+  // Handle transactions click
+  const handleTransactionsClick = () => {
+    setShowTransactions(true);
+    setIsTransactionCollapsed(false);
+  };
+
+  // Handle manage button click
+  const handleManageClick = () => {
+    isManageClickRef.current = true;
+    setIsTransactionCollapsed(!isTransactionCollapsed);
+    
+    if (showTransactions === false && !isTransactionCollapsed) {
+      setShowTransactions(true);
+    }
+    
+    setTimeout(() => {
+      isManageClickRef.current = false;
+    }, 100);
+  };
+
+  // Handle collapse state changes
+  const handleCollapseChange = (collapsed: boolean) => {
+    setIsTransactionCollapsed(collapsed);
+    
+    if (collapsed) {
+      setTimeout(() => {
+        setShowTransactions(false);
+      }, 300);
+    }
+  };
+
+  // Show loading spinner if loading
+  if (isLoading || isBankingDataLoading || !cardInfo) {
+    return (
+      <LoadingSpinner size="large" fullScreen={true} />
+    );
+  }
+
+  // Get user name and transactions from data
+  const userName = userData?.user?.name?.split(' ')[0] || 'Guest';
+  const bankingTransactions = userData?.groupedTransactions || [];
+
+  return (
+    <div className="relative min-h-screen bg-[#121212] text-white">
+      {/* Custom header with back button */}
+      <div className="px-5 pt-8 pb-6 mx-auto max-w-md">
+        <div className="flex justify-between items-center">
+          <div className="flex items-center">
+            <Link href="/" className="mr-3">
+              <ArrowLeft className="w-6 h-6" />
+            </Link>
+            <div className="text-xl font-medium tracking-tight">{cardInfo.name}</div>
+          </div>
+          <button className="relative p-1">
+            <Bell className="w-6 h-6" />
+            <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full transform -translate-y-1/4 translate-x-1/4"></span>
+          </button>
+        </div>
+      </div>
+      
+      <div className="px-5 mx-auto max-w-md">
+        {/* Card with React Spring animation */}
+        <animated.div style={cardSpring} className="mb-4">
+          <CreditCardComponent 
+            showInfoState={[showInfo, setShowInfo]}
+            cardInfo={cardInfo}
+          />
+        </animated.div>
+        
+        {/* Main sections grid */}
+        <animated.div style={sectionSpring} className="grid grid-cols-2 gap-4 mb-4">
+          {/* Transactions section */}
+          <div 
+            className="bg-[#212121] rounded-xl p-4 cursor-pointer hover:bg-neutral-700 transition-colors"
+            onClick={handleTransactionsClick}
+          >
+            <h3 className="text-sm font-medium mb-1">Transactions</h3>
+            <p className="text-xs text-neutral-400 mb-2">Recent Activity</p>
+            <div className="flex space-x-1 mb-1">
+              <div className="h-4 w-1/4 rounded-full bg-purple-500"></div>
+              <div className="h-4 w-1/4 rounded-full bg-red-500"></div>
+              <div className="h-4 w-1/4 rounded-full bg-blue-500"></div>
+              <div className="h-4 w-1/4 rounded-full bg-yellow-500"></div>
+            </div>
+          </div>
+          
+          {/* Rewards section */}
+          <div className="bg-[#212121] rounded-xl p-4">
+            <h3 className="text-sm font-medium mb-1">Rewards</h3>
+            <p className="text-xs text-neutral-400 mb-2">Cash back earned</p>
+            <p className="text-green-500 font-semibold">${rewardsBalance.toFixed(2)}</p>
+          </div>
+        </animated.div>
+        
+        {/* Action buttons */}
+        <animated.div style={sectionSpring} className="grid grid-cols-2 gap-4 mb-4" ref={payButtonsRef}>
+          <button 
+            className="bg-[#212121] rounded-xl p-4 flex items-center justify-center hover:bg-neutral-700 transition-colors"
+            onClick={handleTransactionsClick}
+          >
+            <div className="w-10 h-10 rounded-full bg-neutral-700 flex items-center justify-center mr-2">
+              <Icon name="repeat" className="w-5 h-5 text-neutral-200" />
+            </div>
+            <span className="text-sm text-neutral-300">Pay</span>
+          </button>
+          
+          <Link href={`/cards/manage/${id}`} className="bg-[#212121] rounded-xl p-4 flex items-center justify-center hover:bg-neutral-700 transition-colors">
+            <div className="w-10 h-10 rounded-full bg-neutral-700 flex items-center justify-center mr-2">
+              <Icon name="settings" className="w-5 h-5 text-neutral-200" />
+            </div>
+            <span className="text-sm text-neutral-300">Manage</span>
+          </Link>
+        </animated.div>
+        
+        {/* Refer and Earn section */}
+        <animated.div style={actionsSpring} className="bg-[#212121] rounded-xl p-4 mb-4 relative overflow-hidden">
+          <div className="flex justify-between">
+            <div>
+              <h3 className="text-sm font-medium mb-1">Refer and Earn</h3>
+              <p className="text-xs text-neutral-400 max-w-[70%]">
+                Share a referral link to your friend and get rewarded
+              </p>
+              <button className="mt-2 text-xs text-white bg-neutral-700 px-3 py-1 rounded-full hover:bg-neutral-600 transition-colors">
+                Learn more
+              </button>
+            </div>
+            <div className="absolute right-2 bottom-2">
+              <img src="/images/marketing/refer-friend.png" alt="Refer a friend" className="h-24 object-contain" />
+            </div>
+          </div>
+        </animated.div>
+        
+        {/* Additional action buttons */}
+        <animated.div style={actionsSpring} className="grid grid-cols-2 gap-4 mb-4">
+          <button className="bg-[#212121] rounded-xl p-4 flex items-center justify-center hover:bg-neutral-700 transition-colors">
+            <div className="w-10 h-10 rounded-full bg-neutral-700 flex items-center justify-center mr-2">
+              <Icon name="transfer" className="w-5 h-5 text-neutral-200" />
+            </div>
+            <span className="text-sm text-neutral-300">Balance Transfer</span>
+          </button>
+          
+          <button className="bg-[#212121] rounded-xl p-4 flex items-center justify-center hover:bg-neutral-700 transition-colors">
+            <div className="w-10 h-10 rounded-full bg-neutral-700 flex items-center justify-center mr-2">
+              <Lock className="w-5 h-5 text-neutral-200" />
+            </div>
+            <span className="text-sm text-neutral-300">Lock/Unlock</span>
+          </button>
+        </animated.div>
+        
+        {/* Statements section */}
+        <animated.div style={actionsSpring} className="bg-[#212121] rounded-xl p-4 mb-4">
+          <div className="flex justify-between items-center">
+            <h3 className="text-sm font-medium">Statements and Documents</h3>
+            <button className="text-xs text-neutral-400 hover:text-white transition-colors">
+              View All
+            </button>
+          </div>
+        </animated.div>
+        
+        {/* Transaction Container */}
+        {showTransactions && buttonBottomPosition > 0 && (
+          <TransactionContainer 
+            transactionGroups={bankingTransactions}
+            buttonBottomPosition={buttonBottomPosition}
+            isCollapsed={isTransactionCollapsed}
+            onCollapseChange={handleCollapseChange}
+          />
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default CreditCardView;
+
+
+
+<<<<<<<<<<<<<< FILE: lib/types/bankingDataTypes.ts >>>>>>>>>>>>>>>
+
+// Unified banking data types
+export type BankingUser = {
+  id: string;
+  name: string;
+  username: string;
+  email: string;
+  avatar: string;
+  phone: string;
+  address: string;
+  ssn: string;
+  dob: string;
+  occupation: string;
+  income: number;
+  joinDate: string;
+  lastLogin: string;
+};
+
+export type BankingAccount = {
+  id: string;
+  userId: string;
+  type: 'checking' | 'savings' | 'moneyMarket' | 'cd';
+  name: string;
+  accountNumber: string;
+  routingNumber: string;
+  balance: number;
+  availableBalance?: number;
+  pendingTransactions?: number;
+  interestRate: number;
+  openDate: string;
+  maturityDate?: string;
+};
+
+export type BankingCreditCard = {
+  id: string;
+  userId: string;
+  type: string;
+  name: string;
+  cardNumber: string;
+  expiry: string;
+  cvv: string;
+  creditLimit: number;
+  currentBalance: number;
+  availableCredit: number;
+  dueDate: string;
+  minimumPayment: number;
+  rewardsBalance?: number;
+  rewardsType?: string;
+  rewardsRate?: string;
+  applyDate: string;
+  color: string;
+};
+
+export type BankingLoan = {
+  id: string;
+  userId: string;
+  type: string;
+  name: string;
+  loanNumber: string;
+  originalAmount: number;
+  currentBalance: number;
+  interestRate: number;
+  monthlyPayment: number;
+  originationDate: string;
+  term: number;
+  nextPaymentDate: string;
+  paymentsMade: number;
+  paymentsRemaining: number;
+  propertyAddress?: string;
+  vehicle?: string;
+  vin?: string;
+};
+
+export type BankingTransaction = {
+  id: string;
+  userId: string;
+  accountId: string;
+  date: string;
+  merchant: string;
+  category: string;
+  icon: string;
+  amount: number;
+  isIncoming: boolean;
+  status: string;
+  location?: string;
+  message?: string;
+  timestamp: string;
+};
+
+export type TransactionDateGroup = {
+  date: string;
+  transactions: BankingTransaction[];
+};
+
+export type BankingData = {
+  users: BankingUser[];
+  accounts: BankingAccount[];
+  creditCards: BankingCreditCard[];
+  loans: BankingLoan[];
+  transactions: Record<string, Record<string, BankingTransaction[]>>;
+  groupedTransactions: Record<string, TransactionDateGroup[]>;
+  categoryTotals?: Record<string, Record<string, number>>;
+};
+
+export type FilteredUserData = {
+  user: BankingUser | null;
+  accounts: BankingAccount[];
+  creditCards: BankingCreditCard[];
+  loans: BankingLoan[];
+  transactions: Record<string, BankingTransaction[]>;
+  groupedTransactions: TransactionDateGroup[];
+  categoryTotals?: Record<string, number>;
+};
+

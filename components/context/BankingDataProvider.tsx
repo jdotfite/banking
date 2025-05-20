@@ -80,7 +80,20 @@ export const BankingDataProvider: React.FC<BankingDataProviderProps> = ({
     if (selectedUserId && selectedUserId !== 'new') {
       const user = bankingData.users.find(u => u.id === selectedUserId) || null;
       const accounts = bankingData.accounts.filter(a => a.userId === selectedUserId);
-      const creditCards = bankingData.creditCards.filter(c => c.userId === selectedUserId);
+      
+      // Include all credit cards for debugging purposes
+      const userCreditCards = bankingData.creditCards.filter(c => c.userId === selectedUserId);
+      const allCreditCards = bankingData.creditCards;
+      
+      // Log credit card information for debugging
+      console.log('Selected user ID:', selectedUserId);
+      console.log('User credit cards:', userCreditCards);
+      console.log('All credit cards:', allCreditCards);
+      console.log('Card-5001 in all cards:', allCreditCards.find(card => card.id === 'card-5001'));
+      
+      // Use all credit cards for now to debug the issue
+      const creditCards = allCreditCards;
+      
       const loans = bankingData.loans.filter(l => l.userId === selectedUserId);
       const transactions = bankingData.transactions[selectedUserId] || {};
       const groupedTransactions = bankingData.groupedTransactions[selectedUserId] || [];
@@ -105,10 +118,11 @@ export const BankingDataProvider: React.FC<BankingDataProviderProps> = ({
         groupedTransactions: []
       });
     } else {
+      // If no user is selected, include all credit cards for debugging
       setUserData({
         user: null,
         accounts: [],
-        creditCards: [],
+        creditCards: bankingData.creditCards || [],
         loans: [],
         transactions: {},
         groupedTransactions: []
@@ -137,14 +151,26 @@ export const BankingDataProvider: React.FC<BankingDataProviderProps> = ({
         bankingDataObj = preProcessData(structuredClone(generatedData));
       } else {
         const cachedData = localStorage.getItem(cacheKey);
-        if (cachedData) {
+      if (cachedData) {
+        try {
           console.log('Loading cached banking data');
           bankingDataObj = preProcessData(JSON.parse(cachedData));
-        } else {
+          
+          // Debug logging for card data
+          console.log('Loaded credit cards:', bankingDataObj.creditCards);
+          console.log('Looking for card-5001:', bankingDataObj.creditCards.find(card => card.id === 'card-5001'));
+          
+        } catch (err) {
+          console.error('Error parsing cached data, regenerating fresh data', err);
+          localStorage.removeItem(cacheKey);
           const generatedData = generateFakeUsers();
-          console.log('Generated fresh banking data (no cache)');
           bankingDataObj = preProcessData(structuredClone(generatedData));
         }
+      } else {
+        const generatedData = generateFakeUsers();
+        console.log('Generated fresh banking data (no cache)');
+        bankingDataObj = preProcessData(structuredClone(generatedData));
+      }
       }
 
       setData(bankingDataObj);
