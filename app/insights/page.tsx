@@ -2,11 +2,12 @@
 
 import React from 'react';
 import Insights from '@/components/screens/Insights';
+import PageTemplate from '@/components/layout/PageTemplate';
 
 export default function InsightsPage() {
   return (
-    <main className="relative min-h-screen">
+    <PageTemplate>
       <Insights />
-    </main>
+    </PageTemplate>
   );
 }

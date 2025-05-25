@@ -75,36 +75,45 @@ export const BankingDataProvider: React.FC<BankingDataProviderProps> = ({
     
     return processedData;
   }, [preProcess]);
-
   const filterUserData = useCallback((bankingData: BankingData) => {
     if (selectedUserId && selectedUserId !== 'new') {
       const user = bankingData.users.find(u => u.id === selectedUserId) || null;
       const accounts = bankingData.accounts.filter(a => a.userId === selectedUserId);
-      
-      // Include all credit cards for debugging purposes
-      const userCreditCards = bankingData.creditCards.filter(c => c.userId === selectedUserId);
-      const allCreditCards = bankingData.creditCards;
-      
-      // Log credit card information for debugging
-      console.log('Selected user ID:', selectedUserId);
-      console.log('User credit cards:', userCreditCards);
-      console.log('All credit cards:', allCreditCards);
-      console.log('Card-5001 in all cards:', allCreditCards.find(card => card.id === 'card-5001'));
-      
-      // Use all credit cards for now to debug the issue
-      const creditCards = allCreditCards;
-      
+      const creditCards = bankingData.creditCards.filter(c => c.userId === selectedUserId);
       const loans = bankingData.loans.filter(l => l.userId === selectedUserId);
-      const transactions = bankingData.transactions[selectedUserId] || {};
+      
+      // Get account transactions
+      const accountTransactions = bankingData.transactions[selectedUserId] || {};
+      
+      // Get credit card transactions and integrate them into the transactions object
+      const allTransactions = { ...accountTransactions };
+        // Add credit card transactions to the transactions object
+      if (bankingData.creditCardTransactions) {
+        creditCards.forEach(card => {
+          if (bankingData.creditCardTransactions?.[card.id]) {
+            allTransactions[card.id] = bankingData.creditCardTransactions[card.id];
+          }
+        });
+      }
+      
       const groupedTransactions = bankingData.groupedTransactions[selectedUserId] || [];
       const categoryTotals = bankingData.categoryTotals?.[selectedUserId];
-      
-      setUserData({
+        console.log('Credit card transactions integrated:', {
+        selectedUserId,
+        creditCards: creditCards.map(c => c.id),
+        availableTransactions: Object.keys(allTransactions),
+        creditCardTransactions: bankingData.creditCardTransactions ? Object.keys(bankingData.creditCardTransactions) : 'none',
+        sampleCreditCardData: bankingData.creditCardTransactions ? {
+          'card-5001': bankingData.creditCardTransactions['card-5001']?.length || 0,
+          'card-5002': bankingData.creditCardTransactions['card-5002']?.length || 0
+        } : 'no credit card data'
+      });
+        setUserData({
         user,
         accounts,
         creditCards,
         loans,
-        transactions,
+        transactions: allTransactions,
         groupedTransactions,
         categoryTotals
       });

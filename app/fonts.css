@@ -1,0 +1,16 @@
+/* Local OCR-A Font Definition */
+@font-face {
+  font-family: 'OCR A Std';
+  src: url('/fonts/ocrastd.woff') format('woff'),
+       url('/fonts/ocrastd.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: block; /* Prevents font flashing by blocking text until font loads */
+}
+
+/* Fallback font class for stable rendering */
+.ocr-font {
+  font-family: 'OCR A Std', 'Courier New', monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.3px;
+}

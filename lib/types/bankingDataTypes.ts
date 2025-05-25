@@ -99,6 +99,7 @@ export type BankingData = {
   transactions: Record<string, Record<string, BankingTransaction[]>>;
   groupedTransactions: Record<string, TransactionDateGroup[]>;
   categoryTotals?: Record<string, Record<string, number>>;
+  creditCardTransactions?: Record<string, BankingTransaction[]>;
 };
 
 export type FilteredUserData = {

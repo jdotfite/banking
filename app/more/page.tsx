@@ -2,11 +2,12 @@
 
 import React from 'react';
 import More from '@/components/screens/More';
+import PageTemplate from '@/components/layout/PageTemplate';
 
 export default function MorePage() {
   return (
-    <main className="relative min-h-screen">
+    <PageTemplate>
       <More />
-    </main>
+    </PageTemplate>
   );
 }

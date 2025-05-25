@@ -176,21 +176,16 @@ const Home: React.FC = () => {
       image: '/images/marketing/refer-friend.png',
       color: 'from-green-800 to-green-900'
     }
-  ];
-  
-  return (
-    <div className="relative min-h-screen bg-[#121212] text-white pb-20">
+  ];  return (
+    <>
       {/* Header */}
-      <Header userName={userName} />
-      
-      <div className="px-5 mx-auto max-w-md">
-        {/* Accounts List */}
+      <Header userName={userName} />      
+      {/* Accounts List */}
         <animated.div style={cardsSpring} className="mb-6">
-          <div className="space-y-3">
-            {allAccounts.map((account) => (
+          <div className="space-y-3">{allAccounts.map((account) => (
               <Link 
                 key={account.id}
-                href={account.type === 'credit' ? `/cards/${account.id}` : '#'}
+                href={account.type === 'credit' ? `/cards?selected=${account.id}` : '#'}
                 className={account.type === 'credit' ? 'block cursor-pointer' : 'block cursor-default'}
                 onClick={(e) => account.type !== 'credit' && e.preventDefault()}
               >
@@ -339,8 +334,7 @@ const Home: React.FC = () => {
             )}
           </div>
         </animated.div>
-        
-        {/* Transaction Container */}
+          {/* Transaction Container */}
         {showTransactions && buttonBottomPosition > 0 && (
           <TransactionContainer 
             transactionGroups={bankingTransactions}
@@ -349,8 +343,7 @@ const Home: React.FC = () => {
             onCollapseChange={handleCollapseChange}
           />
         )}
-      </div>
-    </div>
+    </>
   );
 };
 

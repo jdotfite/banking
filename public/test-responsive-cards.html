@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Responsive Cards Test</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+            background: #121212;
+            color: white;
+        }
+        .test-container {
+            margin-bottom: 20px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .test-label {
+            background: #333;
+            padding: 10px;
+            font-weight: bold;
+        }
+        .test-frame {
+            background: white;
+            height: 800px;
+            border: none;
+            width: 100%;
+        }
+        .controls {
+            margin-bottom: 20px;
+            padding: 20px;
+            background: #333;
+            border-radius: 8px;
+        }
+        .controls button {
+            background: #007acc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin: 5px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .controls button:hover {
+            background: #005a9e;
+        }
+    </style>
+</head>
+<body>
+    <h1>📱 Responsive Card Stack Test</h1>
+    <p>Testing the card stack component at different screen sizes to verify responsive fixes.</p>
+    
+    <div class="controls">
+        <h3>Quick Test Sizes:</h3>
+        <button onclick="setSize(320, 568)">iPhone SE (320px)</button>
+        <button onclick="setSize(375, 667)">iPhone 8 (375px)</button>
+        <button onclick="setSize(414, 736)">iPhone Plus (414px)</button>
+        <button onclick="setSize(768, 1024)">iPad (768px)</button>
+        <button onclick="setSize(1024, 768)">Desktop Small (1024px)</button>
+        <button onclick="setSize('100%', 800)">Full Width</button>
+    </div>
+
+    <div class="test-container">
+        <div class="test-label">Card Stack Component Test</div>
+        <iframe 
+            id="testFrame" 
+            class="test-frame" 
+            src="http://localhost:3000/cards"
+            style="width: 375px;"
+        ></iframe>
+    </div>
+
+    <div style="background: #333; padding: 20px; border-radius: 8px; margin-top: 20px;">
+        <h3>✅ Test Checklist:</h3>
+        <ul>
+            <li><strong>Card Centering:</strong> Cards should be centered horizontally at all screen sizes</li>
+            <li><strong>No Overflow:</strong> Cards should not be cut off on left/right sides</li>
+            <li><strong>Dots Position:</strong> Navigation dots should appear below the card stack</li>
+            <li><strong>Proper Scaling:</strong> Cards should scale down appropriately on smaller screens</li>
+            <li><strong>Touch/Drag:</strong> Swipe functionality should work on mobile devices</li>
+            <li><strong>Navigation:</strong> Arrow buttons should be properly positioned</li>
+        </ul>
+        
+        <h3>🔧 Recent Fixes Applied:</h3>
+        <ul>
+            <li>✅ Fixed hydration error in layout.tsx</li>
+            <li>✅ Changed card stack positioning from left-aligned to center-aligned</li>
+            <li>✅ Moved dots outside scaled container to prevent positioning issues</li>
+            <li>✅ Enhanced container constraints (max-w-6xl)</li>
+            <li>✅ Improved scaling logic with padding accounting and minimum scale</li>
+            <li>✅ Separated card height from total height to isolate dots</li>
+        </ul>
+    </div>
+
+    <script>
+        function setSize(width, height) {
+            const frame = document.getElementById('testFrame');
+            frame.style.width = typeof width === 'number' ? width + 'px' : width;
+            frame.style.height = height + 'px';
+        }
+        
+        // Auto-refresh the iframe every 10 seconds to catch any updates
+        setInterval(() => {
+            const frame = document.getElementById('testFrame');
+            frame.src = frame.src;
+        }, 10000);
+        
+        console.log('📱 Responsive test page loaded. Use the buttons above to test different screen sizes.');
+    </script>
+</body>
+</html>

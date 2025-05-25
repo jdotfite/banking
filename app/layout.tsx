@@ -49,6 +49,8 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <link rel="icon" type="image/png" sizes="196x196" href="/images/icons/favicon-196.png" />
         <link rel="apple-touch-icon" href="/images/icons/apple-icon-180.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
+        <link rel="preload" href="/fonts/ocrastd.woff" as="font" type="font/woff" crossOrigin="" />
+        <link rel="preload" href="/fonts/ocrastd.otf" as="font" type="font/otf" crossOrigin="" />
       </head>
       <body className="font-sans bg-[#1d1d1d] text-white overflow-x-hidden">
         <RegisterServiceWorker />

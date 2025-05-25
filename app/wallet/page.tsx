@@ -2,11 +2,12 @@
 
 import React from 'react';
 import Wallet from '@/components/screens/Wallet';
+import PageTemplate from '@/components/layout/PageTemplate';
 
 export default function WalletPage() {
   return (
-    <main className="relative min-h-screen">
+    <PageTemplate>
       <Wallet />
-    </main>
+    </PageTemplate>
   );
 }
