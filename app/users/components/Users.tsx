@@ -8,6 +8,7 @@ import { animated, useSpring, useSprings } from 'react-spring';
 import UserEditModal from './UserEditModal';
 import { ChevronLeft, ChevronRight, Settings, CreditCard, Wallet, Home, PiggyBank } from 'lucide-react';
 import { Button } from '@/components/ui/form';
+import { BankingUser, BankingAccount, BankingCreditCard, BankingLoan } from '@/lib/types/bankingDataTypes';
 
 interface UsersProps {
   onSelectUser: (userId: string | null) => void;
@@ -55,9 +56,8 @@ const Users: React.FC<UsersProps> = ({ onSelectUser }) => {
   // Create individual useSpring hooks for each user
   // First, create refs to store the API for each user's spring
   const springApis = React.useRef<any[]>([]);
-  
-  // Create the spring props for each user
-  const productSpringProps = users.map((user, i) => {
+    // Create the spring props for each user
+  const productSpringProps = users.map((user: BankingUser, i: number) => {
     // Use useSpring with the ref API pattern
     const [props, api] = useSpring(() => ({
       opacity: 1,
@@ -89,22 +89,20 @@ const Users: React.FC<UsersProps> = ({ onSelectUser }) => {
   
   const handleEditUser = (userId: string, e: React.MouseEvent) => {
     e.stopPropagation();
-    setShowEditModal(userId);
-  };
+    setShowEditModal(userId);  };
   
   // Helper to get the user index from userId
   const getUserIndex = useCallback((userId: string) => {
-    return users.findIndex(user => user.id === userId);
+    return users.findIndex((user: BankingUser) => user.id === userId);
   }, [users]);
-  
-  const nextProduct = (userId: string, e: React.MouseEvent) => {
+    const nextProduct = (userId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     const userIndex = getUserIndex(userId);
     if (userIndex === -1) return;
     
-    const userAccounts = bankingData.accounts.filter((account: any) => account.userId === userId);
-    const userCards = bankingData.creditCards.filter((card: any) => card.userId === userId);
-    const userLoans = bankingData.loans.filter((loan: any) => loan.userId === userId);
+    const userAccounts = bankingData.accounts.filter((account: BankingAccount) => account.userId === userId);
+    const userCards = bankingData.creditCards.filter((card: BankingCreditCard) => card.userId === userId);
+    const userLoans = bankingData.loans.filter((loan: BankingLoan) => loan.userId === userId);
 
     const totalProducts = userAccounts.length + userCards.length + userLoans.length;
     const currentIndex = activeProductIndex[userId] || 0;
@@ -124,15 +122,14 @@ const Users: React.FC<UsersProps> = ({ onSelectUser }) => {
       [userId]: newIndex,
     });
   };
-
   const prevProduct = (userId: string, e: React.MouseEvent) => {
     e.stopPropagation();
     const userIndex = getUserIndex(userId);
     if (userIndex === -1) return;
     
-    const userAccounts = bankingData.accounts.filter((account: any) => account.userId === userId);
-    const userCards = bankingData.creditCards.filter((card: any) => card.userId === userId);
-    const userLoans = bankingData.loans.filter((loan: any) => loan.userId === userId);
+    const userAccounts = bankingData.accounts.filter((account: BankingAccount) => account.userId === userId);
+    const userCards = bankingData.creditCards.filter((card: BankingCreditCard) => card.userId === userId);
+    const userLoans = bankingData.loans.filter((loan: BankingLoan) => loan.userId === userId);
 
     const totalProducts = userAccounts.length + userCards.length + userLoans.length;
     const currentIndex = activeProductIndex[userId] || 0;
@@ -221,7 +218,7 @@ const Users: React.FC<UsersProps> = ({ onSelectUser }) => {
 
           <h3 className="text-lg font-medium mb-3 text-neutral-300">User Profiles</h3>
           
-          {users.map((user: any, index: number) => {
+          {users.map((user: BankingUser, index: number) => {
             const productCount = getProductCount(user.id);
             const currentProductIndex = activeProductIndex[user.id] || 0;
             

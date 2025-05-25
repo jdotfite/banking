@@ -8,6 +8,7 @@ import Icon from '@/components/ui/icons/Icon';
 import { useBankingData } from '@/components/context/BankingDataProvider';
 import TransactionContainer from '@/components/ui/transactions/TransactionContainer';
 import { TransactionDateGroup, TransactionType } from '@/lib/types';
+import { BankingCreditCard, BankingTransaction } from '@/lib/types/bankingDataTypes';
 import { ChevronRight } from 'lucide-react';
 
 // Quick Actions Component  
@@ -40,7 +41,7 @@ const QuickActions = () => {
 };
 
 // Credit Limit Display Component
-const CreditLimitDisplay = ({ selectedCard }: { selectedCard: any }) => {
+const CreditLimitDisplay = ({ selectedCard }: { selectedCard: BankingCreditCard | null }) => {
   if (!selectedCard) return null;
 
   const usagePercentage = (selectedCard.currentBalance / selectedCard.creditLimit) * 100;
@@ -85,9 +86,7 @@ const CreditLimitDisplay = ({ selectedCard }: { selectedCard: any }) => {
                 style={{ width: `${usagePercentage}%` }}
               />
             </div>
-          </div>
-
-          {selectedCard.rewardsBalance > 0 && (
+          </div>          {selectedCard.rewardsBalance && selectedCard.rewardsBalance > 0 && (
             <div className="flex justify-between text-sm border-t border-neutral-700 pt-2">
               <span className="text-neutral-400">Rewards Balance</span>
               <span className="text-yellow-400 font-medium">
@@ -164,10 +163,9 @@ const TransactionsPreview = ({
           See all <ChevronRight className="w-4 h-4 ml-1" />
         </button>
       </div>
-      
-      {/* Preview of recent transactions */}
+        {/* Preview of recent transactions */}
       <div className="space-y-2">
-        {recentTransactions.map((transaction: any) => (
+        {recentTransactions.map((transaction: BankingTransaction) => (
           <div 
             key={transaction.id}
             className="bg-[#212121] rounded-lg p-3 flex items-center justify-between"
@@ -183,10 +181,9 @@ const TransactionsPreview = ({
                   {transaction.location || transaction.message || transaction.timestamp}
                 </div>
               </div>
-            </div>
-            <div className="text-right">
-              <div className={`font-medium tracking-tight ${transaction.isCredit ? 'text-green-500' : 'text-white'}`}>
-                {transaction.isCredit ? '+' : '-'}${transaction.amount.toFixed(2)}
+            </div>            <div className="text-right">
+              <div className={`font-medium tracking-tight ${transaction.isIncoming ? 'text-green-500' : 'text-white'}`}>
+                {transaction.isIncoming ? '+' : '-'}${transaction.amount.toFixed(2)}
               </div>
             </div>
           </div>
@@ -280,15 +277,14 @@ export default function CardsPage() {
     
     // Group transactions by date
     const grouped: { [key: string]: TransactionType[] } = {};
-    
-    transactions.forEach((transaction: any) => {
+      transactions.forEach((transaction: BankingTransaction) => {
       // Convert transaction to proper format
       const formattedTransaction: TransactionType = {
         id: transaction.id,
         merchant: transaction.merchant,
         location: transaction.location,
         amount: transaction.amount,
-        isIncoming: transaction.isCredit || false,
+        isIncoming: transaction.isIncoming || false,
         timestamp: transaction.timestamp,
         message: transaction.message,
         icon: getTransactionIcon(transaction.category),

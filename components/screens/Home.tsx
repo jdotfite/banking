@@ -2,7 +2,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
-import Link from 'next/link';{ useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import { animated, useSpring } from 'react-spring';
 import { getDefaultCard } from '@/lib/data/cards';
 import { getTransactions } from '@/lib/data/transactions';
