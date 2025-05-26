@@ -12,13 +12,12 @@ import { BankingCreditCard, BankingTransaction } from '@/lib/types/bankingDataTy
 import { ChevronRight } from 'lucide-react';
 
 // Quick Actions Component  
-const QuickActions = () => {
-  const actions = [
+const QuickActions = () => {  const actions = [
     { type: 'repeat', label: 'Pay', icon: 'repeat' },
     { type: 'lock', label: 'Lock', icon: 'lock' },
-    { type: 'transfer', label: 'Transfer', icon: 'transfer' },
-    { type: 'settings', label: 'Settings', icon: 'settings' },
-    { type: 'statements', label: 'Statements', icon: 'more' }
+    { type: 'lost', label: 'Lost', icon: 'alert' },
+    { type: 'statements', label: 'Statements', icon: 'fileText' },
+    { type: 'more', label: 'More', icon: 'more' }
   ];
 
   return (
@@ -46,11 +45,15 @@ const CreditLimitDisplay = ({ selectedCard }: { selectedCard: BankingCreditCard 
 
   const usagePercentage = (selectedCard.currentBalance / selectedCard.creditLimit) * 100;
 
-  return (
-    <div className="px-4 py-4">
+  return (    <div className="px-4 py-4">
       <div className="bg-[#212121] rounded-xl p-4">
-        <h3 className="text-white font-semibold mb-3">Credit Limit</h3>
         <div className="space-y-3">
+          <div className="flex justify-between">
+            <span className="text-neutral-400">Current Balance</span>
+            <span className="text-white font-bold text-lg">
+              ${selectedCard.currentBalance.toLocaleString()}
+            </span>
+          </div>
           <div className="flex justify-between text-sm">
             <span className="text-neutral-400">Available Credit</span>
             <span className="text-green-400 font-medium">
@@ -58,9 +61,15 @@ const CreditLimitDisplay = ({ selectedCard }: { selectedCard: BankingCreditCard 
             </span>
           </div>
           <div className="flex justify-between text-sm">
-            <span className="text-neutral-400">Current Balance</span>
+            <span className="text-neutral-400">Due Date</span>
             <span className="text-white font-medium">
-              ${selectedCard.currentBalance.toLocaleString()}
+              {new Date(selectedCard.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+            </span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-neutral-400">Minimum Payment</span>
+            <span className="text-white font-medium">
+              ${selectedCard.minimumPayment.toFixed(2)}
             </span>
           </div>
           <div className="flex justify-between text-sm border-t border-neutral-700 pt-2">
@@ -69,8 +78,7 @@ const CreditLimitDisplay = ({ selectedCard }: { selectedCard: BankingCreditCard 
               ${selectedCard.creditLimit.toLocaleString()}
             </span>
           </div>
-          
-          {/* Usage Bar */}
+            {/* Usage Bar */}
           <div className="mt-3">
             <div className="flex justify-between text-xs mb-1">
               <span className="text-neutral-400">Usage</span>
@@ -86,7 +94,9 @@ const CreditLimitDisplay = ({ selectedCard }: { selectedCard: BankingCreditCard 
                 style={{ width: `${usagePercentage}%` }}
               />
             </div>
-          </div>          {selectedCard.rewardsBalance && selectedCard.rewardsBalance > 0 && (
+          </div>
+
+          {selectedCard.rewardsType !== 'none' && selectedCard.rewardsBalance > 0 && (
             <div className="flex justify-between text-sm border-t border-neutral-700 pt-2">
               <span className="text-neutral-400">Rewards Balance</span>
               <span className="text-yellow-400 font-medium">

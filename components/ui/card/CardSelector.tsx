@@ -18,12 +18,11 @@ const CardSelector: React.FC<CardSelectorProps> = ({ selectedCardId, onCardSelec
   const [cardsData, setCardsData] = useState<BankingCreditCard[]>([]);
   const [startX, setStartX] = useState<number | null>(null);
   const [active, setActive] = useState<HTMLDivElement | null>(null);
-
   // Constants for styling and animations
   const SPACING = 30;
   const BASE_WIDTH = 767;
   const BASE_HEIGHT = 484;
-  const EXTRA_DOT_OFFSET = 40;
+  const EXTRA_DOT_OFFSET = 10;
 
   // Map card types to image paths
   const cardTypeImages: Record<string, string> = {

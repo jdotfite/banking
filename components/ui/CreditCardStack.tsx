@@ -5,21 +5,19 @@ interface CreditCardStackProps {
   onCardChange?: (index: number, cardId?: string) => void;
 }
 
-const CreditCardStack = ({ onCardChange }: CreditCardStackProps) => {
-  const BASE_WIDTH = 767;
+const CreditCardStack = ({ onCardChange }: CreditCardStackProps) => {  const BASE_WIDTH = 767;
   const BASE_HEIGHT = 484;
   const SPACING = 30;
-  const EXTRA_DOT_OFFSET = 40;
+  const EXTRA_DOT_OFFSET = -51; // Adjusted to position dots at ~246px to align with bottom of card stack
   
   const { userData } = useBankingData();
-
-  // Map card types to images - using demo images for now
+  // Map card types to images - using local images
   const cardTypeImages = {
-    "Visa Signature Rewards": "https://assets.codepen.io/890371/card-sig-rewards.png",
-    "Visa Platinum Low Rate": "https://assets.codepen.io/890371/card-plat-low.png", 
-    "Platinum Business Rewards": "https://assets.codepen.io/890371/card-business-plat-rewards.png",
-    "Platinum Rewards": "https://assets.codepen.io/890371/card-plat-rewards.png",
-    "Platinum Secured": "https://assets.codepen.io/890371/card-plat-secured.png"
+    "Visa Signature Rewards": "/images/cards/credit/card-sig-rewards.png",
+    "Visa Platinum Low Rate": "/images/cards/credit/card-plat-low.png", 
+    "Platinum Business Rewards": "/images/cards/credit/card-business-plat-rewards.png",
+    "Platinum Rewards": "/images/cards/credit/card-plat-rewards.png",
+    "Platinum Secured": "/images/cards/credit/card-plat-secured.png"
   };
 
   // Get credit cards from banking data
@@ -138,12 +136,14 @@ const CreditCardStack = ({ onCardChange }: CreditCardStackProps) => {
   `;  return (
     <>
       <style dangerouslySetInnerHTML={{ __html: styles }} />
-      <div className="py-8 overflow-x-hidden">
-        <div className="max-w-4xl mx-auto px-4"><div 
+      <div className="py-14">
+        <div className="max-w-4xl mx-auto px-4">
+
+          {/* Container that accounts for both cards and dots */}          <div 
             ref={containerRef}
             className="relative w-full mx-auto"
             style={{ aspectRatio: `${BASE_WIDTH} / ${BASE_HEIGHT}` }}
-          >            <div
+          ><div
               ref={swiperRef}
               className="absolute top-0 left-0"
               style={{
@@ -257,15 +257,13 @@ const CreditCardStack = ({ onCardChange }: CreditCardStackProps) => {
                 <svg width="48" height="48" viewBox="0 0 24 24">
                   <path d="M9 5l7 7-7 7" fill="none" stroke="#fff" strokeWidth="2"/>
                 </svg>
-              </button>            </div>            {/* Dots */}
-            <div 
-              className="absolute w-full left-0 flex justify-center select-none"
+              </button>            </div>            {/* Dots */}            <div 
+              className="absolute w-full left-0 flex justify-center select-none py-3"
               style={{
                 top: `${(BASE_HEIGHT + SPACING * (cardsData.length - 1) + EXTRA_DOT_OFFSET) * scale}px`
               }}
-            >
-              {cardsData.map((_, index) => {
-                const dotSize = Math.round(28 * scale);
+            >              {cardsData.map((_, index) => {
+                const dotSize = Math.round(56 * scale); // Doubled from 28 to 56
                 return (
                   <button
                     key={index}

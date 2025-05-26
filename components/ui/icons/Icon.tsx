@@ -26,6 +26,10 @@ const Icon: React.FC<IconProps> = ({ name, className = 'w-6 h-6' }) => {
     card: LucideIcons.CreditCard, // For credit card navigation
     withdraw: LucideIcons.MinusCircle, // For withdraw action
     settings: LucideIcons.Settings, // For settings
+    shield: LucideIcons.Shield, // For lost/security actions
+    alert: LucideIcons.AlertTriangle, // For alert/warning actions
+    fileText: LucideIcons.FileText, // For statements/documents
+    lock: LucideIcons.Lock, // For lock action
   };
 
   // Map for merchant-specific icons

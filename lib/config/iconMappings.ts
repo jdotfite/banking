@@ -49,13 +49,14 @@ export const standardIconMap: Record<string, any> = {
   deposit: LucideIcons.PlusCircle,
   transfer: LucideIcons.ArrowLeftRight,
   more: LucideIcons.MoreHorizontal,
-  
-  // Action icons
+    // Action icons
   add: LucideIcons.Plus,
   edit: LucideIcons.Edit,
   delete: LucideIcons.Trash,
   search: LucideIcons.Search,
   settings: LucideIcons.Settings,
+  shield: LucideIcons.Shield,
+  fileText: LucideIcons.FileText,
   
   // Notification icons
   notificationBell: LucideIcons.Bell,

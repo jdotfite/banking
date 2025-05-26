@@ -135,13 +135,21 @@ const Home: React.FC = () => {
               <div className="h-4 w-1/4 rounded-full bg-yellow-500"></div>
             </div>
           </div>
-          
-          {/* Rewards section */}
-          <div className="bg-[#212121] rounded-xl p-4">
-            <h3 className="text-sm font-medium mb-1">Rewards</h3>
-            <p className="text-xs text-neutral-400 mb-2">Cash back earned</p>
-            <p className="text-green-500 font-semibold">${cardInfo?.rewardsBalance?.toFixed(2) || '0.00'}</p>
-          </div>
+            {/* Rewards section - only show for cards that offer rewards */}
+          {cardInfo?.rewardsType && cardInfo.rewardsType !== 'none' && (
+            <div className="bg-[#212121] rounded-xl p-4">
+              <h3 className="text-sm font-medium mb-1">Rewards</h3>
+              <p className="text-xs text-neutral-400 mb-2">
+                {cardInfo.rewardsType === 'cashback' ? 'Cash back earned' : 
+                 cardInfo.rewardsType === 'points' ? 'Points earned' : 'Rewards earned'}
+              </p>
+              <p className="text-green-500 font-semibold">
+                {cardInfo.rewardsType === 'cashback' ? '$' : ''}
+                {cardInfo?.rewardsBalance?.toFixed(2) || '0.00'}
+                {cardInfo.rewardsType === 'points' ? ' pts' : ''}
+              </p>
+            </div>
+          )}
         </animated.div>
         
         {/* Action buttons */}
