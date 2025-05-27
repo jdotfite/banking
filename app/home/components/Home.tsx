@@ -8,13 +8,13 @@ import Header from '@/components/ui/navigation/Header';
 import LoadingSpinner from '@/components/ui/common/LoadingSpinner';
 import Icon from '@/components/ui/icons/Icon';
 import TransactionContainer from '@/components/ui/transactions/TransactionContainer';
+import PromotionalSlider from './PromotionalSlider';
 import { BankingAccount, TransactionDateGroup } from '@/lib/types';
 import { ChevronRight } from 'lucide-react';
 
 const Home: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [activeAccountIndex, setActiveAccountIndex] = useState(0);
-  const [activePromotionIndex, setActivePromotionIndex] = useState(0);
   const [showTransactions, setShowTransactions] = useState(false);
   const [isTransactionCollapsed, setIsTransactionCollapsed] = useState(true);
   const transactionsContainerRef = useRef<HTMLDivElement>(null);
@@ -143,7 +143,6 @@ const Home: React.FC = () => {
       color: card.color || '#7b2528'
     }))
   ];
-
   // Quick actions
   const quickActions = [
     { name: 'Send', icon: 'transfer', color: '#3b82f6' },
@@ -151,35 +150,13 @@ const Home: React.FC = () => {
     { name: 'Deposit', icon: 'deposit', color: '#10b981' },
     { name: 'Withdraw', icon: 'withdraw', color: '#f59e0b' },
     { name: 'Invest', icon: 'insights', color: '#8b5cf6' }
-  ];
-
-  // Promotional banners
-  const promotions = [
-    {
-      title: 'Refer and Earn',
-      description: 'Share a referral link to your friend and get rewarded',
-      buttonText: 'Learn more',
-      image: '/images/marketing/refer-friend.png',
-      color: 'from-neutral-800 to-neutral-900'
-    },
-    {
-      title: 'Boost Your Savings',
-      description: 'Open a high-yield savings account today',
-      buttonText: 'Get started',
-      image: '/images/marketing/go-paperless.png',
-      color: 'from-blue-800 to-blue-900'
-    },
-    {
-      title: 'Go Paperless',
-      description: 'Switch to e-statements and help the environment',
-      buttonText: 'Switch now',
-      image: '/images/marketing/refer-friend.png',
-      color: 'from-green-800 to-green-900'
-    }
-  ];  return (
-    <>
-      {/* Header */}
+  ];return (
+    <>      {/* Header */}
       <Header userName={userName} />      
+      
+      {/* Promotional Banners */}
+      <PromotionalSlider style={promotionsSpring} />
+      
       {/* Accounts List */}
         <animated.div style={cardsSpring} className="mb-6">
           <div className="space-y-3">{allAccounts.map((account) => (
@@ -221,8 +198,7 @@ const Home: React.FC = () => {
               </Link>
             ))}
           </div>
-        </animated.div>
-        
+        </animated.div>        
         {/* Quick Actions */}
         <animated.div style={actionsSpring} className="mb-6">
           <div className="overflow-x-auto scrollbar-hide">
@@ -239,49 +215,6 @@ const Home: React.FC = () => {
                   </div>
                   <span className="text-xs text-white">{action.name}</span>
                 </div>
-              ))}
-            </div>
-          </div>
-        </animated.div>
-        
-        {/* Promotional Banners */}
-        <animated.div style={promotionsSpring} className="mb-6">
-          <div className="relative overflow-hidden">
-            <div className="flex overflow-x-auto pb-4 scrollbar-hide snap-x snap-mandatory">
-              {promotions.map((promo, index) => (
-                <div 
-                  key={index}
-                  className="min-w-[90%] mr-4 snap-center first:pl-0 last:pr-5 flex"
-                  onClick={() => setActivePromotionIndex(index)}
-                >
-                  <div className={`rounded-lg p-4 bg-gradient-to-br ${promo.color} relative overflow-hidden flex-1 flex flex-col`}>
-                    <div className="flex justify-between flex-1">
-                      <div className="max-w-[65%] flex flex-col">
-                        <h3 className="text-white font-medium mb-1">{promo.title}</h3>
-                        <p className="text-white/80 text-xs mb-3 flex-1">
-                          {promo.description}
-                        </p>
-                        <button className="text-xs text-white bg-white/20 px-3 py-1 rounded-full hover:bg-white/30 transition-colors self-start">
-                          {promo.buttonText}
-                        </button>
-                      </div>
-                      <div className="absolute right-2 bottom-2">
-                        <img src={promo.image} alt={promo.title} className="h-20 object-contain" />
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            
-            {/* Pagination dots */}
-            <div className="flex justify-center mt-1">
-              {promotions.map((_, index) => (
-                <div 
-                  key={index}
-                  className={`w-2 h-2 rounded-full mx-1 ${index === activePromotionIndex ? 'bg-white' : 'bg-neutral-600'}`}
-                  onClick={() => setActivePromotionIndex(index)}
-                />
               ))}
             </div>
           </div>

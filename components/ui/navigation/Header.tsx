@@ -28,9 +28,8 @@ const Header: React.FC<HeaderProps> = ({ userName }) => {
     delay: 500,
     config: { tension: 400, friction: 20 },
   });
-
   return (
-    <animated.div style={headerSpring} className="px-5 pt-8 pb-6 mx-auto max-w-md">
+    <animated.div style={headerSpring} className="pt-8 pb-6 mx-auto max-w-md">
       <div className="flex justify-between items-center">
         <div className="flex items-center">
           <div className="w-10 h-10 rounded-full mr-3 overflow-hidden border border-neutral-700">
@@ -46,7 +45,7 @@ const Header: React.FC<HeaderProps> = ({ userName }) => {
           <Bell className="w-6 h-6" />
           <animated.span 
             style={notificationSpring}
-            className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full transform -translate-y-1/4 translate-x-1/4"
+            className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"
           ></animated.span>
         </button>
       </div>
