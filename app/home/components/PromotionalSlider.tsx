@@ -96,18 +96,26 @@ const PromotionalSlider: React.FC<PromotionalSliderProps> = ({ style, className 
     { id: 'go-paperless', component: <GoPaperlessSlide /> },
     { id: 'refer-earn', component: <ReferAndEarnSlide /> },
     { id: 'boost-savings', component: <BoostSavingsSlide /> }
-  ];
-
-  // Handle scroll events to update active slide
+  ];  // Handle scroll events to update active slide (improved accuracy)
   const handleScroll = () => {
-    if (!scrollContainerRef.current || isScrollingRef.current) return;
+    // Don't handle scroll events during dragging or programmatic scrolling
+    if (!scrollContainerRef.current || isScrollingRef.current || isDraggingRef.current) return;
 
     const container = scrollContainerRef.current;
     const scrollLeft = container.scrollLeft;
-    const slideWidth = container.clientWidth * 0.9; // 90% width per slide
-    const newIndex = Math.round(scrollLeft / slideWidth);
+    const containerWidth = container.clientWidth;
+    const slideWidth = containerWidth * 0.9; // 90% width per slide
     
-    if (newIndex !== activeSlideIndex && newIndex >= 0 && newIndex < slides.length) {
+    // More precise calculation with proper rounding
+    const exactIndex = scrollLeft / slideWidth;
+    let newIndex = Math.round(exactIndex);
+    
+    // Ensure index is within bounds
+    newIndex = Math.max(0, Math.min(newIndex, slides.length - 1));
+    
+    // Only update if the index has actually changed and we're close enough to a slide center
+    const distanceFromCenter = Math.abs(exactIndex - newIndex);
+    if (newIndex !== activeSlideIndex && distanceFromCenter < 0.3) {
       setActiveSlideIndex(newIndex);
     }
   };
@@ -131,7 +139,7 @@ const PromotionalSlider: React.FC<PromotionalSliderProps> = ({ style, className 
     setTimeout(() => {
       isScrollingRef.current = false;
     }, 500);
-  };  // Mouse drag handlers
+  };  // Mouse drag handlers (improved for consistency)
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!scrollContainerRef.current) return;
     
@@ -144,8 +152,9 @@ const PromotionalSlider: React.FC<PromotionalSliderProps> = ({ style, className 
     // Prevent text selection while dragging
     e.preventDefault();
     
-    // Change cursor to grabbing
+    // Change cursor to grabbing and disable scroll snap during interaction
     scrollContainerRef.current.style.cursor = 'grabbing';
+    scrollContainerRef.current.style.scrollSnapType = 'none';
   };
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDraggingRef.current || !scrollContainerRef.current) return;
@@ -162,8 +171,7 @@ const PromotionalSlider: React.FC<PromotionalSliderProps> = ({ style, className 
     
     // Don't update scroll position during drag - just track distance
     // This prevents the immediate scrolling behavior and allows for smooth animation on release
-  };
-  const handleMouseUp = () => {
+  };  const handleMouseUp = () => {
     if (!scrollContainerRef.current) return;
     
     const wasDragging = isDraggingRef.current;
@@ -174,10 +182,12 @@ const PromotionalSlider: React.FC<PromotionalSliderProps> = ({ style, className 
       setIsDragging(false);
     }, 100);
     
+    // Restore cursor and scroll snap
     scrollContainerRef.current.style.cursor = 'grab';
+    scrollContainerRef.current.style.scrollSnapType = 'x mandatory';
     
     // Determine if drag was significant enough to change slides
-    if (dragDistanceRef.current > 30) { // Lower threshold for more responsive feel
+    if (dragDistanceRef.current > 40) { // Increased threshold for more intentional swipes
       let newIndex = activeSlideIndex;
       
       if (dragDirectionRef.current > 0 && activeSlideIndex < slides.length - 1) {
@@ -192,6 +202,9 @@ const PromotionalSlider: React.FC<PromotionalSliderProps> = ({ style, className 
       if (newIndex !== activeSlideIndex) {
         scrollToSlide(newIndex);
       }
+    } else if (wasDragging && dragDistanceRef.current > 0) {
+      // If drag wasn't enough to change slides, snap back to current slide
+      scrollToSlide(activeSlideIndex);
     }
     
     // Reset drag tracking
@@ -202,35 +215,81 @@ const PromotionalSlider: React.FC<PromotionalSliderProps> = ({ style, className 
     if (isDraggingRef.current) {
       handleMouseUp();
     }
-  };
+  };  // Touch handlers for mobile (fixed for smoother mobile experience)
+  const touchStartYRef = useRef(0);
+  const isHorizontalSwipeRef = useRef(false);
 
-  // Touch handlers for mobile (same logic as mouse)
   const handleTouchStart = (e: React.TouchEvent) => {
     if (!scrollContainerRef.current) return;
     
     isDraggingRef.current = true;
     setIsDragging(true);
     startXRef.current = e.touches[0].pageX;
+    touchStartYRef.current = e.touches[0].pageY;
     scrollStartRef.current = scrollContainerRef.current.scrollLeft;
     dragDistanceRef.current = 0;
     dragDirectionRef.current = 0;
+    isHorizontalSwipeRef.current = false;
+    
+    // Don't prevent default immediately - let natural touch handling work first
   };
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!isDraggingRef.current || !scrollContainerRef.current) return;
     
-    const x = e.touches[0].pageX;
-    const walk = x - startXRef.current;
-    dragDistanceRef.current = Math.abs(walk);
+    const currentX = e.touches[0].pageX;
+    const currentY = e.touches[0].pageY;
+    const walkX = currentX - startXRef.current;
+    const walkY = currentY - touchStartYRef.current;
     
-    // Determine drag direction for visual feedback
-    if (Math.abs(walk) > 10) {
-      dragDirectionRef.current = walk > 0 ? -1 : 1;
+    // Determine if this is primarily a horizontal swipe
+    if (!isHorizontalSwipeRef.current && (Math.abs(walkX) > 10 || Math.abs(walkY) > 10)) {
+      // If horizontal movement is greater than vertical, it's a horizontal swipe
+      isHorizontalSwipeRef.current = Math.abs(walkX) > Math.abs(walkY);
+      
+      if (isHorizontalSwipeRef.current) {
+        // Now we know it's a horizontal swipe, disable scroll snap
+        scrollContainerRef.current.style.scrollSnapType = 'none';
+      }
+    }
+    
+    // Only prevent default if we've determined this is a horizontal swipe
+    if (isHorizontalSwipeRef.current) {
+      e.preventDefault();
+      dragDistanceRef.current = Math.abs(walkX);
+      
+      // Determine drag direction
+      if (Math.abs(walkX) > 15) {
+        dragDirectionRef.current = walkX > 0 ? -1 : 1;
+      }
+    } else {
+      // It's a vertical scroll, reset drag state and let native scrolling handle it
+      isDraggingRef.current = false;
+      setIsDragging(false);
     }
   };
 
-  const handleTouchEnd = () => {
-    handleMouseUp(); // Same logic as mouse up
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    if (!scrollContainerRef.current) return;
+    
+    // Only handle touch end if it was a horizontal swipe
+    if (isHorizontalSwipeRef.current) {
+      e.preventDefault();
+      
+      // Re-enable scroll snap after touch interaction
+      scrollContainerRef.current.style.scrollSnapType = 'x mandatory';
+      
+      handleMouseUp(); // Same logic as mouse up
+    } else {
+      // Reset state for non-horizontal swipes
+      isDraggingRef.current = false;
+      setIsDragging(false);
+      dragDistanceRef.current = 0;
+      dragDirectionRef.current = 0;
+    }
+    
+    // Reset horizontal swipe flag
+    isHorizontalSwipeRef.current = false;
   };
 
   // Handle slide click (prevent if dragging)
@@ -253,13 +312,16 @@ const PromotionalSlider: React.FC<PromotionalSliderProps> = ({ style, className 
     return () => {
       container.removeEventListener('scroll', handleScroll);
     };
-  }, [activeSlideIndex]);
-  return (
+  }, [activeSlideIndex]);  return (
     <animated.div style={{ ...sliderSpring, ...style }} className={className}>
       <div className="relative overflow-hidden">        <div 
           ref={scrollContainerRef}
           className="flex overflow-x-auto pb-2 scrollbar-hide snap-x snap-mandatory select-none"
-          style={{ scrollSnapType: 'x mandatory' }}
+          style={{ 
+            scrollSnapType: 'x mandatory',
+            WebkitOverflowScrolling: 'touch',
+            touchAction: 'pan-x pinch-zoom'
+          }}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
