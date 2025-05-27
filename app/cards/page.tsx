@@ -52,7 +52,7 @@ const CreditLimitDisplay = ({ selectedCard }: { selectedCard: BankingCreditCard 
             <span className="text-white font-bold text-lg">
               ${selectedCard.currentBalance.toLocaleString()}
             </span>
-          </div>          <div className="flex justify-between text-sm">
+          </div>          <div className="flex justify-between text-sm border-t border-neutral-700 pt-2">
             <span className="text-neutral-400">Available Credit</span>
             <span className="text-neutral-300 font-medium">
               ${selectedCard.availableCredit.toLocaleString()}
