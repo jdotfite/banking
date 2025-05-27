@@ -46,34 +46,33 @@ const CreditLimitDisplay = ({ selectedCard }: { selectedCard: BankingCreditCard 
   const usagePercentage = (selectedCard.currentBalance / selectedCard.creditLimit) * 100;
 
   return (    <div className="px-4 py-4">
-      <div className="bg-[#212121] rounded-xl p-4">
-        <div className="space-y-3">
+      <div className="bg-[#212121] rounded-xl p-4">        <div className="space-y-3">
           <div className="flex justify-between">
-            <span className="text-neutral-400">Current Balance</span>
+            <span className="text-neutral-200">Current Balance</span>
             <span className="text-white font-bold text-lg">
               ${selectedCard.currentBalance.toLocaleString()}
             </span>
           </div>          <div className="flex justify-between text-sm">
             <span className="text-neutral-400">Available Credit</span>
-            <span className="text-white font-medium">
+            <span className="text-neutral-300 font-medium">
               ${selectedCard.availableCredit.toLocaleString()}
             </span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-neutral-400">Due Date</span>
-            <span className="text-white font-medium">
+            <span className="text-neutral-300 font-medium">
               {new Date(selectedCard.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
             </span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-neutral-400">Minimum Payment</span>
-            <span className="text-white font-medium">
+            <span className="text-neutral-300 font-medium">
               ${selectedCard.minimumPayment.toFixed(2)}
             </span>
           </div>
           <div className="flex justify-between text-sm border-t border-neutral-700 pt-2">
             <span className="text-neutral-400">Credit Limit</span>
-            <span className="text-white font-medium">
+            <span className="text-neutral-300 font-medium">
               ${selectedCard.creditLimit.toLocaleString()}
             </span>
           </div>
