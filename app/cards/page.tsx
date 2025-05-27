@@ -94,9 +94,7 @@ const CreditLimitDisplay = ({ selectedCard }: { selectedCard: BankingCreditCard 
                 style={{ width: `${usagePercentage}%` }}
               />
             </div>
-          </div>
-
-          {selectedCard.rewardsType !== 'none' && selectedCard.rewardsBalance > 0 && (
+          </div>          {selectedCard.rewardsType !== 'none' && selectedCard.rewardsBalance && selectedCard.rewardsBalance > 0 && (
             <div className="flex justify-between text-sm border-t border-neutral-700 pt-2">
               <span className="text-neutral-400">Rewards Balance</span>
               <span className="text-yellow-400 font-medium">
