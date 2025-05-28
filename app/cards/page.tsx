@@ -59,16 +59,15 @@ const CreditLimitDisplay = ({ selectedCard }: { selectedCard: BankingCreditCard 
   const usagePercentage = (selectedCard.currentBalance / selectedCard.creditLimit) * 100;
 
   return (    <div className="px-4 py-4">
-      <div className="bg-[#212121] rounded-xl p-4">        <div className="space-y-3">
-          <div className="flex justify-between">
+      <div className="bg-[#212121] rounded-xl p-4">        <div className="space-y-3">          <div className="flex justify-between">
             <span className="text-neutral-200">Current Balance</span>
             <span className="text-white font-bold text-lg">
-              ${selectedCard.currentBalance.toLocaleString()}
+              ${selectedCard.currentBalance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
             </span>
           </div>          <div className="flex justify-between text-sm border-t border-neutral-700 pt-2">
             <span className="text-neutral-400">Available Credit</span>
             <span className="text-neutral-300 font-medium">
-              ${selectedCard.availableCredit.toLocaleString()}
+              ${selectedCard.availableCredit.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
             </span>
           </div>
           <div className="flex justify-between text-sm">
@@ -82,11 +81,10 @@ const CreditLimitDisplay = ({ selectedCard }: { selectedCard: BankingCreditCard 
             <span className="text-neutral-300 font-medium">
               ${selectedCard.minimumPayment.toFixed(2)}
             </span>
-          </div>
-          <div className="flex justify-between text-sm border-t border-neutral-700 pt-2">
+          </div>          <div className="flex justify-between text-sm border-t border-neutral-700 pt-2">
             <span className="text-neutral-400">Credit Limit</span>
             <span className="text-neutral-300 font-medium">
-              ${selectedCard.creditLimit.toLocaleString()}
+              ${selectedCard.creditLimit.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
             </span>
           </div>
             {/* Usage Bar */}
@@ -110,7 +108,7 @@ const CreditLimitDisplay = ({ selectedCard }: { selectedCard: BankingCreditCard 
               <span className="text-neutral-400">Rewards Balance</span>
               <span className="text-yellow-400 font-medium">
                 {selectedCard.rewardsType === 'cashback' ? '$' : ''}
-                {selectedCard.rewardsBalance.toLocaleString()}
+                {selectedCard.rewardsBalance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
                 {selectedCard.rewardsType === 'points' ? ' pts' : ''}
               </span>
             </div>
@@ -422,8 +420,12 @@ export default function CardsPage() {
         <CustomBottomSheet
           open={showPaymentOptions}
           onDismiss={() => setShowPaymentOptions(false)}
-          header="Manage Card"
           theme="dark"
+          maxHeight={800}
+          snapPoints={['content', 600]}
+          initialSnap={0}
+          enableDynamicSizing={true}
+          onSnap={(index) => console.log('Snapped to index:', index)}
         >
           <PaymentOptionsMenu 
             onItemClick={handlePaymentOptionClick}

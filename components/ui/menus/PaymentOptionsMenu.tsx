@@ -53,6 +53,46 @@ export const PaymentOptionsMenu: React.FC<PaymentOptionsMenuProps> = ({ onItemCl
       icon: '🙋',
       iconBg: 'bg-red-500/20',
       iconColor: 'text-red-400'
+    },
+    {
+      id: 'payment-limits',
+      title: 'Payment limits',
+      description: 'Set daily and monthly payment limits',
+      icon: '💰',
+      iconBg: 'bg-yellow-500/20',
+      iconColor: 'text-yellow-400'
+    },
+    {
+      id: 'virtual-card',
+      title: 'Virtual card',
+      description: 'Create and manage virtual cards',
+      icon: '💳',
+      iconBg: 'bg-indigo-500/20',
+      iconColor: 'text-indigo-400'
+    },
+    {
+      id: 'fraud-protection',
+      title: 'Fraud protection',
+      description: 'Advanced security and fraud monitoring',
+      icon: '🛡️',
+      iconBg: 'bg-cyan-500/20',
+      iconColor: 'text-cyan-400'
+    },
+    {
+      id: 'international-usage',
+      title: 'International usage',
+      description: 'Enable card usage for international transactions',
+      icon: '🌍',
+      iconBg: 'bg-emerald-500/20',
+      iconColor: 'text-emerald-400'
+    },
+    {
+      id: 'contactless-payments',
+      title: 'Contactless payments',
+      description: 'Manage tap-to-pay and contactless settings',
+      icon: '📱',
+      iconBg: 'bg-pink-500/20',
+      iconColor: 'text-pink-400'
     }
   ];
 

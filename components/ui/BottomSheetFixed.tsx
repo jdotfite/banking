@@ -12,10 +12,9 @@ export interface CustomBottomSheetProps {
   className?: string;
   maxHeight?: number;
   theme?: 'light' | 'dark';
-  snapPoints?: (number | 'content')[];
+  snapPoints?: number[];
   initialSnap?: number;
   onSnap?: (index: number) => void;
-  enableDynamicSizing?: boolean;
 }
 
 export const CustomBottomSheet: React.FC<CustomBottomSheetProps> = ({ 
@@ -28,72 +27,24 @@ export const CustomBottomSheet: React.FC<CustomBottomSheetProps> = ({
   theme = 'light',
   snapPoints = [maxHeight],
   initialSnap = 0,
-  onSnap,
-  enableDynamicSizing = true
+  onSnap
 }) => {
   const [mounted, setMounted] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const sheetRef = useRef<HTMLDivElement>(null);
   const [currentSnapIndex, setCurrentSnapIndex] = useState(initialSnap);
   const [isDismissing, setIsDismissing] = useState(false);
-  const [contentHeight, setContentHeight] = useState(0);
-  const [calculatedSnapPoints, setCalculatedSnapPoints] = useState<number[]>(snapPoints.map(sp => typeof sp === 'number' ? sp : maxHeight));
   
   // Ensure we're mounted before using window or document
   useEffect(() => {
     setMounted(true);
   }, []);
-  // Measure content height when dynamic sizing is enabled
-  useEffect(() => {
-    if (!enableDynamicSizing || !contentRef.current || !open) return;    const measureContent = () => {
-      if (contentRef.current) {
-        const scrollHeight = contentRef.current.scrollHeight;
-        const headerHeight = header ? 60 : 0;
-        const handleHeight = 32;
-        const viewportHeight = window.innerHeight;
-        const maxViewportHeight = viewportHeight * 0.7; // 70vh cap
-        const totalContentHeight = Math.min(scrollHeight + headerHeight + handleHeight + 40, maxHeight, maxViewportHeight);
-        
-        setContentHeight(totalContentHeight);
-        
-        // Update snap points with content height
-        const newSnapPoints = snapPoints.map(sp => {
-          if (sp === 'content') {
-            return totalContentHeight;
-          }
-          return typeof sp === 'number' ? sp : maxHeight;
-        });
-        
-        setCalculatedSnapPoints(newSnapPoints);
-      }
-    };
-
-    // Measure immediately and after a short delay to catch dynamic content
-    measureContent();
-    const timer = setTimeout(measureContent, 100);
-    
-    // Use ResizeObserver for better content measurement if available
-    let resizeObserver: ResizeObserver | null = null;
-    if (typeof ResizeObserver !== 'undefined' && contentRef.current) {
-      resizeObserver = new ResizeObserver(() => {
-        measureContent();
-      });
-      resizeObserver.observe(contentRef.current);
-    }
-    
-    return () => {
-      clearTimeout(timer);
-      if (resizeObserver) {
-        resizeObserver.disconnect();
-      }
-    };
-  }, [open, enableDynamicSizing, children, header, maxHeight, snapPoints]);
 
   // Convert snap points to percentages for easier calculation
   const getSnapPercentage = useCallback((snapIndex: number) => {
-    const snapHeight = calculatedSnapPoints[snapIndex] || maxHeight;
+    const snapHeight = snapPoints[snapIndex] || maxHeight;
     return ((maxHeight - snapHeight) / maxHeight) * 100;
-  }, [calculatedSnapPoints, maxHeight]);
+  }, [snapPoints, maxHeight]);
 
   const [{ y, opacity }, api] = useSpring(() => ({ 
     y: 100, // Start at 100% (fully hidden below screen)
@@ -133,12 +84,13 @@ export const CustomBottomSheet: React.FC<CustomBottomSheetProps> = ({
       setIsDismissing(true);
     }
   }, [isDismissing]);
+
   // Find closest snap point
   const findClosestSnapPoint = useCallback((currentY: number) => {
     let closestIndex = 0;
     let minDistance = Math.abs(currentY - getSnapPercentage(0));
     
-    for (let i = 1; i < calculatedSnapPoints.length; i++) {
+    for (let i = 1; i < snapPoints.length; i++) {
       const distance = Math.abs(currentY - getSnapPercentage(i));
       if (distance < minDistance) {
         minDistance = distance;
@@ -147,7 +99,7 @@ export const CustomBottomSheet: React.FC<CustomBottomSheetProps> = ({
     }
     
     return closestIndex;
-  }, [calculatedSnapPoints, getSnapPercentage]);
+  }, [snapPoints, getSnapPercentage]);
 
   // Check if content can scroll
   const canContentScroll = useCallback((direction: 'up' | 'down') => {
