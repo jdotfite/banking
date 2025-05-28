@@ -10,15 +10,27 @@ import TransactionContainer from '@/components/ui/transactions/TransactionContai
 import { TransactionDateGroup, TransactionType } from '@/lib/types';
 import { BankingCreditCard, BankingTransaction } from '@/lib/types/bankingDataTypes';
 import { ChevronRight } from 'lucide-react';
+import { CustomBottomSheet } from '@/components/ui/BottomSheet';
+import { PaymentOptionsMenu, PaymentOption } from '@/components/ui/menus/PaymentOptionsMenu';
 
 // Quick Actions Component  
-const QuickActions = () => {  const actions = [
+const QuickActions = ({ onMoreClick }: { onMoreClick: () => void }) => {
+  const actions = [
     { type: 'repeat', label: 'Pay', icon: 'repeat' },
     { type: 'lock', label: 'Lock', icon: 'lock' },
     { type: 'lost', label: 'Lost', icon: 'alert' },
     { type: 'statements', label: 'Statements', icon: 'fileText' },
     { type: 'more', label: 'More', icon: 'more' }
   ];
+
+  const handleActionClick = (actionType: string) => {
+    if (actionType === 'more') {
+      onMoreClick();
+    } else {
+      console.log(`${actionType} action clicked`);
+      // Handle other actions here
+    }
+  };
 
   return (
     <div className="px-4 py-6">
@@ -27,6 +39,7 @@ const QuickActions = () => {  const actions = [
           <button
             key={action.type}
             className="flex flex-col items-center space-y-2"
+            onClick={() => handleActionClick(action.type)}
           >
             <div className="w-14 h-14 rounded-full flex items-center justify-center bg-[#212121]">
               <Icon name={action.icon} className="w-6 h-6 text-white" />
@@ -206,6 +219,7 @@ export default function CardsPage() {
   const [overrideCardIndex, setOverrideCardIndex] = useState<number | null>(null);
   const [showTransactions, setShowTransactions] = useState(false);
   const [isTransactionCollapsed, setIsTransactionCollapsed] = useState(true);
+  const [showPaymentOptions, setShowPaymentOptions] = useState(false);
   const transactionsContainerRef = useRef<HTMLDivElement>(null);
   const [buttonBottomPosition, setButtonBottomPosition] = useState(0);
   
@@ -258,11 +272,50 @@ export default function CardsPage() {
       };
     }
   }, [selectedCard]);
-
   // Handle transactions click
   const handleTransactionsClick = () => {
     setShowTransactions(true);
     setIsTransactionCollapsed(false);
+  };
+
+  // Handle more button click to open payment options
+  const handleMoreClick = () => {
+    setShowPaymentOptions(true);
+  };
+
+  // Handle payment option selection
+  const handlePaymentOptionClick = (option: PaymentOption) => {
+    console.log(`Payment option selected: ${option.title}`);
+    // Add navigation logic here based on the option
+    switch (option.id) {
+      case 'pay-balance':
+        // Navigate to payment page
+        console.log('Navigate to payment page');
+        break;
+      case 'autopay':
+        // Navigate to autopay setup
+        console.log('Navigate to autopay setup');
+        break;
+      case 'payment-history':
+        // Navigate to payment history
+        console.log('Navigate to payment history');
+        break;
+      case 'schedule-payment':
+        // Navigate to scheduled payments
+        console.log('Navigate to scheduled payments');
+        break;
+      case 'payment-methods':
+        // Navigate to payment methods
+        console.log('Navigate to payment methods');
+        break;
+      case 'payment-alerts':
+        // Navigate to payment alerts
+        console.log('Navigate to payment alerts');
+        break;
+      default:
+        break;
+    }
+    setShowPaymentOptions(false);
   };
 
   // Handle collapse change from TransactionContainer
@@ -342,7 +395,6 @@ export default function CardsPage() {
     } : null,
     transactionGroupsCount: transactionGroups.length
   });
-
   return (
     <PageTemplate>
       <div className="space-y-0">
@@ -350,7 +402,7 @@ export default function CardsPage() {
         <CreditCardStack onCardChange={handleCardChange} />
         
         {/* Quick Actions */}
-        <QuickActions />
+        <QuickActions onMoreClick={handleMoreClick} />
         
         {/* Credit Limit Display */}
         <CreditLimitDisplay selectedCard={selectedCard} />
@@ -371,7 +423,18 @@ export default function CardsPage() {
             isCollapsed={isTransactionCollapsed}
             onCollapseChange={handleCollapseChange}
           />
-        )}
+        )}        {/* Payment Options Bottom Sheet */}
+        <CustomBottomSheet
+          open={showPaymentOptions}
+          onDismiss={() => setShowPaymentOptions(false)}
+          header="Payment Options"
+          theme="dark"
+        >
+          <PaymentOptionsMenu 
+            onItemClick={handlePaymentOptionClick}
+            onClose={() => setShowPaymentOptions(false)}
+          />
+        </CustomBottomSheet>
       </div>
     </PageTemplate>
   );
