@@ -15,55 +15,44 @@ export interface PaymentOptionsMenuProps {
   onClose?: () => void;
 }
 
-export const PaymentOptionsMenu: React.FC<PaymentOptionsMenuProps> = ({ onItemClick, onClose }) => {
-  const paymentOptions: PaymentOption[] = [
-    {
-      id: 'pay-balance',
-      title: 'Pay Balance',
-      description: 'Make a payment towards your balance',
-      icon: '💳',
+export const PaymentOptionsMenu: React.FC<PaymentOptionsMenuProps> = ({ onItemClick, onClose }) => {  const paymentOptions: PaymentOption[] = [    {
+      id: 'manage-pin',
+      title: 'Manage PIN',
+      description: 'Change or reset your card PIN',
+      icon: '🔑',
       iconBg: 'bg-blue-500/20',
       iconColor: 'text-blue-400'
     },
     {
-      id: 'autopay',
-      title: 'Set up AutoPay',
-      description: 'Automatically pay your minimum balance',
-      icon: '⚡',
+      id: 'alerts-notifications',
+      title: 'Alerts & notifications',
+      description: 'Customize your card alerts and notifications',
+      icon: '🔔',
       iconBg: 'bg-green-500/20',
       iconColor: 'text-green-400'
     },
     {
-      id: 'payment-history',
-      title: 'Payment History',
-      description: 'View your recent payments',
-      icon: '📊',
+      id: 'merchant-settings',
+      title: 'Merchant settings',
+      description: 'Manage merchant preferences and restrictions',
+      icon: '🏪',
       iconBg: 'bg-purple-500/20',
       iconColor: 'text-purple-400'
     },
     {
-      id: 'schedule-payment',
-      title: 'Schedule Payment',
-      description: 'Set up a future payment',
-      icon: '🕒',
+      id: 'transaction-settings',
+      title: 'Transaction settings',
+      description: 'Configure transaction limits and preferences',
+      icon: '⚙️',
       iconBg: 'bg-orange-500/20',
       iconColor: 'text-orange-400'
-    },
-    {
-      id: 'payment-methods',
-      title: 'Payment Methods',
-      description: 'Manage your payment accounts',
-      icon: '🏦',
-      iconBg: 'bg-indigo-500/20',
-      iconColor: 'text-indigo-400'
-    },
-    {
-      id: 'payment-alerts',
-      title: 'Payment Alerts',
-      description: 'Set up payment reminders',
-      icon: '🔔',
-      iconBg: 'bg-yellow-500/20',
-      iconColor: 'text-yellow-400'
+    },    {
+      id: 'card-support',
+      title: 'Card support',
+      description: 'Get help with your card or report issues',
+      icon: '🙋',
+      iconBg: 'bg-red-500/20',
+      iconColor: 'text-red-400'
     }
   ];
 

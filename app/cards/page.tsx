@@ -282,35 +282,30 @@ export default function CardsPage() {
   const handleMoreClick = () => {
     setShowPaymentOptions(true);
   };
-
   // Handle payment option selection
   const handlePaymentOptionClick = (option: PaymentOption) => {
     console.log(`Payment option selected: ${option.title}`);
     // Add navigation logic here based on the option
     switch (option.id) {
-      case 'pay-balance':
-        // Navigate to payment page
-        console.log('Navigate to payment page');
+      case 'manage-pin':
+        // Navigate to PIN management page
+        console.log('Navigate to PIN management');
         break;
-      case 'autopay':
-        // Navigate to autopay setup
-        console.log('Navigate to autopay setup');
+      case 'alerts-notifications':
+        // Navigate to alerts and notifications settings
+        console.log('Navigate to alerts and notifications');
         break;
-      case 'payment-history':
-        // Navigate to payment history
-        console.log('Navigate to payment history');
+      case 'merchant-settings':
+        // Navigate to merchant settings
+        console.log('Navigate to merchant settings');
         break;
-      case 'schedule-payment':
-        // Navigate to scheduled payments
-        console.log('Navigate to scheduled payments');
+      case 'transaction-settings':
+        // Navigate to transaction settings
+        console.log('Navigate to transaction settings');
         break;
-      case 'payment-methods':
-        // Navigate to payment methods
-        console.log('Navigate to payment methods');
-        break;
-      case 'payment-alerts':
-        // Navigate to payment alerts
-        console.log('Navigate to payment alerts');
+      case 'card-support':
+        // Navigate to card support
+        console.log('Navigate to card support');
         break;
       default:
         break;
@@ -427,7 +422,7 @@ export default function CardsPage() {
         <CustomBottomSheet
           open={showPaymentOptions}
           onDismiss={() => setShowPaymentOptions(false)}
-          header="Payment Options"
+          header="Manage Card"
           theme="dark"
         >
           <PaymentOptionsMenu 
