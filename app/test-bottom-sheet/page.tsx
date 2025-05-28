@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import { CustomBottomSheet } from '@/components/ui/BottomSheet';
 import PageTemplate from '@/components/layout/PageTemplate';
+import { ArrowLeft } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 // Test content components with different heights
 const ShortContent = () => (
@@ -51,16 +53,28 @@ export default function TestBottomSheetPage() {
   const [showMedium, setShowMedium] = useState(false);
   const [showLong, setShowLong] = useState(false);
   const [showFixed, setShowFixed] = useState(false);
+  const router = useRouter();
 
   return (
-    <PageTemplate
-      showBackButton={true}
-      title="Bottom Sheet Tests"
-      subtitle="Test dynamic sizing and scroll behavior"
-    >
-      <div className="p-6 space-y-4">
+    <PageTemplate>
+      {/* Custom Header with Back Button */}
+      <div className="px-6 pt-8 pb-6">
+        <div className="flex items-center">
+          <button
+            onClick={() => router.back()}
+            className="p-2 rounded-full hover:bg-white/10 transition-colors"
+            aria-label="Go back"
+          >
+            <ArrowLeft size={24} className="text-white" />
+          </button>
+          <div className="ml-2">
+            <h1 className="text-xl font-medium text-white">Bottom Sheet Tests</h1>
+            <p className="text-neutral-400 text-sm">Test dynamic sizing and scroll behavior</p>
+          </div>
+        </div>
+      </div>      <div className="px-6 space-y-4">
         <div className="space-y-4">
-          <h1 className="text-2xl font-bold text-white">Bottom Sheet Test Cases</h1>
+          <h2 className="text-2xl font-bold text-white">Bottom Sheet Test Cases</h2>
           <p className="text-neutral-300">
             Test different content sizes and behavior of the dynamic bottom sheet implementation.
           </p>
