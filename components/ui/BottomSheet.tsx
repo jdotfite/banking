@@ -41,11 +41,33 @@ export const CustomBottomSheet: React.FC<CustomBottomSheetProps> = ({
         config: { tension: 300, friction: 30 }
       });
     }
-  }, [open, api, mounted]);
-  // Handle drag gestures
+  }, [open, api, mounted]);  // Handle drag gestures with content scroll detection
   const bind = useDrag(
-    ({ last, velocity: [, vy], direction: [, dy], movement: [, my], cancel }) => {
+    ({ last, velocity: [, vy], direction: [, dy], movement: [, my], cancel, event }) => {
       if (!mounted) return;
+      
+      // Check if we're dragging within the content area
+      const target = event?.target as HTMLElement;
+      const contentArea = target?.closest('.sheet-content');
+      const dragHandle = target?.closest('.drag-handle');
+      
+      // If dragging in content area and content is scrollable, check scroll position
+      if (contentArea && !dragHandle) {
+        const canScrollUp = contentArea.scrollTop > 0;
+        const canScrollDown = contentArea.scrollTop < (contentArea.scrollHeight - contentArea.clientHeight);
+        
+        // If trying to drag up but content can scroll up, don't interfere
+        if (my < 0 && canScrollUp) {
+          cancel();
+          return;
+        }
+        
+        // If trying to drag down but content can scroll down, don't interfere  
+        if (my > 0 && canScrollDown) {
+          cancel();
+          return;
+        }
+      }
       
       // If dragging down fast or dragged down more than 100px, close
       if (last && (vy > 0.5 || my > 100)) {
@@ -68,7 +90,8 @@ export const CustomBottomSheet: React.FC<CustomBottomSheetProps> = ({
     { 
       axis: 'y',
       bounds: { top: 0 },
-      rubberband: true
+      rubberband: true,
+      pointer: { touch: true }
     }
   );
 
@@ -131,9 +154,8 @@ export const CustomBottomSheet: React.FC<CustomBottomSheetProps> = ({
           transform: y.to((py) => `translateY(${py}%)`),
           willChange: 'transform'
         }}        className={`${bgClass} rounded-t-xl shadow-xl ${className}`}
-      >
-        {/* Drag Handle */}
-        <div className="flex justify-center py-2">
+      >        {/* Drag Handle */}
+        <div className="drag-handle flex justify-center py-2">
           <div className={`w-8 h-1 ${handleClass} rounded-full`} />
         </div>
         
@@ -143,9 +165,8 @@ export const CustomBottomSheet: React.FC<CustomBottomSheetProps> = ({
             <h3 className="text-lg font-medium text-center">{header}</h3>
           </div>
         )}
-        
-        {/* Content */}
-        <div className="max-h-96 overflow-y-auto">
+          {/* Content */}
+        <div className="sheet-content max-h-96 overflow-y-auto" style={{ touchAction: 'pan-y' }}>
           {children}
         </div>
       </animated.div>
