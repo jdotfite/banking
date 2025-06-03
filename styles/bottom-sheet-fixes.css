@@ -1,0 +1,32 @@
+/* Bottom Sheet Fixes for Menu Content */
+.payment-options-sheet .sheet-content {
+  /* Ensure full scrollable area */
+  padding-bottom: 120px !important;
+  /* Sets minimum height to ensure all content can be reached */
+  min-height: min(calc(100% - 80px), 60vh);
+}
+
+/* Fix for iOS bounce */
+.sheet-content {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
+  overflow-y: auto;
+}
+
+/* Make bottom sheets display flex column */
+.bottom-sheet-portal {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Additional menu scroll fix for payment options */
+.payment-options-sheet {
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh;
+}
+
+/* Ensure padding at the bottom for better UX */
+.sheet-content > div {
+  padding-bottom: 24px;
+}

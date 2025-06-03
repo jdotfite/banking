@@ -1,5 +1,6 @@
 /* Import base styles that don't change often */
 @import './base-styles.css';
+@import '../styles/bottom-sheet-fixes.css';
 
 /* Tailwind directives */
 @tailwind base;

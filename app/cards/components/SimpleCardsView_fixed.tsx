@@ -16,11 +16,9 @@ const SimpleCardsView: React.FC<SimpleCardsViewProps> = ({ selectedCardId }) => 
   const SPACING = 30;
   const DOT_AREA_HEIGHT = 60; // Height reserved for dots and spacing
   const DOT_TOP_MARGIN = 20; // Space between last card and dots
-
   // Default card type images mapping
   const cardTypeImages = {
     "Platinum Secured": "/images/cards/credit/card-plat-secured.png",
-    "Platinum Business Rewards": "/images/cards/credit/card-business-plat-rewards.png",
     "Platinum Low Rate": "/images/cards/credit/card-plat-low.png",
     "Signature Rewards": "/images/cards/credit/card-sig-rewards.png",
     "Platinum Rewards": "/images/cards/credit/card-plat-rewards.png",

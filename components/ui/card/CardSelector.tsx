@@ -23,11 +23,9 @@ const CardSelector: React.FC<CardSelectorProps> = ({ selectedCardId, onCardSelec
   const BASE_WIDTH = 767;
   const BASE_HEIGHT = 484;
   const EXTRA_DOT_OFFSET = 10;
-
   // Map card types to image paths
   const cardTypeImages: Record<string, string> = {
     "Platinum Secured": "/images/cards/credit/card-plat-secured.png",
-    "Platinum Business Rewards": "/images/cards/credit/card-business-plat-rewards.png",
     "Platinum Low Rate": "/images/cards/credit/card-plat-low.png",
     "Signature Rewards": "/images/cards/credit/card-sig-rewards.png",
     "Platinum Rewards": "/images/cards/credit/card-plat-rewards.png",

@@ -12,11 +12,9 @@ const CreditCardStack = ({ onCardChange }: CreditCardStackProps) => {
   const CARD_RADIUS = 20;
   
   const { userData } = useBankingData();
-
   // Card type configuration with colors matching CodePen
   const cardColors = {
     "Platinum Secured": "#732b7b",
-    "Platinum Business Rewards": "#98999a", 
     "Signature Rewards": "#b22326",
     "Platinum Rewards": "#24427a",
     "Platinum Low Rate": "#3086a0",
@@ -161,18 +159,16 @@ const CreditCardStack = ({ onCardChange }: CreditCardStackProps) => {
     // Hide navigation if only one card
     if (cardsData.length <= 1) {
       return null;
-    }
-
-    return (
+    }    return (
       <div className="flex justify-center items-center ">
-        <button
+        {/* <button
           onClick={navigateLeft}
           className="nav-arrow nav-arrow-left"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-6 h-6">
             <path d="M15 19L8 12l7-7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
-        </button>
+        </button> */}
 
         {/* Navigation middle section */}
         <div className="mx-4">
@@ -195,14 +191,14 @@ const CreditCardStack = ({ onCardChange }: CreditCardStackProps) => {
           )}
         </div>
 
-        <button
+        {/* <button
           onClick={navigateRight}
           className="nav-arrow nav-arrow-right"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" className="w-6 h-6">
             <path d="M9 5l7 7-7 7" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
           </svg>
-        </button>
+        </button> */}
       </div>
     );
   };
@@ -414,11 +410,10 @@ const CreditCardStack = ({ onCardChange }: CreditCardStackProps) => {
     }
 
     .nav-dot {
-      width: 1.25rem;
-      height: 1.25rem;
+      width: .85rem;
+      height: .85rem;
       border-radius: 50%;
       background: rgb(82 82 82); /* bg-neutral-600 */
-      border: 2px solid rgb(38 38 38); /* border-neutral-800 */
       transition: all 0.3s ease;
       cursor: pointer;
     }
@@ -431,7 +426,7 @@ const CreditCardStack = ({ onCardChange }: CreditCardStackProps) => {
     .nav-dot.active {
       background: #ee3831;
       border-color: rgb(220 38 38); /* border-red-600 */
-      transform: scale(1.25);
+      transform: scale(1.2);
       box-shadow: 0 0 0 3px rgba(238, 56, 49, 0.2);
     }
   `;
@@ -439,7 +434,7 @@ const CreditCardStack = ({ onCardChange }: CreditCardStackProps) => {
   return (
     <>
       <style dangerouslySetInnerHTML={{ __html: styles }} />
-      <div className="pt-14 pb-6">
+      <div className="pt-14 pb-2">
         <div className="max-w-4xl mx-auto px-4">
           {/* Container that accounts for both cards and navigation */}
           <div 

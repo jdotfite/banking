@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { animated, useSpring } from 'react-spring';
 import CreditCardStack from '@/components/ui/CreditCardStack';
 import PageTemplate from '@/components/layout/PageTemplate';
 import Icon from '@/components/ui/icons/Icon';
@@ -54,64 +55,106 @@ const QuickActions = ({ onMoreClick }: { onMoreClick: () => void }) => {
 
 // Credit Limit Display Component
 const CreditLimitDisplay = ({ selectedCard }: { selectedCard: BankingCreditCard | null }) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  // Spring animation for the collapsible details section
+  const detailsSpring = useSpring({
+    height: isExpanded ? 'auto' : 0,
+    opacity: isExpanded ? 1 : 0,
+    config: { tension: 280, friction: 25 }
+  });
+
+  // Spring animation for the chevron rotation
+  const chevronSpring = useSpring({
+    transform: isExpanded ? 'rotate(90deg)' : 'rotate(0deg)',
+    config: { tension: 280, friction: 25 }
+  });
+  
   if (!selectedCard) return null;
 
   const usagePercentage = (selectedCard.currentBalance / selectedCard.creditLimit) * 100;
 
-  return (    <div className="px-4 py-4">
-      <div className="bg-[#212121] rounded-xl p-4">        <div className="space-y-3">          <div className="flex justify-between">
+  return (
+    <div className="px-4 py-4">      <div className="bg-[#212121] rounded-xl p-4">
+        <div>
+          {/* Always visible Current Balance */}
+          <div className="flex justify-between items-center">
             <span className="text-neutral-200">Current Balance</span>
             <span className="text-white font-bold text-lg">
               ${selectedCard.currentBalance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
             </span>
-          </div>          <div className="flex justify-between text-sm border-t border-neutral-700 pt-2">
-            <span className="text-neutral-400">Available Credit</span>
-            <span className="text-neutral-300 font-medium">
-              ${selectedCard.availableCredit.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-            </span>
           </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-neutral-400">Due Date</span>
-            <span className="text-neutral-300 font-medium">
-              {new Date(selectedCard.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+          
+          {/* Simple Expand/Collapse button */}
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="w-full flex items-center justify-between py-3 text-neutral-400 border-t border-neutral-700 mt-3 pt-3"
+          >
+            <span className="text-sm font-medium">
+              {isExpanded ? 'Hide Details' : 'Show Details'}
             </span>
-          </div>
-          <div className="flex justify-between text-sm">
-            <span className="text-neutral-400">Minimum Payment</span>
-            <span className="text-neutral-300 font-medium">
-              ${selectedCard.minimumPayment.toFixed(2)}
-            </span>
-          </div>          <div className="flex justify-between text-sm border-t border-neutral-700 pt-2">
-            <span className="text-neutral-400">Credit Limit</span>
-            <span className="text-neutral-300 font-medium">
-              ${selectedCard.creditLimit.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-            </span>
-          </div>
-            {/* Usage Bar */}
-          <div className="mt-3">
-            <div className="flex justify-between text-xs mb-1">
-              <span className="text-neutral-400">Usage</span>
-              <span className="text-neutral-400">{usagePercentage.toFixed(1)}%</span>
-            </div>
-            <div className="w-full bg-neutral-700 rounded-full h-2">
-              <div 
-                className={`h-2 rounded-full ${
-                  usagePercentage > 80 ? 'bg-red-500' : 
-                  usagePercentage > 60 ? 'bg-yellow-500' : 
-                  'bg-green-500'
-                }`}
-                style={{ width: `${usagePercentage}%` }}
-              />
-            </div>
-          </div>          {selectedCard.rewardsType !== 'none' && selectedCard.rewardsBalance && selectedCard.rewardsBalance > 0 && (
-            <div className="flex justify-between text-sm border-t border-neutral-700 pt-2">
-              <span className="text-neutral-400">Rewards Balance</span>
-              <span className="text-yellow-400 font-medium">
-                {selectedCard.rewardsType === 'cashback' ? '$' : ''}
-                {selectedCard.rewardsBalance.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-                {selectedCard.rewardsType === 'points' ? ' pts' : ''}
-              </span>
-            </div>
+            <animated.div style={chevronSpring}>
+              <ChevronRight className="w-4 h-4" />
+            </animated.div>
+          </button>          {/* Collapsible details with React Spring animation */}
+          {isExpanded && (
+            <animated.div 
+              style={{
+                opacity: detailsSpring.opacity,
+              }}
+              className="space-y-4"
+            >
+              {/* Credit Information Group */}
+              <div className="space-y-3 border-t border-neutral-700 pt-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-neutral-400">Available Credit</span>
+                  <span className="text-neutral-300 font-medium">
+                    ${selectedCard.availableCredit.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                  </span>
+                </div>
+                
+                <div className="flex justify-between text-sm">
+                  <span className="text-neutral-400">Credit Limit</span>
+                  <span className="text-neutral-300 font-medium">
+                    ${selectedCard.creditLimit.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
+                  </span>
+                </div>
+                
+                {/* Usage Bar */}
+                <div>
+                  <div className="flex justify-between text-xs mb-1">
+                    <span className="text-neutral-400">Credit Usage</span>
+                    <span className="text-neutral-400">{usagePercentage.toFixed(1)}%</span>
+                  </div>
+                  <div className="w-full bg-neutral-700 rounded-full h-2">
+                    <div 
+                      className={`h-2 rounded-full ${
+                        usagePercentage > 80 ? 'bg-red-500' : 
+                        usagePercentage > 60 ? 'bg-yellow-500' : 
+                        'bg-green-500'
+                      }`}
+                      style={{ width: `${usagePercentage}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              {/* Payment Information Group */}
+              <div className="space-y-3 border-t border-neutral-700 pt-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-neutral-400">Due Date</span>
+                  <span className="text-neutral-300 font-medium">
+                    {new Date(selectedCard.dueDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  </span>
+                </div>
+                
+                <div className="flex justify-between text-sm">
+                  <span className="text-neutral-400">Minimum Payment</span>
+                  <span className="text-neutral-300 font-medium">
+                    ${selectedCard.minimumPayment.toFixed(2)}
+                  </span>
+                </div>
+              </div>
+            </animated.div>
           )}
         </div>
       </div>
@@ -416,16 +459,16 @@ export default function CardsPage() {
             isCollapsed={isTransactionCollapsed}
             onCollapseChange={handleCollapseChange}
           />
-        )}        {/* Payment Options Bottom Sheet */}
-        <CustomBottomSheet
+        )}        {/* Payment Options Bottom Sheet */}        <CustomBottomSheet
           open={showPaymentOptions}
           onDismiss={() => setShowPaymentOptions(false)}
           theme="dark"
-          maxHeight={800}
-          snapPoints={['content', 600]}
+          maxHeight={700}  // Slightly reduced to ensure it fits on more screens
+          snapPoints={['content', 500]} // Adjusted snap points
           initialSnap={0}
           enableDynamicSizing={true}
           onSnap={(index) => console.log('Snapped to index:', index)}
+          className="payment-options-sheet"
         >
           <PaymentOptionsMenu 
             onItemClick={handlePaymentOptionClick}

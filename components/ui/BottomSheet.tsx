@@ -42,8 +42,7 @@ export const CustomBottomSheet: React.FC<CustomBottomSheetProps> = ({
   // Ensure we're mounted before using window or document
   useEffect(() => {
     setMounted(true);
-  }, []);
-  // Measure content height when dynamic sizing is enabled
+  }, []);  // Measure content height when dynamic sizing is enabled
   useEffect(() => {
     if (!enableDynamicSizing || !contentRef.current || !open) return;    const measureContent = () => {
       if (contentRef.current) {
@@ -51,8 +50,14 @@ export const CustomBottomSheet: React.FC<CustomBottomSheetProps> = ({
         const headerHeight = header ? 60 : 0;
         const handleHeight = 32;
         const viewportHeight = window.innerHeight;
-        const maxViewportHeight = viewportHeight * 0.7; // 70vh cap
-        const totalContentHeight = Math.min(scrollHeight + headerHeight + handleHeight + 40, maxHeight, maxViewportHeight);
+        const maxViewportHeight = viewportHeight * 0.8; // 80vh cap to show more content
+        const minViewportHeight = viewportHeight * 0.5; // At least 50vh to ensure enough space
+        
+        // Ensure enough height for menus with many items while respecting max height
+        const totalContentHeight = Math.max(
+          minViewportHeight,
+          Math.min(scrollHeight + headerHeight + handleHeight + 60, maxHeight, maxViewportHeight)
+        );
         
         setContentHeight(totalContentHeight);
         
@@ -314,8 +319,7 @@ export const CustomBottomSheet: React.FC<CustomBottomSheetProps> = ({
           touchAction: 'none'
         }}
       />
-        
-      {/* Bottom Sheet */}
+          {/* Bottom Sheet */}
       <animated.div
         ref={sheetRef}
         {...bind()}
@@ -329,6 +333,8 @@ export const CustomBottomSheet: React.FC<CustomBottomSheetProps> = ({
           transform: y.to((py) => `translateY(${py}%)`),
           willChange: 'transform',
           maxHeight: `${maxHeight}px`,
+          display: 'flex',
+          flexDirection: 'column',
           borderTopLeftRadius: '16px',
           borderTopRightRadius: '16px',
           backgroundColor: isDark ? '#212121' : '#ffffff',
@@ -347,16 +353,18 @@ export const CustomBottomSheet: React.FC<CustomBottomSheetProps> = ({
           <div className={`px-4 py-3 border-b ${headerClass}`}>
             <h3 className="text-lg font-medium text-center">{header}</h3>
           </div>
-        )}
-          
-        {/* Content */}
+        )}        {/* Content */}
         <div 
           ref={contentRef}
           className="sheet-content overflow-y-auto" 
           style={{ 
             touchAction: 'pan-y',
-            maxHeight: header ? `${maxHeight - 120}px` : `${maxHeight - 80}px`,
-            WebkitOverflowScrolling: 'touch'
+            maxHeight: header ? `calc(${maxHeight}px - 120px)` : `calc(${maxHeight}px - 80px)`,
+            minHeight: '60vh', // Ensure enough room for all menu items
+            WebkitOverflowScrolling: 'touch',
+            overscrollBehavior: 'contain',
+            position: 'relative', // Enables proper height calculation
+            paddingBottom: '24px' // Extra padding at bottom to ensure visibility
           }}
         >
           {children}
