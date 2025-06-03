@@ -9,6 +9,7 @@ import LoadingSpinner from '@/components/ui/common/LoadingSpinner';
 import Icon from '@/components/ui/icons/Icon';
 import TransactionContainer from '@/components/ui/transactions/TransactionContainer';
 import PromotionalSlider from './PromotionalSlider';
+import ToDo from './ToDo';
 import { BankingAccount, TransactionDateGroup } from '@/lib/types';
 import { ChevronRight } from 'lucide-react';
 
@@ -141,21 +142,14 @@ const Home: React.FC = () => {
       balance: card.currentBalance,
       accountNumber: card.cardNumber,
       color: card.color || '#7b2528'
-    }))
-  ];
-  // Quick actions
-  const quickActions = [
-    { name: 'Send', icon: 'transfer', color: '#3b82f6' },
-    { name: 'Pay', icon: 'repeat', color: '#ef4444' },
-    { name: 'Deposit', icon: 'deposit', color: '#10b981' },
-    { name: 'Withdraw', icon: 'withdraw', color: '#f59e0b' },
-    { name: 'Invest', icon: 'insights', color: '#8b5cf6' }
-  ];return (
+    }))  ];
+
+  return (
     <>      {/* Header */}
       <Header userName={userName} />      
       
-      {/* Promotional Banners */}
-      <PromotionalSlider style={promotionsSpring} />
+      {/* ToDo Component - New position */}
+      <ToDo style={promotionsSpring} />
       
       {/* Accounts List */}
         <animated.div style={cardsSpring} className="mb-6">
@@ -168,17 +162,7 @@ const Home: React.FC = () => {
               >
                 <div 
                   className="bg-[#212121] rounded-lg p-4 flex items-center justify-between"
-                >
-                  <div className="flex items-center">
-                    <div 
-                      className="w-10 h-10 rounded-full flex items-center justify-center mr-3"
-                      style={{ backgroundColor: account.color }}
-                    >
-                      <Icon 
-                        name={account.type === 'credit' ? 'cards' : account.type}
-                        className="w-5 h-5 text-white" 
-                      />
-                    </div>
+                >                  <div className="flex items-center">
                     <div>
                       <div className="font-medium tracking-tight text-white">{account.name}</div>
                       <div className="text-neutral-400 text-xs">
@@ -197,28 +181,10 @@ const Home: React.FC = () => {
                 </div>
               </Link>
             ))}
-          </div>
-        </animated.div>        
-        {/* Quick Actions */}
-        <animated.div style={actionsSpring} className="mb-6">
-          <div className="overflow-x-auto scrollbar-hide">
-            <div className="flex justify-between w-full pb-2">
-              {quickActions.map((action, index) => (
-                <div 
-                  key={index}
-                  className="flex-shrink-0 flex flex-col items-center"
-                >
-                  <div 
-                    className="w-14 h-14 rounded-full flex items-center justify-center mb-2 bg-[#212121]"
-                  >
-                    <Icon name={action.icon} className="w-6 h-6 text-white" />
-                  </div>
-                  <span className="text-xs text-white">{action.name}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-        </animated.div>
+          </div>        </animated.div>        
+        
+        {/* Promotional Banners - Moved from top */}
+        <PromotionalSlider style={promotionsSpring} />
         
         {/* Recent Transactions */}
         <animated.div style={transactionsSpring} className="mb-4" ref={transactionsContainerRef}>

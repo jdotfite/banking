@@ -91,6 +91,18 @@ export type TransactionDateGroup = {
   transactions: BankingTransaction[];
 };
 
+export type TodoItem = {
+  id: string;
+  title: string;
+  completed: boolean;
+};
+
+export type TodoData = {
+  completedCount: number;
+  totalCount: number;
+  items: TodoItem[];
+};
+
 export type BankingData = {
   users: BankingUser[];
   accounts: BankingAccount[];
@@ -110,4 +122,5 @@ export type FilteredUserData = {
   transactions: Record<string, BankingTransaction[]>;
   groupedTransactions: TransactionDateGroup[];
   categoryTotals?: Record<string, number>;
+  todoItems?: TodoData;
 };

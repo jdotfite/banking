@@ -29,23 +29,32 @@ const Header: React.FC<HeaderProps> = ({ userName }) => {
     config: { tension: 400, friction: 20 },
   });
   return (
-    <animated.div style={headerSpring} className="pt-8 pb-6 mx-auto max-w-md">
-      <div className="flex justify-between items-center">
+    <animated.div style={headerSpring} className="pt-8 pb-6 mx-auto max-w-md">      <div className="flex justify-between items-center">
         <div className="flex items-center">
-          <div className="w-10 h-10 rounded-full mr-3 overflow-hidden border border-neutral-700">
+          <div className="w-10 h-10 rounded-lg mr-3 overflow-hidden">
             <img 
               src={userAvatar} 
               alt="Profile" 
               className="w-full h-full object-cover"
             />
+          </div>          <div>
+            <div className="text-sm text-neutral-500 leading-none">Welcome Back,</div>
+            <div className="text-xl font-medium tracking-tight leading-tight">{userName}</div>
           </div>
-          <div className="text-xl font-medium tracking-tight">Welcome, {userName}!</div>
         </div>
-        <button className="relative p-1">
-          <Bell className="w-6 h-6" />
-          <animated.span 
-            style={notificationSpring}
-            className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"
+        <button className="relative">
+          <div className="w-10 h-10 rounded-full border border-neutral-800 flex items-center justify-center">
+            <Bell className="w-5 h-5" />
+          </div>          <animated.span 
+            style={{
+              ...notificationSpring,
+              position: 'absolute',
+              right: '12px',
+              top: '8px',
+              width: '0.5rem',
+              height: '0.5rem'
+            }}
+            className="bg-red-500 rounded-full"
           ></animated.span>
         </button>
       </div>

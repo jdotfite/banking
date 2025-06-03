@@ -32,7 +32,6 @@ const QuickActions = ({ onMoreClick }: { onMoreClick: () => void }) => {
       // Handle other actions here
     }
   };
-
   return (
     <div className="px-4 py-6">
       <div className="flex justify-around">
@@ -42,7 +41,7 @@ const QuickActions = ({ onMoreClick }: { onMoreClick: () => void }) => {
             className="flex flex-col items-center space-y-2"
             onClick={() => handleActionClick(action.type)}
           >
-            <div className="w-14 h-14 rounded-full flex items-center justify-center bg-[#212121]">
+            <div className="w-14 h-14 rounded-2xl flex items-center justify-center bg-[#212121]">
               <Icon name={action.icon} className="w-6 h-6 text-white" />
             </div>
             <span className="text-xs text-white">{action.label}</span>
